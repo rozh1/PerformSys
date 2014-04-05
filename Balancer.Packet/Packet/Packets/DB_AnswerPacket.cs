@@ -1,15 +1,15 @@
 ﻿using System.Data;
 
-namespace Balancer.Packet.Packets
+namespace Balancer.Common.Packet.Packets
 {
     public class DbAnswerPacket : IPacket
     {
         private string _answerString;
 
-        public DbAnswerPacket(string answer)
+        public DbAnswerPacket(string answerPacketData)
         {
-            _answerString = answer;
-            AnswerDataTable = (DataTable)SerializeMapper.Deserialize(answer);
+            _answerString = answerPacketData;
+            AnswerDataTable = (DataTable)SerializeMapper.Deserialize(answerPacketData);
         }
 
         public DbAnswerPacket(DataTable answer)

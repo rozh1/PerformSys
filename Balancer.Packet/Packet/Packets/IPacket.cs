@@ -1,4 +1,4 @@
-﻿namespace Balancer.Packet.Packets
+﻿namespace Balancer.Common.Packet.Packets
 {
     internal interface IPacket
     {

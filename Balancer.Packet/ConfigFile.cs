@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
-using server.Properties;
 
-namespace server
+namespace Balancer.Common
 {
     public class ConfigFile
     {
@@ -30,12 +29,6 @@ namespace server
             string conf = "";
             try
             {
-                //поиск конфига
-                if (!File.Exists(_configFilePath))
-                {
-                    SaveSettings(Resources.defaultConfig);
-                }
-
                 var fsread = new FileStream(_configFilePath, FileMode.Open, FileAccess.Read);
                 if (fsread.Length < 1)
                 {

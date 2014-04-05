@@ -5,8 +5,9 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using Balancer.Packet;
-using Balancer.Packet.Packets;
+using Balancer.Common;
+using Balancer.Common.Packet;
+using Balancer.Common.Packet.Packets;
 using server.DataBase;
 
 namespace server
@@ -17,14 +18,19 @@ namespace server
 
         private readonly TcpClient _tcpClient;
 
+        private bool serverIsLife;
+
         public Server(int port)
         {
             _listener = new TcpListener(IPAddress.Any, port);
 
             _listener.Start();
 
+            serverIsLife = true;
+
             Logger.Write("Начато прослушивание " + IPAddress.Any + ":" + port);
-            while (true)
+
+            while (serverIsLife)
             {
                 _tcpClient = _listener.AcceptTcpClient();
 
@@ -49,21 +55,21 @@ namespace server
 
                     string packetData = "";
                     var buffer = new byte[1400];
-                    int count;
 
                     try
                     {
+                        int count;
                         while ((count = _tcpClient.GetStream().Read(buffer, 0, buffer.Length)) > 0)
 
                         {
                             packetData += Encoding.ASCII.GetString(buffer, 0, count);
-                            if (packetData.IndexOf("\n\r", System.StringComparison.Ordinal) >= 0) break;
+                            if (packetData.IndexOf("\n\r", StringComparison.Ordinal) >= 0) break;
                         }
                         ThreadPool.QueueUserWorkItem(MySqlWorker, packetData);
                     }
                     catch (Exception ex)
                     {
-                        Logger.Write("Исключение при чтении запроса");
+                        Logger.Write("Исключение при чтении запроса: "+ ex.Message);
                     }
                 }
             }
@@ -82,16 +88,27 @@ namespace server
                 Logger.Write("Запрос начал выполнение");
                 var sw = new Stopwatch();
                 sw.Start();
-                dt = DB.CustomQuery(packet.Data);
+                try
+                {
+                    dt = DB.CustomQuery(packet.Data);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Write(ex.Message);
+                }
                 sw.Stop();
                 Logger.Write("Запрос выполнен за " + sw.ElapsedMilliseconds + " мс");
             }
             if (dt != null)
             {
                 Logger.Write("Отправка результата клиенту");
-                DbAnswerPacket dbAnswerPacket = new DbAnswerPacket(dt);
-                Byte[] answerPacket = dbAnswerPacket.GetPacket().ToBytes();
-                _tcpClient.GetStream().Write(answerPacket, 0, answerPacket.Length);
+                var dbAnswerPacket = new DbAnswerPacket(dt);
+                Packet answerPacket = dbAnswerPacket.GetPacket();
+                answerPacket.Type = PacketType.Answer;
+                answerPacket.ClientId = packet.ClientId;
+                answerPacket.Id = packet.Id;
+                Byte[] answerPacketBytes = answerPacket.ToBytes();
+                _tcpClient.GetStream().Write(answerPacketBytes, 0, answerPacketBytes.Length);
             }
         }
 
@@ -100,6 +117,7 @@ namespace server
         /// </summary>
         ~Server()
         {
+            serverIsLife = false;
             if (_listener != null)
             {
                 _listener.Stop();

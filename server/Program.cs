@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
+using Balancer.Common;
 
 namespace server
 {
@@ -8,6 +10,10 @@ namespace server
         private static void Main(string[] args)
         {
             Logger.Write("Сервер запущен");
+
+            string configFilePath = "server.log";
+            ConfigFile.SetConfigPath(configFilePath);
+            if (!File.Exists(configFilePath)) ConfigFile.SaveSettings(Properties.Resources.defaultConfig);
             ConfigFile.LoadSettings();
 
             int maxThreadsCount = Environment.ProcessorCount*2;

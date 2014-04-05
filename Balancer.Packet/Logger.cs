@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading;
 
-namespace server
+namespace Balancer.Common
 {
     /// <summary>
     ///     Класс логгера
@@ -30,6 +30,7 @@ namespace server
                     @"
 ");
             }
+            Console.WriteLine(message);
             Mut.ReleaseMutex();
         }
 

@@ -1,4 +1,4 @@
-﻿namespace Balancer.Packet.Packets
+﻿namespace Balancer.Common.Packet.Packets
 {
     public class StatusPacket : IPacket
     {
@@ -9,7 +9,13 @@
             _status = status;
         }
 
-        private bool Status
+        public StatusPacket(string packetData)
+        {
+
+            _status = packetData[0]=='1';
+        }
+
+        public bool Status
         {
             get { return _status; }
             set { _status = value; }
