@@ -83,8 +83,7 @@ namespace rbn
 
                             RbnQueue.AddClient(client);
 
-                            ServersHandler.Server server = Servers.GetNextReadyServer();
-                            Servers.SendRequest(server,client.Query,1);
+                            RbnQueue.SendRequestToServer();
                         }
                     }
                     catch (Exception ex)

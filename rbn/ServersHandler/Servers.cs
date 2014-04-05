@@ -116,6 +116,7 @@ namespace rbn.ServersHandler
                         case PacketType.Status:
                             var sp = new StatusPacket(packet.Data);
                             server.Status = sp.Status;
+                            RbnQueue.SendRequestToServer();
                             break;
                         case PacketType.Answer:
                             RbnQueue.ServerAnswer(int.Parse(packet.ClientId),packet.Data);

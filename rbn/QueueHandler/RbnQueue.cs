@@ -17,59 +17,85 @@
  */
 #endregion
 
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
+using Balancer.Common;
 using Balancer.Common.Packet;
+using rbn.ServersHandler;
 
 namespace rbn.QueueHandler
 {
     static class RbnQueue
     {
-        private static List<Client> clients  = new List<Client>();
+        /// <summary>
+        /// Список клиентов (очередь выполнения)
+        /// </summary>
+        private static readonly List<Client> Clients  = new List<Client>();
 
-        //static public void Init()
-        //{
-        //    clients
-        //}
+        private static int id = 1;
 
+        /// <summary>
+        /// Добавление клиента в конец
+        /// </summary>
+        /// <param name="client">клиент</param>
         static public void AddClient(Client client)
         {
-            if (clients.Contains(client))
+            if (Clients.Contains(client))
             {
-                Client tmpClient = clients[clients.IndexOf(client)];
+                Client tmpClient = Clients[Clients.IndexOf(client)];
                 tmpClient.Query = client.Query;
                 tmpClient.AnswerPacketData = "";
             }
             else
             {
-                clients.Add(client);
+                client.Id = id++;
+                Clients.Add(client);
             }
         }
 
+        /// <summary>
+        /// Удаление клиента
+        /// </summary>
+        /// <param name="client">клиент</param>
         public static void RemoveClient(Client client)
         {
-            if (clients.Contains(client))
+            if (Clients.Contains(client))
             {
-                clients.Remove(client);
+                Clients.Remove(client);
             }
         }
 
-        public static Client GetClientByTcpConnection(TcpClient tcpClient)
-        {
-            int count = clients.Count;
-            for (int i = 0; i < count; i++)
-            {
-                if (clients[i].Connection == tcpClient) return clients[i];
-            }
-            return null;
-        }
-
+        /// <summary>
+        /// Ответ сервера
+        /// </summary>
+        /// <param name="clientId">номер клиента</param>
+        /// <param name="answer">пакет ответа</param>
         public static void ServerAnswer(int clientId, string answer)
         {
-            SendAnswer(clients[clientId-1], answer);
+            try
+            {
+                int count = Clients.Count;
+                for (int i = 0; i < count; i++)
+                {
+                    if (Clients[i].Id == clientId)
+                    {
+                        SendAnswer(Clients[i], answer);
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Write("Исключение при передаче ответа клиенту" + ex.Message);
+            }
         }
 
+        /// <summary>
+        /// отправка ответа клиенту
+        /// </summary>
+        /// <param name="client">клиент</param>
+        /// <param name="answer">пакет ответа</param>
         static void SendAnswer(Client client, string answer)
         {
             var packet = new Packet(PacketType.Answer,answer);
@@ -77,6 +103,35 @@ namespace rbn.QueueHandler
             client.AnswerPacketData = answer;
             if (client.Connection.Connected)
                 client.Connection.GetStream().Write(bytes, 0, bytes.Length);
+        }
+
+        /// <summary>
+        /// Выбор клиента и отправка его запроса на сервер
+        /// </summary>
+        static public void SendRequestToServer()
+        {
+            int count = Clients.Count;
+            for (int i = 0; i < count; i++)
+            {
+                if (!Clients[i].QuerySended) 
+                    if(!SendRequest(Clients[i])) break;
+            }
+        }
+
+        /// <summary>
+        /// Отправка запроса серверу
+        /// </summary>
+        /// <param name="client">клиент</param>
+        static bool SendRequest(Client client)
+        {
+            ServersHandler.Server server = Servers.GetNextReadyServer();
+            if (server != null)
+            {
+                Servers.SendRequest(server, client.Query, client.Id);
+                client.QuerySended = true;
+            }
+            else return false;
+            return true;
         }
     }
 }

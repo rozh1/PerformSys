@@ -65,7 +65,7 @@ namespace rbn.Properties {
         ///Global_id=1;
         ///RBN_Port=3409;
         ///Server_count=1;
-        ///Server_1=127.0.0.1:3409;.
+        ///Server_1=127.0.0.1:3410;.
         /// </summary>
         internal static string defaultConfig {
             get {
