@@ -7,11 +7,11 @@ namespace server
 {
     internal class Program
     {
-        private static void Main(string[] args)
+        private static void Main()
         {
             Logger.Write("Сервер запущен");
 
-            string configFilePath = "server.log";
+            string configFilePath = "server.cfg";
             ConfigFile.SetConfigPath(configFilePath);
             if (!File.Exists(configFilePath)) ConfigFile.SaveSettings(Properties.Resources.defaultConfig);
             ConfigFile.LoadSettings();

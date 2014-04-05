@@ -40,7 +40,8 @@ namespace server
                 {
                     int workerThreads, completionPortThreads;
                     ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
-                    var sp = new StatusPacket((workerThreads <= Environment.ProcessorCount*2));
+                    bool status = (workerThreads <= Environment.ProcessorCount*2);
+                    var sp = new StatusPacket(status);
                     Byte[] statusPacket = sp.GetPacket().ToBytes();
                     try
                     {
@@ -51,7 +52,7 @@ namespace server
                     {
                         Logger.Write("Исключение при отсылке статуса: " + ex.Message);
                     }
-                    Logger.Write("Отослан статус");
+                    Logger.Write("Отослан статус " + status.ToString());
 
                     string packetData = "";
                     var buffer = new byte[1400];
