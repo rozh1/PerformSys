@@ -17,26 +17,13 @@
  */
 #endregion
 
-﻿namespace Balancer.Packet.Packets
+﻿using System.Net.Sockets;
+
+namespace rbn.ServersHandler
 {
-    public class DbRequestPacket : IPacket
+    class Server
     {
-        private string _query;
-
-        public DbRequestPacket(string query)
-        {
-            _query = query;
-        }
-
-        private string Query
-        {
-            get { return _query; }
-            set { _query = value; }
-        }
-
-        public Packet GetPacket()
-        {
-            return new Packet(PacketType.Request, _query);
-        }
+        public TcpClient Connection { get; set; }
+        public bool Status { get; set; }
     }
 }

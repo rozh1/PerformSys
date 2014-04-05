@@ -24,8 +24,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
-using Balancer.Packet;
-using Balancer.Packet.Packets;
+using Balancer.Common.Packet;
+using Balancer.Common.Packet.Packets;
 
 
 namespace client
@@ -40,8 +40,6 @@ namespace client
             tcpClient.Connect(args[0], int.Parse(args[1]));
             if (tcpClient.Connected)
             {
-                byte[] buf = new byte[100];
-                tcpClient.GetStream().Read(buf, 0, buf.Length);
                 string query = Console.ReadLine();
                 DbRequestPacket dbRequestPacket = new DbRequestPacket(query);
                 Byte[] requestPacket = dbRequestPacket.GetPacket().ToBytes();

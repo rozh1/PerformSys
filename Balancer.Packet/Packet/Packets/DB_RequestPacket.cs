@@ -17,29 +17,26 @@
  */
 #endregion
 
-﻿using System;
-using System.IO;
-using Balancer.Common;
-using rbn.ServersHandler;
-
-namespace rbn
+﻿namespace Balancer.Common.Packet.Packets
 {
-    internal class Program
+    public class DbRequestPacket : IPacket
     {
-        private static void Main()
+        private string _query;
+
+        public DbRequestPacket(string query)
         {
-            Logger.Write("Сервер запущен");
+            _query = query;
+        }
 
-            string configFilePath = Environment.CurrentDirectory + "\\rbn.cfg";
-            ConfigFile.SetConfigPath(configFilePath);
-            if (!File.Exists(configFilePath)) ConfigFile.SaveSettings(Properties.Resources.defaultConfig);
-            ConfigFile.LoadSettings();
+        private string Query
+        {
+            get { return _query; }
+            set { _query = value; }
+        }
 
-            Settings.Init();
-
-            Servers.Init();
-
-            new Server(int.Parse(ConfigFile.GetConfigValue("RBN_Port")));
+        public Packet GetPacket()
+        {
+            return new Packet(PacketType.Request, _query);
         }
     }
 }

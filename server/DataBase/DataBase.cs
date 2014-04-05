@@ -20,6 +20,7 @@
 ﻿using System;
 using System.Data;
 using System.Globalization;
+using Balancer.Common;
 
 namespace server.DataBase
 {

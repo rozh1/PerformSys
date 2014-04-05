@@ -44,9 +44,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Balancer.Packet\Balancer.Packet.csproj">
+    <ProjectReference Include="..\Balancer.Packet\Balancer.Common.csproj">
       <Project>{1f3c64f3-bf67-4593-8f40-f245cb445af4}</Project>
-      <Name>Balancer.Packet</Name>
+      <Name>Balancer.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
