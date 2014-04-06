@@ -48,6 +48,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="QueueHandler\Client.cs" />
+    <Compile Include="QueueHandler\QueueEntity.cs" />
     <Compile Include="QueueHandler\RbnQueue.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="ServersHandler\Server.cs" />
