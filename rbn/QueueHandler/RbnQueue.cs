@@ -14,7 +14,9 @@ namespace rbn.QueueHandler
         /// </summary>
         private static readonly List<Client> Clients  = new List<Client>();
 
-        private static int id = 1;
+        static Queue<QueueEntity> _queue = new Queue<QueueEntity>(); 
+
+        private static int _id = 1;
 
         /// <summary>
         /// Добавление клиента в конец
@@ -27,11 +29,13 @@ namespace rbn.QueueHandler
                 Client tmpClient = Clients[Clients.IndexOf(client)];
                 tmpClient.Query = client.Query;
                 tmpClient.AnswerPacketData = "";
+                _queue.Enqueue(new QueueEntity() { ClientId = tmpClient.Id, Query = tmpClient.Query });
             }
             else
             {
-                client.Id = id++;
+                client.Id = _id++;
                 Clients.Add(client);
+                _queue.Enqueue(new QueueEntity() { ClientId = client.Id, Query = client.Query });
             }
         }
 
@@ -91,28 +95,41 @@ namespace rbn.QueueHandler
         /// </summary>
         static public void SendRequestToServer()
         {
-            int count = Clients.Count;
-            for (int i = 0; i < count; i++)
+
+            if (_queue.Count > 0)
             {
-                if (!Clients[i].QuerySended) 
-                    if(!SendRequest(Clients[i])) break;
+                QueueEntity qe = _queue.Dequeue();
+                SendRequest(qe);
             }
         }
 
         /// <summary>
         /// Отправка запроса серверу
         /// </summary>
-        /// <param name="client">клиент</param>
-        static bool SendRequest(Client client)
+        static bool SendRequest(QueueEntity queueEntity)
         {
             ServersHandler.Server server = Servers.GetNextReadyServer();
             if (server != null)
             {
-                Servers.SendRequest(server, client.Query, client.Id);
+                Servers.SendRequest(server, queueEntity.Query, queueEntity.ClientId);
+                Client client = GetClientById(queueEntity.ClientId);
                 client.QuerySended = true;
             }
             else return false;
             return true;
+        }
+
+        static Client GetClientById(int Id)
+        {
+            int count = Clients.Count;
+            for (int i = 0; i < count; i++)
+            {
+                if (Clients[i].Id == Id)
+                {
+                    return Clients[i];
+                }
+            }
+            return null;
         }
     }
 }
