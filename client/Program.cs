@@ -18,9 +18,11 @@ namespace client
             int.TryParse(args[0], out count);
             int.TryParse(args[2], out port);
 
+            Random random = new Random();
+
             Client[] clients = new Client[count];
 
-            for (int i=0; i<count; i++) clients[i] = new Client(args[1],port, i);
+            for (int i = 0; i < count; i++) clients[i] = new Client(args[1], port, i, random.Next(1,5));
         }
     }
 }
