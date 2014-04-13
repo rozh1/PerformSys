@@ -95,7 +95,7 @@ namespace rbn.ServersHandler
         {
             var server = (Server) param;
             TcpClient connection = server.Connection;
-
+            string nextPacketData = "";
             while (connection.Connected)
             {
                 string packetData = "";
@@ -106,8 +106,19 @@ namespace rbn.ServersHandler
                     int count;
                     while ((count = connection.GetStream().Read(buffer, 0, buffer.Length)) > 0)
                     {
-                        packetData += Encoding.ASCII.GetString(buffer, 0, count);
-                        if (packetData.IndexOf("\n\r", StringComparison.Ordinal) >= 0) break;
+                        packetData += nextPacketData + Encoding.ASCII.GetString(buffer, 0, count);
+                        if (packetData.Contains(Packet.PacketEnd))
+                        {
+                            int index = packetData.IndexOf(Packet.PacketEnd, StringComparison.Ordinal);
+                            nextPacketData =
+                                packetData.Substring(
+                                    index +
+                                    Packet.PacketEnd.Length);
+                            packetData =
+                                packetData.Remove(index);
+                            break;
+                        }
+                        nextPacketData = "";
                     }
                     var packet = new Packet(packetData);
 
@@ -125,7 +136,7 @@ namespace rbn.ServersHandler
                 }
                 catch (Exception ex)
                 {
-                    Logger.Write("Исключение при чтении запроса: " + ex.Message);
+                    Logger.Write("Исключение при чтении ответа: " + ex.Message);
                 }
             }
         }

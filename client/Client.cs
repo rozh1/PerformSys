@@ -18,10 +18,8 @@
 #endregion
 
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -34,26 +32,71 @@ namespace client
     {
         private string _address;
         private int _port;
-        public ClientStatsData clientStatsData;
+        private int _number;
+        public ClientStatsData ClientStatsData;
 
-        public Client(string address, int port)
+        public Client(string address, int port, int number)
         {
             _address = address;
             _port = port;
-            Thread t = new Thread(new ThreadStart(ClientThread));
+            _number = number;
+            Thread t = new Thread(ClientThread);
             t.Start();
         }
 
         void ClientThread()
         {
-            clientStatsData = new ClientStatsData();
+            ClientStatsData = new ClientStatsData();
             var sw = new Stopwatch();
 
             var tcpClient = new TcpClient();
             tcpClient.Connect(_address, _port);
             if (tcpClient.Connected)
             {
-                string query = "select * from IP;";
+                const string query = 
+@"SELECT
+        S_ACCTBAL,
+        S_NAME,
+        N_NAME,
+        P_PARTKEY,
+        P_MFGR,
+        S_ADDRESS,
+        S_PHONE,
+        S_COMMENT
+FROM
+        PART,
+        SUPPLIER,
+        PARTSUPP,
+        NATION,
+        REGION
+WHERE
+        P_PARTKEY = PS_PARTKEY
+        AND S_SUPPKEY = PS_SUPPKEY
+        AND P_SIZE = 29
+        AND P_TYPE LIKE '%BRASS'
+        AND S_NATIONKEY = N_NATIONKEY
+        AND N_REGIONKEY = R_REGIONKEY
+        AND R_NAME = 'MIDDLE EAST'
+        AND PS_SUPPLYCOST = (
+                SELECT
+                        MIN(PS_SUPPLYCOST)
+                FROM
+                        PARTSUPP,
+                        SUPPLIER,
+                        NATION,
+                        REGION
+                WHERE
+                        P_PARTKEY = PS_PARTKEY
+                        AND S_SUPPKEY = PS_SUPPKEY
+                        AND S_NATIONKEY = N_NATIONKEY
+                        AND N_REGIONKEY = R_REGIONKEY
+                        AND R_NAME = 'MIDDLE EAST'
+        )
+ORDER BY
+        S_ACCTBAL DESC,
+        N_NAME,
+        S_NAME,
+        P_PARTKEY;";
                 var dbRequestPacket = new DbRequestPacket(query);
                 Byte[] requestPacket = dbRequestPacket.GetPacket().ToBytes();
                 tcpClient.GetStream().Write(requestPacket, 0, requestPacket.Length);
@@ -70,7 +113,7 @@ namespace client
                     while ((count = tcpClient.GetStream().Read(buffer, 0, buffer.Length)) > 0)
                     {
                         packetData += Encoding.ASCII.GetString(buffer, 0, count);
-                        if (packetData.IndexOf("\n\r", StringComparison.Ordinal) >= 0) break;
+                        if (packetData.IndexOf(Packet.PacketEnd, StringComparison.Ordinal) >= 0) break;
                     }
                     packet = new Packet(packetData);
                 } while (packet.Type != PacketType.Answer);
@@ -87,11 +130,11 @@ namespace client
                     for (int i = 0; i < dt.Columns.Count; i++) answer += dt.Rows[j][i] + "\t";
                 }
 
-                clientStatsData.WaitTime = sw.ElapsedMilliseconds;
-                clientStatsData.Answer = answer;
+                ClientStatsData.WaitTime = sw.ElapsedMilliseconds;
+                ClientStatsData.Answer = answer;
             }
             tcpClient.Close();
-            Console.WriteLine(clientStatsData.WaitTime);
+            Console.WriteLine(_number + "\t" + ClientStatsData.WaitTime);
         }
     }
 }

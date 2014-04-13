@@ -39,7 +39,7 @@ namespace client
 
             Client[] clients = new Client[count];
 
-            for (int i=0; i<count; i++) clients[i] = new Client(args[1],port);
+            for (int i=0; i<count; i++) clients[i] = new Client(args[1],port, i);
         }
     }
 }

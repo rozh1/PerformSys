@@ -37,6 +37,7 @@ namespace Balancer.Common.Packet
         private PacketType _type;
         private string _id="0000";
         private string _clientId = "0000";
+        private static string _packetEnd = "\n\n\r\r\t\t";
 
         public Packet(byte[] packet)
         {
@@ -91,11 +92,16 @@ namespace Balancer.Common.Packet
             set { _clientId = value; }
         }
 
+        public static String PacketEnd
+        {
+            get { return _packetEnd; }
+        }
+
         public String ToBase64String()
         {
             String str = ((int)_type).ToString("000") + _id + _clientId + _data;
             byte[] strBytes = Encoding.UTF8.GetBytes(str);
-            return Convert.ToBase64String(strBytes) + "\n\r";
+            return Convert.ToBase64String(strBytes) + _packetEnd;
         }
 
         private void FromBase64String(string base64String)
