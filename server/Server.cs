@@ -35,6 +35,7 @@ namespace server
                 _tcpClient = _listener.AcceptTcpClient();
 
                 Logger.Write("Принято соединие");
+                string nextPacketData = "";
 
                 while (_tcpClient.Connected)
                 {
@@ -63,8 +64,19 @@ namespace server
                         while ((count = _tcpClient.GetStream().Read(buffer, 0, buffer.Length)) > 0)
 
                         {
-                            packetData += Encoding.ASCII.GetString(buffer, 0, count);
-                            if (packetData.IndexOf("\n\r", StringComparison.Ordinal) >= 0) break;
+                            packetData += nextPacketData + Encoding.ASCII.GetString(buffer, 0, count);
+                            if (packetData.Contains(Packet.PacketEnd))
+                            {
+                                int index = packetData.IndexOf(Packet.PacketEnd, StringComparison.Ordinal);
+                                nextPacketData =
+                                    packetData.Substring(
+                                        index +
+                                        Packet.PacketEnd.Length);
+                                packetData =
+                                    packetData.Remove(index);
+                                break;
+                            }
+                            nextPacketData = "";
                         }
                         ThreadPool.QueueUserWorkItem(MySqlWorker, packetData);
                     }
