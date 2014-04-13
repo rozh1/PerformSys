@@ -65,8 +65,7 @@ namespace server
                     Byte[] statusPacket = sp.GetPacket().ToBytes();
                     try
                     {
-                        if (_tcpClient.Connected)
-                            _tcpClient.GetStream().Write(statusPacket, 0, statusPacket.Length);
+                        _tcpClient.GetStream().Write(statusPacket, 0, statusPacket.Length);
                     }
                     catch (Exception ex)
                     {

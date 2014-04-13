@@ -29,6 +29,9 @@ namespace server.DataBase
         /// строка параметров подключения
         private readonly MySqlConnectionStringBuilder _connectionString;
 
+        private string _database;
+        private int _comandTimeout = int.MaxValue;
+
         public MySqlDb(string user, string password, string database, string server, string port)
         {
             _connectionString = new MySqlConnectionStringBuilder
@@ -41,7 +44,9 @@ namespace server.DataBase
                 MaximumPoolSize = 50,
                 MinimumPoolSize = 2,
                 Pooling = true
+                
             };
+            _database = database;
         }
 
         public event Action ConnectionError;
@@ -57,7 +62,7 @@ namespace server.DataBase
                 var conn = new MySqlConnection(_connectionString.GetConnectionString(true));
                 conn.Open();
                 Insert("SET NAMES utf8", conn);
-                Logger.Write("Выполненно подключение к БД", 7);
+                Logger.Write("Выполненно подключение к БД " + _database, 7);
                 conn.Close();
             }
             catch (MySqlException e)
@@ -100,6 +105,7 @@ namespace server.DataBase
             using (MySqlConnection conn = ConnectionOpen())
             {
                 var cmd = new MySqlCommand(query, conn);
+                cmd.CommandTimeout = _comandTimeout;
                 try
                 {
                     cmd.ExecuteNonQuery();
@@ -115,6 +121,7 @@ namespace server.DataBase
         public void Insert(string query, MySqlConnection conn)
         {
             var cmd = new MySqlCommand(query, conn);
+            cmd.CommandTimeout = _comandTimeout;
             try
             {
                 cmd.ExecuteNonQuery();
@@ -138,7 +145,9 @@ namespace server.DataBase
             {
                 try
                 {
-                    var da = new MySqlDataAdapter(query, conn);
+                    var cmd = new MySqlCommand(query, conn);
+                    cmd.CommandTimeout = _comandTimeout;
+                    var da = new MySqlDataAdapter(cmd);
                     da.Fill(answer, "Answer");
                     da.Dispose();
                 }
@@ -147,23 +156,6 @@ namespace server.DataBase
                     Logger.Write("При чтении из БД произошло исключение: " + e.Message);
                 }
                 ConnectionClose(conn);
-            }
-            return answer;
-        }
-
-        public DataSet Select(string query, MySqlConnection conn)
-        {
-            //if (mysqlConn.State != System.Data.ConnectionState.Open) MySQLConnectionOpen();
-            var answer = new DataSet();
-            try
-            {
-                var da = new MySqlDataAdapter(query, conn);
-                da.Fill(answer, "Answer");
-                da.Dispose();
-            }
-            catch (Exception e)
-            {
-                Logger.Write("При чтении из БД произошло исключение: " + e.Message);
             }
             return answer;
         }
@@ -180,6 +172,7 @@ namespace server.DataBase
             using (MySqlConnection conn = ConnectionOpen())
             {
                 var cmd = new MySqlCommand(query, conn);
+                cmd.CommandTimeout = _comandTimeout;
                 try
                 {
                     updatedRows = cmd.ExecuteNonQuery();
@@ -205,6 +198,7 @@ namespace server.DataBase
             using (MySqlConnection conn = ConnectionOpen())
             {
                 var cmd = new MySqlCommand(query, conn);
+                cmd.CommandTimeout = _comandTimeout;
                 try
                 {
                     deletedRows = cmd.ExecuteNonQuery();
