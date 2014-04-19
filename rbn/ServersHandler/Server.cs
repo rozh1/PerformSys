@@ -6,5 +6,6 @@ namespace rbn.ServersHandler
     {
         public TcpClient Connection { get; set; }
         public bool Status { get; set; }
+        public bool StatusRecived { get; set; }
     }
 }

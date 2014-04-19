@@ -68,7 +68,7 @@ namespace server.DataBase
         private static void InsertQuery(string query)
         {
             CheckInit();
-            Logger.Write("Запрос на запись к базе: " + query, 7);
+            //Logger.Write("Запрос на запись к базе: " + query, 7);
             switch (database)
             {
                 case "mysql":
@@ -85,7 +85,7 @@ namespace server.DataBase
         private static DataSet SelectQuery(string query)
         {
             CheckInit();
-            Logger.Write("Запрос на чтение к базе: " + query, 7);
+            //Logger.Write("Запрос на чтение к базе: " + query, 7);
             switch (database)
             {
                 case "mysql":
@@ -101,7 +101,7 @@ namespace server.DataBase
         private static void UpdateQuery(string query)
         {
             CheckInit();
-            Logger.Write("Запрос на обновление к базе: " + query, 7);
+            //Logger.Write("Запрос на обновление к базе: " + query, 7);
             int updatedRows = 0;
             switch (database)
             {

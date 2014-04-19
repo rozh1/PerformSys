@@ -20,6 +20,10 @@ namespace server
 
         private bool serverIsLife;
 
+        private int _queueLength = 0;
+
+        Mutex mutex = new Mutex();
+
         public Server(int port)
         {
             _listener = new TcpListener(IPAddress.Any, port);
@@ -35,49 +39,39 @@ namespace server
                 _tcpClient = _listener.AcceptTcpClient();
 
                 Logger.Write("Принято соединие");
-                string nextPacketData = "";
+                string packetData = "";
 
                 while (_tcpClient.Connected)
                 {
-                    int workerThreads, completionPortThreads;
-                    ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
-                    bool status = (workerThreads <= Environment.ProcessorCount*2);
-                    var sp = new StatusPacket(status);
-                    Byte[] statusPacket = sp.GetPacket().ToBytes();
-                    try
-                    {
-                        _tcpClient.GetStream().Write(statusPacket, 0, statusPacket.Length);
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Write("Исключение при отсылке статуса: " + ex.Message);
-                    }
-                    Logger.Write("Отослан статус " + status.ToString());
+                    SendStatus();
 
-                    string packetData = "";
+                    string onePacketData = ""; 
+                    
                     var buffer = new byte[1400];
 
                     try
                     {
                         int count;
                         while ((count = _tcpClient.GetStream().Read(buffer, 0, buffer.Length)) > 0)
-
+                        //Client.Receive(buffer))>0)//.
                         {
-                            packetData += nextPacketData + Encoding.ASCII.GetString(buffer, 0, count);
-                            if (packetData.Contains(Packet.PacketEnd))
-                            {
-                                int index = packetData.IndexOf(Packet.PacketEnd, StringComparison.Ordinal);
-                                nextPacketData =
-                                    packetData.Substring(
-                                        index +
-                                        Packet.PacketEnd.Length);
-                                packetData =
-                                    packetData.Remove(index);
-                                break;
-                            }
-                            nextPacketData = "";
+                            packetData += Encoding.ASCII.GetString(buffer, 0, count);
+                            if (packetData.Contains(Packet.PacketEnd)) break;
                         }
-                        ThreadPool.QueueUserWorkItem(MySqlWorker, packetData);
+                        while (packetData.Contains(Packet.PacketEnd))
+                        {
+                            int index = packetData.IndexOf(Packet.PacketEnd, StringComparison.Ordinal);
+                            onePacketData =
+                                packetData.Remove(index);
+                            packetData =
+                                packetData.Substring(
+                                    index +
+                                    Packet.PacketEnd.Length);
+
+                            _queueLength++;
+                            SendStatus();
+                            ThreadPool.QueueUserWorkItem(MySqlWorker, onePacketData);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -87,13 +81,32 @@ namespace server
             }
         }
 
+        void SendStatus()
+        {
+            //int workerThreads, completionPortThreads;
+            //ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
+            bool status = (_queueLength <= Environment.ProcessorCount);
+            var sp = new StatusPacket(status);
+            Byte[] statusPacket = sp.GetPacket().ToBytes();
+            try
+            {
+                _tcpClient.GetStream().Write(statusPacket, 0, statusPacket.Length);
+            }
+            catch (Exception ex)
+            {
+                Logger.Write("Исключение при отсылке статуса: " + ex.Message);
+            }
+            Logger.Write("Отослан статус " + status.ToString());
+        }
+
         private void MySqlWorker(object data)
         {
             var packetData = (string) data;
             var packet = new Packet(packetData);
 
-            Logger.Write("Принят запрос: " + packet.Data);
+            //Logger.Write("Принят запрос: " + packet.Data);
 
+            Logger.Write("Принят запрос от клиента: " + packet.ClientId);
             DataTable dt = null;
             if (packet.Type == PacketType.Request)
             {
@@ -113,7 +126,7 @@ namespace server
             }
             if (dt != null)
             {
-                Logger.Write("Отправка результата клиенту");
+                Logger.Write("Отправка результата клиенту "+ packet.ClientId);
                 var dbAnswerPacket = new DbAnswerPacket(dt);
                 Packet answerPacket = dbAnswerPacket.GetPacket();
                 answerPacket.Type = PacketType.Answer;
@@ -122,6 +135,8 @@ namespace server
                 Byte[] answerPacketBytes = answerPacket.ToBytes();
                 _tcpClient.GetStream().Write(answerPacketBytes, 0, answerPacketBytes.Length);
             }
+            _queueLength--;
+            SendStatus();
         }
 
         /// <summary>

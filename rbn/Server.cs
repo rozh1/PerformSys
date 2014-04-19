@@ -59,7 +59,7 @@ namespace rbn
                     {
                         var packet = new Packet(packetData);
 
-                        Logger.Write("Принят запрос: " + packet.Data);
+                        //Logger.Write("Принят запрос: " + packet.Data);
 
                         client.Connection = tcpClient;
                         client.Query = packet.Data;

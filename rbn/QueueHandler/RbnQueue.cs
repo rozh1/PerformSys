@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Threading;
 using Balancer.Common;
 using Balancer.Common.Packet;
 using rbn.ServersHandler;
@@ -58,6 +59,7 @@ namespace rbn.QueueHandler
         /// <param name="answer">пакет ответа</param>
         public static void ServerAnswer(int clientId, string answer)
         {
+            Logger.Write("Получен ответ для клиента " + clientId);
             try
             {
                 int count = Clients.Count;
@@ -90,17 +92,20 @@ namespace rbn.QueueHandler
                 client.Connection.GetStream().Write(bytes, 0, bytes.Length);
         }
 
+        private static Mutex sendMutex = new Mutex();
+
         /// <summary>
         /// Выбор клиента и отправка его запроса на сервер
         /// </summary>
         static public void SendRequestToServer()
         {
-
+            sendMutex.WaitOne(1000);
             if (_queue.Count > 0)
             {
-                QueueEntity qe = _queue.Dequeue();
-                SendRequest(qe);
+                QueueEntity qe = _queue.Peek();
+                if (SendRequest(qe)) _queue.Dequeue();
             }
+            sendMutex.ReleaseMutex();
         }
 
         /// <summary>
@@ -114,6 +119,7 @@ namespace rbn.QueueHandler
                 Servers.SendRequest(server, queueEntity.Query, queueEntity.ClientId);
                 Client client = GetClientById(queueEntity.ClientId);
                 client.QuerySended = true;
+                Logger.Write("Отправлен запрос от клиента " + client.Id);
             }
             else return false;
             return true;

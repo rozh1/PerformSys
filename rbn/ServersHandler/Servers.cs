@@ -55,7 +55,7 @@ namespace rbn.ServersHandler
         {
             for (int i = _lastReadyServerIndex; i < servers.Count; i++)
             {
-                if (servers[i].Status)
+                if (servers[i].Status)// && servers[i].StatusRecived)
                 {
                     _lastReadyServerIndex = i + 1;
                     return servers[i];
@@ -63,7 +63,7 @@ namespace rbn.ServersHandler
             }
             for (int i = 0; i < servers.Count; i++)
             {
-                if (servers[i].Status)
+                if (servers[i].Status)// && servers[i].StatusRecived)
                 {
                     _lastReadyServerIndex = i;
                     return servers[i];
@@ -108,7 +108,8 @@ namespace rbn.ServersHandler
                         case PacketType.Status:
                             var sp = new StatusPacket(packet.Data);
                             server.Status = sp.Status;
-                            RbnQueue.SendRequestToServer();
+                            server.StatusRecived = true;
+                            if (server.Status) RbnQueue.SendRequestToServer();
                             break;
                         case PacketType.Answer:
                             RbnQueue.ServerAnswer(int.Parse(packet.ClientId),packet.Data);
@@ -127,7 +128,11 @@ namespace rbn.ServersHandler
             Packet packet = new Packet(PacketType.Request, query, Settings.GlobalId,Settings.RegionId,clientId);
             byte[] packetBytes = packet.ToBytes();
             if (server.Connection.Connected)
+            {
                 server.Connection.GetStream().Write(packetBytes, 0, packetBytes.Length);
+
+                server.StatusRecived = false;
+            }
         }
     }
 }
