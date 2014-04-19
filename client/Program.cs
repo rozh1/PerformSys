@@ -41,7 +41,7 @@ namespace client
 
             Client[] clients = new Client[count];
 
-            for (int i = 0; i < count; i++) clients[i] = new Client(args[1], port, i, random.Next(1,5));
+            for (int i = 0; i < count; i++) clients[i] = new Client(args[1], port, i, (i%5)+1); //random.Next(1,5));
         }
     }
 }
