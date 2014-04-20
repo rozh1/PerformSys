@@ -77,6 +77,17 @@
   <ItemGroup>
     <None Include="Resources\q5.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\q10.sql" />
+    <Content Include="Resources\q11.sql" />
+    <Content Include="Resources\q12.sql" />
+    <Content Include="Resources\q13.sql" />
+    <Content Include="Resources\q14.sql" />
+    <Content Include="Resources\q6.sql" />
+    <Content Include="Resources\q7.sql" />
+    <Content Include="Resources\q8.sql" />
+    <Content Include="Resources\q9.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
