@@ -16,7 +16,7 @@ namespace server
             if (!File.Exists(configFilePath)) ConfigFile.SaveSettings(Properties.Resources.defaultConfig);
             ConfigFile.LoadSettings();
 
-            int maxThreadsCount = Environment.ProcessorCount;
+            int maxThreadsCount = Environment.ProcessorCount*2;
 
             ThreadPool.SetMaxThreads(maxThreadsCount, maxThreadsCount);
 

@@ -121,6 +121,21 @@
   <data name="q1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\q1.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
   </data>
+  <data name="q10" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\q10.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
+  </data>
+  <data name="q11" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\q11.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
+  </data>
+  <data name="q12" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\q12.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
+  </data>
+  <data name="q13" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\q13.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
+  </data>
+  <data name="q14" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\q14.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
+  </data>
   <data name="q2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\q2.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
   </data>
@@ -132,5 +147,17 @@
   </data>
   <data name="q5" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\q5.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
+  </data>
+  <data name="q6" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\q6.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
+  </data>
+  <data name="q7" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\q7.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
+  </data>
+  <data name="q8" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\q8.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
+  </data>
+  <data name="q9" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\q9.sql;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
   </data>
 </root>

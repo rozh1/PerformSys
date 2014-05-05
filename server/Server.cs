@@ -85,7 +85,7 @@ namespace server
         {
             //int workerThreads, completionPortThreads;
             //ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
-            bool status = (_queueLength <= Environment.ProcessorCount);
+            bool status = (_queueLength <= Environment.ProcessorCount*2);
             var sp = new StatusPacket(status);
             Byte[] statusPacket = sp.GetPacket().ToBytes();
             try
