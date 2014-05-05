@@ -17,11 +17,13 @@
  */
 #endregion
 
-﻿namespace client
+﻿using System;
+
+namespace client
 {
     class ClientStatsData
     {
-        public long WaitTime { get; set; }
+        public TimeSpan WaitTime { get; set; }
         public string Answer { get; set; }
     }
 }

@@ -51,6 +51,18 @@ namespace rbn.ServersHandler
                 serversThreads.Add(serverThread);
                 serverThread.Start(server);
             }
+
+            Thread t = new Thread(SendThread);
+            t.Start();
+        }
+
+        static void SendThread()
+        {
+            while (true)
+            {
+                RbnQueue.SendRequestToServer();
+                Thread.Sleep(200);
+            }
         }
 
         static public void AddServer(Server server)

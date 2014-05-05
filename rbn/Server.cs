@@ -84,8 +84,6 @@ namespace rbn
                         client.Query = packet.Data;
 
                         RbnQueue.AddClient(client);
-
-                        RbnQueue.SendRequestToServer();
                     }
                 }
                 catch (Exception ex)

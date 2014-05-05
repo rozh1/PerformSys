@@ -61,26 +61,27 @@ namespace client.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на select
-        ///	l_returnflag,
-        ///	l_linestatus,
-        ///	sum(l_quantity) as sum_qty,
-        ///	sum(l_extendedprice) as sum_base_price,
-        ///	sum(l_extendedprice * (1 - l_discount)) as sum_disc_price,
-        ///	sum(l_extendedprice * (1 - l_discount) * (1 + l_tax)) as sum_charge,
-        ///	avg(l_quantity) as avg_qty,
-        ///	avg(l_extendedprice) as avg_price,
-        ///	avg(l_discount) as avg_disc,
-        ///	count(*) as count_order
-        ///from
-        ///	lineitem
-        ///where
-        ///	l_shipdate &lt;= date &apos;1998-12-01&apos; - interval &apos;105&apos; day (3)
-        ///group by
-        ///	l_returnflag,
-        ///	l_linestatus
-        ///order by
-        ///	l_returnf [остаток строки не уместился]&quot;;.
+        ///   Ищет локализованную строку, похожую на SELECT
+        ///	L_RETURNFLAG,
+        ///	L_LINESTATUS,
+        ///	SUM(L_QUANTITY) AS SUM_QTY,
+        ///	SUM(L_EXTENDEDPRICE) AS SUM_BASE_PRICE,
+        ///	SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS SUM_DISC_PRICE,
+        ///	SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT) * (1 + L_TAX)) AS SUM_CHARGE,
+        ///	AVG(L_QUANTITY) AS AVG_QTY,
+        ///	AVG(L_EXTENDEDPRICE) AS AVG_PRICE,
+        ///	AVG(L_DISCOUNT) AS AVG_DISC,
+        ///	COUNT(*) AS COUNT_ORDER
+        ///FROM
+        ///	LINEITEM
+        ///WHERE
+        ///	L_SHIPDATE &lt;= DATE &apos;1998-12-01&apos; - INTERVAL &apos;90&apos; DAY
+        ///GROUP BY
+        ///	L_RETURNFLAG,
+        ///	L_LINESTATUS
+        ///ORDER BY
+        ///	L_RETURNFLAG,
+        ///	L_LINESTATUS;.
         /// </summary>
         internal static string q1 {
             get {
@@ -89,40 +90,198 @@ namespace client.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на SELECT
+        ///	C_CUSTKEY,
+        ///	C_NAME,
+        ///	SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,
+        ///	C_ACCTBAL,
+        ///	N_NAME,
+        ///	C_ADDRESS,
+        ///	C_PHONE,
+        ///	C_COMMENT
+        ///FROM
+        ///	CUSTOMER,
+        ///	ORDERS,
+        ///	LINEITEM,
+        ///	NATION
+        ///WHERE
+        ///	C_CUSTKEY = O_CUSTKEY
+        ///	AND L_ORDERKEY = O_ORDERKEY
+        ///	AND O_ORDERDATE &gt;= DATE &apos;1994-04-01&apos;
+        ///	AND O_ORDERDATE &lt; DATE &apos;1994-04-01&apos; + INTERVAL &apos;3&apos; MONTH
+        ///	AND L_RETURNFLAG = &apos;R&apos;
+        ///	AND C_NATIONKEY = N_NATIONKEY
+        ///GROUP BY
+        ///	C_CUSTKEY,
+        ///	C_NAME,
+        ///	C_ACCTBAL,
+        ///	C_PHONE,
+        ///	N_NAME,
+        ///	C_ADDRESS,
+        ///	C_COMMENT
+        ///ORDER BY
+        ///	 [остаток строки не уместился]&quot;;.
+        /// </summary>
+        internal static string q10 {
+            get {
+                return ResourceManager.GetString("q10", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на SELECT
+        ///	PS_PARTKEY,
+        ///	SUM(PS_SUPPLYCOST * PS_AVAILQTY) AS VALUE
+        ///FROM
+        ///	PARTSUPP,
+        ///	SUPPLIER,
+        ///	NATION
+        ///WHERE
+        ///	PS_SUPPKEY = S_SUPPKEY
+        ///	AND S_NATIONKEY = N_NATIONKEY
+        ///	AND N_NAME = &apos;ALGERIA&apos;
+        ///GROUP BY
+        ///	PS_PARTKEY HAVING
+        ///		SUM(PS_SUPPLYCOST * PS_AVAILQTY) &gt; (
+        ///			SELECT
+        ///				SUM(PS_SUPPLYCOST * PS_AVAILQTY) * 0.0001000000
+        ///			FROM
+        ///				PARTSUPP,
+        ///				SUPPLIER,
+        ///				NATION
+        ///			WHERE
+        ///				PS_SUPPKEY = S_SUPPKEY
+        ///				AND S_NATIONKEY = N_NATIONKEY
+        ///				AND N_NAME = &apos;ALGERIA&apos;
+        ///		)
+        ///ORDER BY
+        ///	VALUE DESC;
+        ///.
+        /// </summary>
+        internal static string q11 {
+            get {
+                return ResourceManager.GetString("q11", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на SELECT
+        ///	L_SHIPMODE,
+        ///	SUM(CASE
+        ///		WHEN O_ORDERPRIORITY = &apos;1-URGENT&apos;
+        ///			OR O_ORDERPRIORITY = &apos;2-HIGH&apos;
+        ///			THEN 1
+        ///		ELSE 0
+        ///	END) AS HIGH_LINE_COUNT,
+        ///	SUM(CASE
+        ///		WHEN O_ORDERPRIORITY &lt;&gt; &apos;1-URGENT&apos;
+        ///			AND O_ORDERPRIORITY &lt;&gt; &apos;2-HIGH&apos;
+        ///			THEN 1
+        ///		ELSE 0
+        ///	END) AS LOW_LINE_COUNT
+        ///FROM
+        ///	ORDERS,
+        ///	LINEITEM
+        ///WHERE
+        ///	O_ORDERKEY = L_ORDERKEY
+        ///	AND L_SHIPMODE IN (&apos;AIR&apos;, &apos;SHIP&apos;)
+        ///	AND L_COMMITDATE &lt; L_RECEIPTDATE
+        ///	AND L_SHIPDATE &lt; L_COMMITDATE
+        ///	AND L_RECEIPTDATE &gt;= DATE &apos;1994-01-01&apos;
+        ///	AND L_RECEIPTDATE &lt; DATE [остаток строки не уместился]&quot;;.
+        /// </summary>
+        internal static string q12 {
+            get {
+                return ResourceManager.GetString("q12", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на select
-        ///	s_acctbal,
-        ///	s_name,
-        ///	n_name,
-        ///	p_partkey,
-        ///	p_mfgr,
-        ///	s_address,
-        ///	s_phone,
-        ///	s_comment
+        ///	c_count,
+        ///	count(*) as custdist
         ///from
-        ///	part,
-        ///	supplier,
-        ///	partsupp,
-        ///	nation,
-        ///	region
-        ///where
-        ///	p_partkey = ps_partkey
-        ///	and s_suppkey = ps_suppkey
-        ///	and p_size = 48
-        ///	and p_type like &apos;%NICKEL&apos;
-        ///	and s_nationkey = n_nationkey
-        ///	and n_regionkey = r_regionkey
-        ///	and r_name = &apos;AMERICA&apos;
-        ///	and ps_supplycost = (
+        ///	(
         ///		select
-        ///			min(ps_supplycost)
+        ///			c_custkey,
+        ///			count(o_orderkey) as c_count
         ///		from
-        ///			partsupp,
-        ///			supplier,
-        ///			nation,
-        ///			region
-        ///		where
-        ///			p_partkey = ps_partkey
-        ///			and  [остаток строки не уместился]&quot;;.
+        ///			customer left outer join orders on
+        ///				c_custkey = o_custkey
+        ///				and o_comment not like &apos;%special%requests%&apos;
+        ///		group by
+        ///			c_custkey
+        ///	) as c_orders
+        ///group by
+        ///	c_count
+        ///order by
+        ///	custdist desc,
+        ///	c_count desc;.
+        /// </summary>
+        internal static string q13 {
+            get {
+                return ResourceManager.GetString("q13", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на SELECT
+        ///	100.00 * SUM(CASE
+        ///		WHEN P_TYPE LIKE &apos;PROMO%&apos;
+        ///			THEN L_EXTENDEDPRICE * (1 - L_DISCOUNT)
+        ///		ELSE 0
+        ///	END) / SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS PROMO_REVENUE
+        ///FROM
+        ///	LINEITEM,
+        ///	PART
+        ///WHERE
+        ///	L_PARTKEY = P_PARTKEY
+        ///	AND L_SHIPDATE &gt;= DATE &apos;1995-01-01&apos;
+        ///	AND L_SHIPDATE &lt; DATE &apos;1995-01-01&apos; + INTERVAL &apos;1&apos; MONTH;
+        ///.
+        /// </summary>
+        internal static string q14 {
+            get {
+                return ResourceManager.GetString("q14", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на SELECT
+        ///	S_ACCTBAL,
+        ///	S_NAME,
+        ///	N_NAME,
+        ///	P_PARTKEY,
+        ///	P_MFGR,
+        ///	S_ADDRESS,
+        ///	S_PHONE,
+        ///	S_COMMENT
+        ///FROM
+        ///	PART,
+        ///	SUPPLIER,
+        ///	PARTSUPP,
+        ///	NATION,
+        ///	REGION
+        ///WHERE
+        ///	P_PARTKEY = PS_PARTKEY
+        ///	AND S_SUPPKEY = PS_SUPPKEY
+        ///	AND P_SIZE = 48
+        ///	AND P_TYPE LIKE &apos;%NICKEL&apos;
+        ///	AND S_NATIONKEY = N_NATIONKEY
+        ///	AND N_REGIONKEY = R_REGIONKEY
+        ///	AND R_NAME = &apos;AMERICA&apos;
+        ///	AND PS_SUPPLYCOST = (
+        ///		SELECT
+        ///			MIN(PS_SUPPLYCOST)
+        ///		FROM
+        ///			PARTSUPP,
+        ///			SUPPLIER,
+        ///			NATION,
+        ///			REGION
+        ///		WHERE
+        ///			P_PARTKEY = PS_PARTKEY
+        ///			AND S_SUPPKEY = PS_SUPPKEY
+        ///			AND S_N [остаток строки не уместился]&quot;;.
         /// </summary>
         internal static string q2 {
             get {
@@ -131,31 +290,29 @@ namespace client.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на select
-        ///	l_orderkey,
-        ///	sum(l_extendedprice * (1 - l_discount)) as revenue,
-        ///	o_orderdate,
-        ///	o_shippriority
-        ///from
-        ///	customer,
-        ///	orders,
-        ///	lineitem
-        ///where
-        ///	c_mktsegment = &apos;HOUSEHOLD&apos;
-        ///	and c_custkey = o_custkey
-        ///	and l_orderkey = o_orderkey
-        ///	and o_orderdate &lt; date &apos;1995-03-31&apos;
-        ///	and l_shipdate &gt; date &apos;1995-03-31&apos;
-        ///group by
-        ///	l_orderkey,
-        ///	o_orderdate,
-        ///	o_shippriority
-        ///order by
-        ///	revenue desc,
-        ///	o_orderdate
-        ///limit 0,10;
-        ///
-        ///.
+        ///   Ищет локализованную строку, похожую на SELECT
+        ///	L_ORDERKEY,
+        ///	SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE,
+        ///	O_ORDERDATE,
+        ///	O_SHIPPRIORITY
+        ///FROM
+        ///	CUSTOMER,
+        ///	ORDERS,
+        ///	LINEITEM
+        ///WHERE
+        ///	C_MKTSEGMENT = &apos;HOUSEHOLD&apos;
+        ///	AND C_CUSTKEY = O_CUSTKEY
+        ///	AND L_ORDERKEY = O_ORDERKEY
+        ///	AND O_ORDERDATE &lt; DATE &apos;1995-03-31&apos;
+        ///	AND L_SHIPDATE &gt; DATE &apos;1995-03-31&apos;
+        ///GROUP BY
+        ///	L_ORDERKEY,
+        ///	O_ORDERDATE,
+        ///	O_SHIPPRIORITY
+        ///ORDER BY
+        ///	REVENUE DESC,
+        ///	O_ORDERDATE
+        ///LIMIT 0,10;.
         /// </summary>
         internal static string q3 {
             get {
@@ -164,29 +321,27 @@ namespace client.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на select
-        ///	o_orderpriority,
-        ///	count(*) as order_count
-        ///from
-        ///	orders
-        ///where
-        ///	o_orderdate &gt;= date &apos;1996-02-01&apos;
-        ///	and o_orderdate &lt; date &apos;1996-02-01&apos; + interval &apos;3&apos; month
-        ///	and exists (
-        ///		select
-        ///			*
-        ///		from
-        ///			lineitem
-        ///		where
-        ///			l_orderkey = o_orderkey
-        ///			and l_commitdate &lt; l_receiptdate
-        ///	)
-        ///group by
-        ///	o_orderpriority
-        ///order by
-        ///	o_orderpriority;
-        ///
-        ///.
+        ///   Ищет локализованную строку, похожую на SELECT
+        ///    O_ORDERPRIORITY,
+        ///    COUNT(*) AS ORDER_COUNT
+        ///FROM
+        ///    ORDERS
+        ///WHERE
+        ///    O_ORDERDATE &gt;= DATE &apos;1996-02-01&apos;
+        ///    AND O_ORDERDATE &lt; DATE &apos;1996-02-01&apos; + INTERVAL &apos;3&apos; MONTH
+        ///    AND EXISTS (
+        ///        SELECT
+        ///            *
+        ///        FROM
+        ///            LINEITEM
+        ///        WHERE
+        ///            L_ORDERKEY = O_ORDERKEY
+        ///            AND L_COMMITDATE &lt; L_RECEIPTDATE
+        ///    )
+        ///GROUP BY
+        ///    O_ORDERPRIORITY
+        ///ORDER BY
+        ///    O_ORDERPRIORITY;.
         /// </summary>
         internal static string q4 {
             get {
@@ -195,36 +350,153 @@ namespace client.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на select
-        ///	n_name,
-        ///	sum(l_extendedprice * (1 - l_discount)) as revenue
-        ///from
-        ///	customer,
-        ///	orders,
-        ///	lineitem,
-        ///	supplier,
-        ///	nation,
-        ///	region
-        ///where
-        ///	c_custkey = o_custkey
-        ///	and l_orderkey = o_orderkey
-        ///	and l_suppkey = s_suppkey
-        ///	and c_nationkey = s_nationkey
-        ///	and s_nationkey = n_nationkey
-        ///	and n_regionkey = r_regionkey
-        ///	and r_name = &apos;MIDDLE EAST&apos;
-        ///	and o_orderdate &gt;= date &apos;1995-01-01&apos;
-        ///	and o_orderdate &lt; date &apos;1995-01-01&apos; + interval &apos;1&apos; year
-        ///group by
-        ///	n_name
-        ///order by
-        ///	revenue desc;
-        ///
-        ///.
+        ///   Ищет локализованную строку, похожую на SELECT
+        ///	N_NAME,
+        ///	SUM(L_EXTENDEDPRICE * (1 - L_DISCOUNT)) AS REVENUE
+        ///FROM
+        ///	CUSTOMER,
+        ///	ORDERS,
+        ///	LINEITEM,
+        ///	SUPPLIER,
+        ///	NATION,
+        ///	REGION
+        ///WHERE
+        ///	C_CUSTKEY = O_CUSTKEY
+        ///	AND L_ORDERKEY = O_ORDERKEY
+        ///	AND L_SUPPKEY = S_SUPPKEY
+        ///	AND C_NATIONKEY = S_NATIONKEY
+        ///	AND S_NATIONKEY = N_NATIONKEY
+        ///	AND N_REGIONKEY = R_REGIONKEY
+        ///	AND R_NAME = &apos;MIDDLE EAST&apos;
+        ///	AND O_ORDERDATE &gt;= DATE &apos;1995-01-01&apos;
+        ///	AND O_ORDERDATE &lt; DATE &apos;1995-01-01&apos; + INTERVAL &apos;1&apos; YEAR
+        ///GROUP BY
+        ///	N_NAME
+        ///ORDER BY
+        ///	REVENUE DESC;.
         /// </summary>
         internal static string q5 {
             get {
                 return ResourceManager.GetString("q5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на SELECT
+        ///	SUM(L_EXTENDEDPRICE * L_DISCOUNT) AS REVENUE
+        ///FROM
+        ///	LINEITEM
+        ///WHERE
+        ///	L_SHIPDATE &gt;= DATE &apos;1997-01-01&apos;
+        ///	AND L_SHIPDATE &lt; DATE &apos;1997-01-01&apos; + INTERVAL &apos;1&apos; YEAR
+        ///	AND L_DISCOUNT BETWEEN 0.07 - 0.01 AND 0.07 + 0.01
+        ///	AND L_QUANTITY &lt; 24;.
+        /// </summary>
+        internal static string q6 {
+            get {
+                return ResourceManager.GetString("q6", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на SELECT
+        ///	SUPP_NATION,
+        ///	CUST_NATION,
+        ///	L_YEAR,
+        ///	SUM(VOLUME) AS REVENUE
+        ///FROM
+        ///	(
+        ///		SELECT
+        ///			N1.N_NAME AS SUPP_NATION,
+        ///			N2.N_NAME AS CUST_NATION,
+        ///			EXTRACT(YEAR FROM L_SHIPDATE) AS L_YEAR,
+        ///			L_EXTENDEDPRICE * (1 - L_DISCOUNT) AS VOLUME
+        ///		FROM
+        ///			SUPPLIER,
+        ///			LINEITEM,
+        ///			ORDERS,
+        ///			CUSTOMER,
+        ///			NATION N1,
+        ///			NATION N2
+        ///		WHERE
+        ///			S_SUPPKEY = L_SUPPKEY
+        ///			AND O_ORDERKEY = L_ORDERKEY
+        ///			AND C_CUSTKEY = O_CUSTKEY
+        ///			AND S_NATIONKEY = N1.N_NATIONKEY
+        ///			AND C_NATIONKEY = N2.N_NATIONKEY
+        ///			 [остаток строки не уместился]&quot;;.
+        /// </summary>
+        internal static string q7 {
+            get {
+                return ResourceManager.GetString("q7", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на SELECT
+        ///	O_YEAR,
+        ///	SUM(CASE
+        ///		WHEN NATION = &apos;IRAN&apos; THEN VOLUME
+        ///		ELSE 0
+        ///	END) / SUM(VOLUME) AS MKT_SHARE
+        ///FROM
+        ///	(
+        ///		SELECT
+        ///			EXTRACT(YEAR FROM O_ORDERDATE) AS O_YEAR,
+        ///			L_EXTENDEDPRICE * (1 - L_DISCOUNT) AS VOLUME,
+        ///			N2.N_NAME AS NATION
+        ///		FROM
+        ///			PART,
+        ///			SUPPLIER,
+        ///			LINEITEM,
+        ///			ORDERS,
+        ///			CUSTOMER,
+        ///			NATION N1,
+        ///			NATION N2,
+        ///			REGION
+        ///		WHERE
+        ///			P_PARTKEY = L_PARTKEY
+        ///			AND S_SUPPKEY = L_SUPPKEY
+        ///			AND L_ORDERKEY = O_ORDERKEY
+        ///			AND O_CUSTKEY = C_CUSTKEY
+        ///			AND C_NATIONKEY = N1 [остаток строки не уместился]&quot;;.
+        /// </summary>
+        internal static string q8 {
+            get {
+                return ResourceManager.GetString("q8", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на SELECT
+        ///	NATION,
+        ///	O_YEAR,
+        ///	SUM(AMOUNT) AS SUM_PROFIT
+        ///FROM
+        ///	(
+        ///		SELECT
+        ///			N_NAME AS NATION,
+        ///			EXTRACT(YEAR FROM O_ORDERDATE) AS O_YEAR,
+        ///			L_EXTENDEDPRICE * (1 - L_DISCOUNT) - PS_SUPPLYCOST * L_QUANTITY AS AMOUNT
+        ///		FROM
+        ///			PART,
+        ///			SUPPLIER,
+        ///			LINEITEM,
+        ///			PARTSUPP,
+        ///			ORDERS,
+        ///			NATION
+        ///		WHERE
+        ///			S_SUPPKEY = L_SUPPKEY
+        ///			AND PS_SUPPKEY = L_SUPPKEY
+        ///			AND PS_PARTKEY = L_PARTKEY
+        ///			AND P_PARTKEY = L_PARTKEY
+        ///			AND O_ORDERKEY = L_ORDERKEY
+        ///			AND S_NATIONKEY = N_NATIONKEY
+        ///			AND P_NAME  [остаток строки не уместился]&quot;;.
+        /// </summary>
+        internal static string q9 {
+            get {
+                return ResourceManager.GetString("q9", resourceCulture);
             }
         }
     }

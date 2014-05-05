@@ -36,6 +36,8 @@ namespace client
         public ClientStatsData ClientStatsData;
         private int _queryNumber;
 
+        public event Action EndWork;
+
         public Client(string address, int port, int number, int queryNumber)
         {
             _address = address;
@@ -49,7 +51,7 @@ namespace client
         void ClientThread()
         {
             ClientStatsData = new ClientStatsData();
-            var sw = new Stopwatch();
+            DateTime startTime;
 
             var tcpClient = new TcpClient();
             tcpClient.Connect(_address, _port);
@@ -60,7 +62,7 @@ namespace client
                 Byte[] requestPacket = dbRequestPacket.GetPacket().ToBytes();
                 tcpClient.GetStream().Write(requestPacket, 0, requestPacket.Length);
 
-                sw.Start();
+                startTime = DateTime.Now;
 
                 var buffer = new byte[1400];
                 Packet packet;
@@ -76,9 +78,7 @@ namespace client
                     }
                     packet = new Packet(packetData);
                 } while (packet.Type != PacketType.Answer);
-
-                sw.Stop();
-
+                
                 //var dt = (DataTable)SerializeMapper.Deserialize(packet.Data);
                 //
                 //string answer = "";
@@ -89,11 +89,12 @@ namespace client
                 //    for (int i = 0; i < dt.Columns.Count; i++) answer += dt.Rows[j][i] + "\t";
                 //}
 
-                ClientStatsData.WaitTime = sw.ElapsedMilliseconds;
+                ClientStatsData.WaitTime = DateTime.Now - startTime;
                 ClientStatsData.Answer = null;//answer;
             }
             tcpClient.Close();
             Console.WriteLine(_number + "\t" + ClientStatsData.WaitTime);
+            if (EndWork != null) EndWork();
         }
     }
 }
