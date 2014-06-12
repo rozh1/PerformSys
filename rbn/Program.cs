@@ -30,7 +30,7 @@ namespace rbn
         {
             Logger.Write("Сервер запущен");
 
-            string configFilePath = Environment.CurrentDirectory + "\\rbn.cfg";
+            string configFilePath = Environment.CurrentDirectory + "/rbn.cfg";
             ConfigFile.SetConfigPath(configFilePath);
             if (!File.Exists(configFilePath)) ConfigFile.SaveSettings(Properties.Resources.defaultConfig);
             ConfigFile.LoadSettings();
