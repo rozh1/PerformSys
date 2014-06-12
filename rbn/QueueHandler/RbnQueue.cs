@@ -19,24 +19,29 @@ namespace rbn.QueueHandler
 
         private static int _id = 1;
 
+        static object clientSyncObject = new object();
+
         /// <summary>
         /// Добавление клиента в конец
         /// </summary>
         /// <param name="client">клиент</param>
         static public void AddClient(Client client)
         {
-            if (Clients.Contains(client))
+            lock (clientSyncObject)
             {
-                Client tmpClient = Clients[Clients.IndexOf(client)];
-                tmpClient.Query = client.Query;
-                tmpClient.AnswerPacketData = "";
-                _queue.Enqueue(new QueueEntity() { ClientId = tmpClient.Id, Query = tmpClient.Query });
-            }
-            else
-            {
-                client.Id = _id++;
-                Clients.Add(client);
-                _queue.Enqueue(new QueueEntity() { ClientId = client.Id, Query = client.Query });
+                if (Clients.Contains(client))
+                {
+                    Client tmpClient = Clients[Clients.IndexOf(client)];
+                    tmpClient.Query = client.Query;
+                    tmpClient.AnswerPacketData = "";
+                    _queue.Enqueue(new QueueEntity() {ClientId = tmpClient.Id, Query = tmpClient.Query});
+                }
+                else
+                {
+                    client.Id = _id++;
+                    Clients.Add(client);
+                    _queue.Enqueue(new QueueEntity() {ClientId = client.Id, Query = client.Query});
+                }
             }
         }
 
@@ -46,9 +51,12 @@ namespace rbn.QueueHandler
         /// <param name="client">клиент</param>
         public static void RemoveClient(Client client)
         {
-            if (Clients.Contains(client))
+            lock (clientSyncObject)
             {
-                Clients.Remove(client);
+                if (Clients.Contains(client))
+                {
+                    Clients.Remove(client);
+                }
             }
         }
 
@@ -62,13 +70,16 @@ namespace rbn.QueueHandler
             Logger.Write("Получен ответ для клиента " + clientId);
             try
             {
-                int count = Clients.Count;
-                for (int i = 0; i < count; i++)
+                lock (clientSyncObject)
                 {
-                    if (Clients[i].Id == clientId)
+                    int count = Clients.Count;
+                    for (int i = 0; i < count; i++)
                     {
-                        SendAnswer(Clients[i], answer);
-                        break;
+                        if (Clients[i].Id == clientId)
+                        {
+                            SendAnswer(Clients[i], answer);
+                            break;
+                        }
                     }
                 }
             }
@@ -118,6 +129,7 @@ namespace rbn.QueueHandler
             {
                 Servers.SendRequest(server, queueEntity.Query, queueEntity.ClientId);
                 Client client = GetClientById(queueEntity.ClientId);
+                if (client == null) return false;
                 client.QuerySended = true;
                 Logger.Write("Отправлен запрос от клиента " + client.Id);
             }
@@ -127,12 +139,14 @@ namespace rbn.QueueHandler
 
         static Client GetClientById(int Id)
         {
-            int count = Clients.Count;
-            for (int i = 0; i < count; i++)
+            lock (clientSyncObject)
             {
-                if (Clients[i].Id == Id)
+                for (int i = 0; i < Clients.Count; i++)
                 {
-                    return Clients[i];
+                    if (Clients[i].Id == Id)
+                    {
+                        return Clients[i];
+                    }
                 }
             }
             return null;
