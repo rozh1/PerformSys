@@ -1,23 +1,23 @@
 ﻿using System;
-using System.Data;
-using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
+using client.Properties;
 
 namespace client
 {
-    class Client
+    /// <summary>
+    ///     эмулятор клиента
+    /// </summary>
+    internal class Client
     {
-        private string _address;
-        private int _port;
-        private int _number;
+        private readonly string _address;
+        private readonly int _number;
+        private readonly int _port;
+        private readonly int _queryNumber;
         public ClientStatsData ClientStatsData;
-        private int _queryNumber;
-
-        public event Action EndWork;
 
         public Client(string address, int port, int number, int queryNumber)
         {
@@ -25,25 +25,32 @@ namespace client
             _port = port;
             _number = number;
             _queryNumber = queryNumber;
-            Thread t = new Thread(ClientThread);
+            var t = new Thread(ClientThread);
             t.Start();
         }
 
-        void ClientThread()
+        /// <summary>
+        ///     Событие окончания работы клиента
+        /// </summary>
+        public event Action EndWork;
+
+        /// <summary>
+        ///     поток эмулятора клиента
+        /// </summary>
+        private void ClientThread()
         {
             ClientStatsData = new ClientStatsData();
-            DateTime startTime;
 
             var tcpClient = new TcpClient();
             tcpClient.Connect(_address, _port);
             if (tcpClient.Connected)
             {
-                string query = Properties.Resources.ResourceManager.GetString("q" + _queryNumber);
+                string query = Resources.ResourceManager.GetString("q" + _queryNumber);
                 var dbRequestPacket = new DbRequestPacket(query);
                 Byte[] requestPacket = dbRequestPacket.GetPacket().ToBytes();
                 tcpClient.GetStream().Write(requestPacket, 0, requestPacket.Length);
 
-                startTime = DateTime.Now;
+                DateTime startTime = DateTime.Now;
 
                 var buffer = new byte[1400];
                 Packet packet;
@@ -59,7 +66,7 @@ namespace client
                     }
                     packet = new Packet(packetData);
                 } while (packet.Type != PacketType.Answer);
-                
+
                 //var dt = (DataTable)SerializeMapper.Deserialize(packet.Data);
                 //
                 //string answer = "";
@@ -71,7 +78,7 @@ namespace client
                 //}
 
                 ClientStatsData.WaitTime = DateTime.Now - startTime;
-                ClientStatsData.Answer = null;//answer;
+                ClientStatsData.Answer = null; //answer;
             }
             tcpClient.Close();
             Console.WriteLine(_number + "\t" + ClientStatsData.WaitTime);

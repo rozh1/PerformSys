@@ -10,81 +10,135 @@ using rbn.QueueHandler;
 
 namespace rbn.ServersHandler
 {
-    class Servers
+    /// <summary>
+    /// Сервера БД
+    /// </summary>
+    internal class Servers
     {
-        private static List<Server> servers = new List<Server>();
+        /// <summary>
+        ///     Список серверов
+        /// </summary>
+        private static readonly List<Server> ServersList = new List<Server>();
 
-        private static List<Thread> serversThreads = new List<Thread>();
+        /// <summary>
+        ///     Список потоков серверов
+        /// </summary>
+        private static readonly List<Thread> ServersThreads = new List<Thread>();
 
-        static public void Init()
+        /// <summary>
+        /// Признак работы потока отправки
+        /// </summary>
+        private static bool _sendThreadLife = true;
+
+        /// <summary>
+        /// Индекс сервера, на каторый был оправлен последний запрос
+        /// </summary>
+        private static int _lastReadyServerIndex;
+
+        /// <summary>
+        ///     Инициализация рабоы с серверами
+        /// </summary>
+        public static void Init()
         {
-            int serverCount = int.Parse(ConfigFile.GetConfigValue("Server_count"));
-            for (int i = 1; i <= serverCount; i++)
+            int serverCount;
+            if (!int.TryParse(ConfigFile.GetConfigValue("Server_count"), out serverCount))
             {
-                string connString = ConfigFile.GetConfigValue("Server_" + i);
-                string[] conn = connString.Split(':');
-                TcpClient tcpClient = new TcpClient();
-                tcpClient.Connect(conn[0], int.Parse(conn[1]));
-                Server server = new Server();
-                server.Connection = tcpClient;
-                AddServer(server);
-                Thread serverThread = new Thread(ServerListenThread);
-                serversThreads.Add(serverThread);
-                serverThread.Start(server);
+                Logger.Write("Не удалось прочитать количество серверов.");
+                Logger.Write("Выход...");
+                Environment.Exit(-1);
             }
 
-            Thread t = new Thread(SendThread);
+            for (int i = 1; i <= serverCount; i++)
+            {
+                try
+                {
+                    string connString = ConfigFile.GetConfigValue("Server_" + i);
+                    string[] conn = connString.Split(':');
+                    var tcpClient = new TcpClient();
+                    tcpClient.Connect(conn[0], int.Parse(conn[1]));
+                    var server = new Server {Connection = tcpClient};
+                    AddServer(server);
+                    var serverThread = new Thread(ServerListenThread);
+                    ServersThreads.Add(serverThread);
+                    serverThread.Start(server);
+                }
+                catch (Exception e)
+                {
+                    Logger.Write("Не удалось подключиться к серверу Server_" + i + " " + e.Message);
+                }
+            }
+
+            var t = new Thread(SendThread);
             t.Start();
         }
 
-        static void SendThread()
+        /// <summary>
+        ///     Поток отправки запросов серверам
+        /// </summary>
+        private static void SendThread()
         {
-            while (true)
+            while (_sendThreadLife)
             {
                 RbnQueue.SendRequestToServer();
-                Thread.Sleep(200);
+                Thread.Sleep(100);
             }
         }
 
-        static public void AddServer(Server server)
+        /// <summary>
+        ///     Добавление сервера в список
+        /// </summary>
+        /// <param name="server"></param>
+        public static void AddServer(Server server)
         {
-            if (!servers.Contains(server))
+            if (!ServersList.Contains(server))
             {
-                servers.Add(server);
+                ServersList.Add(server);
             }
         }
 
+        /// <summary>
+        ///     Удаление сервера из списка
+        /// </summary>
+        /// <param name="server"></param>
         public static void RemoveServer(Server server)
         {
-            if (servers.Contains(server))
+            if (ServersList.Contains(server))
             {
-                servers.Remove(server);
+                server.Connection.Close();
+                ServersList.Remove(server);
             }
         }
 
-        private static int _lastReadyServerIndex;
+        /// <summary>
+        ///     Полчение следующего свободного сервера по круговому алгоритму
+        /// </summary>
+        /// <returns></returns>
         public static Server GetNextReadyServer()
         {
-            for (int i = _lastReadyServerIndex; i < servers.Count; i++)
+            for (int i = _lastReadyServerIndex; i < ServersList.Count; i++)
             {
-                if (servers[i].Status)// && servers[i].StatusRecived)
+                if (ServersList[i].Status && ServersList[i].StatusRecived)
                 {
                     _lastReadyServerIndex = i + 1;
-                    return servers[i];
+                    return ServersList[i];
                 }
             }
-            for (int i = 0; i < servers.Count; i++)
+            for (int i = 0; i < ServersList.Count; i++)
             {
-                if (servers[i].Status)// && servers[i].StatusRecived)
+                if (ServersList[i].Status && ServersList[i].StatusRecived)
                 {
                     _lastReadyServerIndex = i;
-                    return servers[i];
+                    return ServersList[i];
                 }
             }
             return null;
         }
 
-        static void ServerListenThread(object param)
+        /// <summary>
+        ///     Поток обработки ответов сервера
+        /// </summary>
+        /// <param name="param"></param>
+        private static void ServerListenThread(object param)
         {
             var server = (Server) param;
             TcpClient connection = server.Connection;
@@ -121,10 +175,10 @@ namespace rbn.ServersHandler
                             var sp = new StatusPacket(packet.Data);
                             server.Status = sp.Status;
                             server.StatusRecived = true;
-                            if (server.Status) RbnQueue.SendRequestToServer();
+                            //if (server.Status) RbnQueue.SendRequestToServer();
                             break;
                         case PacketType.Answer:
-                            RbnQueue.ServerAnswer(int.Parse(packet.ClientId),packet.Data);
+                            RbnQueue.ServerAnswer(int.Parse(packet.ClientId), packet.Data);
                             break;
                     }
                 }
@@ -135,15 +189,32 @@ namespace rbn.ServersHandler
             }
         }
 
-        static public void SendRequest(Server server, string query, int clientId)
+        /// <summary>
+        ///     Отправка запроса серверу
+        /// </summary>
+        /// <param name="server"></param>
+        /// <param name="query"></param>
+        /// <param name="clientId"></param>
+        public static void SendRequest(Server server, string query, int clientId)
         {
-            Packet packet = new Packet(PacketType.Request, query, Settings.GlobalId,Settings.RegionId,clientId);
+            var packet = new Packet(PacketType.Request, query, Settings.GlobalId, Settings.RegionId, clientId);
             byte[] packetBytes = packet.ToBytes();
             if (server.Connection.Connected)
             {
-                server.Connection.GetStream().Write(packetBytes, 0, packetBytes.Length);
-
                 server.StatusRecived = false;
+                server.Connection.GetStream().Write(packetBytes, 0, packetBytes.Length);
+            }
+        }
+
+        /// <summary>
+        ///     убийца
+        /// </summary>
+        ~Servers()
+        {
+            _sendThreadLife = false;
+            foreach (Server server in ServersList)
+            {
+                server.Connection.Close();
             }
         }
     }

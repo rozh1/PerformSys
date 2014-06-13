@@ -1,9 +1,8 @@
-﻿using System;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 
 namespace rbn.QueueHandler
 {
-    class Client
+    internal class Client
     {
         public TcpClient Connection { get; set; }
         public string Query { get; set; }

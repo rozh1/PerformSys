@@ -9,10 +9,19 @@ using rbn.QueueHandler;
 
 namespace rbn
 {
+    /// <summary>
+    ///     РБН
+    /// </summary>
     internal class Server
     {
+        /// <summary>
+        ///     Слушатель новых соединений (клиентов)
+        /// </summary>
         private readonly TcpListener _listener;
-        
+
+        /// <summary>
+        ///     признак жизн потока
+        /// </summary>
         private bool _serverIsLife;
 
         public Server(int port)
@@ -22,7 +31,7 @@ namespace rbn
             _listener.Start();
 
             _serverIsLife = true;
-            
+
             Logger.Write("Начато прослушивание " + IPAddress.Any + ":" + port);
 
             while (_serverIsLife)
@@ -35,7 +44,11 @@ namespace rbn
             }
         }
 
-        void ClientThread(object param)
+        /// <summary>
+        ///     Поток обслуживания клиента
+        /// </summary>
+        /// <param name="param"></param>
+        private void ClientThread(object param)
         {
             var tcpClient = (TcpClient) param;
             var client = new Client();
@@ -77,7 +90,7 @@ namespace rbn
         }
 
         /// <summary>
-        /// убийца - деструктор
+        ///     убийца - деструктор
         /// </summary>
         ~Server()
         {

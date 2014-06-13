@@ -8,13 +8,13 @@ namespace server.DataBase
     /// <summary>
     ///     Работа с БД
     /// </summary>
-    public static class DB
+    public static class Database
     {
-        private static MySqlDb mysqldb;
+        private static MySqlDb _mysqldb;
 
-        private static string database = "";
+        private static string _database = "";
 
-        private static NumberFormatInfo nfi;
+        private static NumberFormatInfo _nfi;
 
         public static event Action ConnectionError;
 
@@ -24,20 +24,19 @@ namespace server.DataBase
         /// <returns>true в случае успеха</returns>
         public static bool Init()
         {
-            database = ConfigFile.GetConfigValue("DataBase");
-            nfi = new NumberFormatInfo();
-            nfi.NumberDecimalSeparator = ".";
-            switch (database)
+            _database = ConfigFile.GetConfigValue("DataBase");
+            _nfi = new NumberFormatInfo {NumberDecimalSeparator = "."};
+            switch (_database)
             {
                 case "mysql":
-                    mysqldb = new MySqlDb(
+                    _mysqldb = new MySqlDb(
                         ConfigFile.GetConfigValue("MySQL_user"),
                         ConfigFile.GetConfigValue("MySQL_password"),
                         ConfigFile.GetConfigValue("MySQL_database"),
                         ConfigFile.GetConfigValue("MySQL_server"),
                         ConfigFile.GetConfigValue("MySQL_port"));
-                    mysqldb.ConnectionError += mysqldb_ConnectionError;
-                    return mysqldb.MySqlConnectionOpen();
+                    _mysqldb.ConnectionError += mysqldb_ConnectionError;
+                    return _mysqldb.MySqlConnectionOpen();
             }
             return false;
         }
@@ -52,10 +51,10 @@ namespace server.DataBase
         /// </summary>
         private static void CheckInit()
         {
-            switch (database)
+            switch (_database)
             {
                 case "mysql":
-                    if (mysqldb == null) Init();
+                    if (_mysqldb == null) Init();
                     break;
             }
         }
@@ -69,10 +68,10 @@ namespace server.DataBase
         {
             CheckInit();
             //Logger.Write("Запрос на запись к базе: " + query, 7);
-            switch (database)
+            switch (_database)
             {
                 case "mysql":
-                    mysqldb.Insert(query);
+                    _mysqldb.Insert(query);
                     break;
             }
         }
@@ -86,10 +85,10 @@ namespace server.DataBase
         {
             CheckInit();
             //Logger.Write("Запрос на чтение к базе: " + query, 7);
-            switch (database)
+            switch (_database)
             {
                 case "mysql":
-                    return mysqldb.Select(query);
+                    return _mysqldb.Select(query);
             }
             return null;
         }
@@ -103,10 +102,10 @@ namespace server.DataBase
             CheckInit();
             //Logger.Write("Запрос на обновление к базе: " + query, 7);
             int updatedRows = 0;
-            switch (database)
+            switch (_database)
             {
                 case "mysql":
-                    updatedRows = mysqldb.Update(query);
+                    updatedRows = _mysqldb.Update(query);
                     break;
             }
             Logger.Write("В результате измененно " + updatedRows + " строк", 7);
@@ -121,10 +120,10 @@ namespace server.DataBase
             CheckInit();
             Logger.Write("Запрос на удаление к базе: " + query, 7);
             int deletedRows = 0;
-            switch (database)
+            switch (_database)
             {
                 case "mysql":
-                    deletedRows = mysqldb.Delete(query);
+                    deletedRows = _mysqldb.Delete(query);
                     break;
             }
             Logger.Write("В результате измененно " + deletedRows + " строк", 7);

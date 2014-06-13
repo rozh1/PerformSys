@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Balancer.Common;
+using rbn.Properties;
 using rbn.ServersHandler;
 
 namespace rbn
@@ -13,7 +14,7 @@ namespace rbn
 
             string configFilePath = Environment.CurrentDirectory + "/rbn.cfg";
             ConfigFile.SetConfigPath(configFilePath);
-            if (!File.Exists(configFilePath)) ConfigFile.SaveSettings(Properties.Resources.defaultConfig);
+            if (!File.Exists(configFilePath)) ConfigFile.SaveSettings(Resources.defaultConfig);
             ConfigFile.LoadSettings();
 
             Settings.Init();
