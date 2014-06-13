@@ -17,16 +17,17 @@
  */
 #endregion
 
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace rbn.QueueHandler
+namespace rbn
 {
-    internal class Client
+    class Program
     {
-        public TcpClient Connection { get; set; }
-        public string Query { get; set; }
-        public string AnswerPacketData { get; set; }
-        public bool QuerySended { get; set; }
-        public int Id { get; set; }
+        static void Main(string[] args)
+        {
+        }
     }
 }

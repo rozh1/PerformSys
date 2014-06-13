@@ -19,14 +19,12 @@
 
 ﻿using System.Net.Sockets;
 
-namespace rbn.QueueHandler
+namespace rbn.GlobalBalancerHandler
 {
-    internal class Client
+    internal class GlobalBalancer
     {
         public TcpClient Connection { get; set; }
-        public string Query { get; set; }
-        public string AnswerPacketData { get; set; }
-        public bool QuerySended { get; set; }
-        public int Id { get; set; }
+        public bool Status { get; set; }
+        public bool StatusRecived { get; set; }
     }
 }

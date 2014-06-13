@@ -17,16 +17,14 @@
  */
 #endregion
 
-﻿using System.IO;
-using Balancer.Common;
-using rbn.ServersHandler;
+﻿using Balancer.Common;
 
 namespace rbn
 {
-    static class Settings
+    internal static class Settings
     {
-        static public int GlobalId { get; set; }
-        static public int RegionId { get; set; }
+        public static int GlobalId { get; set; }
+        public static int RegionId { get; set; }
 
         public static void Init()
         {

@@ -21,7 +21,7 @@
 
 namespace rbn.ServersHandler
 {
-    class Server
+    internal class Server
     {
         public TcpClient Connection { get; set; }
         public bool Status { get; set; }

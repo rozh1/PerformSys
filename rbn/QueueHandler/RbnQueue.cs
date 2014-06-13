@@ -19,7 +19,6 @@
 
 ﻿using System;
 using System.Collections.Generic;
-using System.Net.Sockets;
 using System.Threading;
 using Balancer.Common;
 using Balancer.Common.Packet;
@@ -27,50 +26,67 @@ using rbn.ServersHandler;
 
 namespace rbn.QueueHandler
 {
-    static class RbnQueue
+    /// <summary>
+    /// Очередь регионального балансировщика
+    /// </summary>
+    internal static class RbnQueue
     {
         /// <summary>
-        /// Список клиентов (очередь выполнения)
+        ///     Список клиентов (очередь выполнения)
         /// </summary>
-        private static readonly List<Client> Clients  = new List<Client>();
-
-        static Queue<QueueEntity> _queue = new Queue<QueueEntity>(); 
-
-        private static int _id = 1;
-
-        static object clientSyncObject = new object();
+        private static readonly List<Client> Clients = new List<Client>();
 
         /// <summary>
-        /// Добавление клиента в конец
+        ///     Очередь
+        /// </summary>
+        private static readonly Queue<QueueEntity> Queue = new Queue<QueueEntity>();
+
+        /// <summary>
+        ///     Уникальный идентификатор пользователя
+        /// </summary>
+        private static int _id = 1;
+
+        /// <summary>
+        ///     Объект синхронизации работы с клиентами
+        /// </summary>
+        private static readonly object ClientSyncObject = new object();
+
+        /// <summary>
+        ///     Мьтекс отправки данных серверу
+        /// </summary>
+        private static readonly Mutex SendMutex = new Mutex();
+
+        /// <summary>
+        ///     Добавление клиента в конец
         /// </summary>
         /// <param name="client">клиент</param>
-        static public void AddClient(Client client)
+        public static void AddClient(Client client)
         {
-            lock (clientSyncObject)
+            lock (ClientSyncObject)
             {
                 if (Clients.Contains(client))
                 {
                     Client tmpClient = Clients[Clients.IndexOf(client)];
                     tmpClient.Query = client.Query;
                     tmpClient.AnswerPacketData = "";
-                    _queue.Enqueue(new QueueEntity() {ClientId = tmpClient.Id, Query = tmpClient.Query});
+                    Queue.Enqueue(new QueueEntity {ClientId = tmpClient.Id, Query = tmpClient.Query});
                 }
                 else
                 {
                     client.Id = _id++;
                     Clients.Add(client);
-                    _queue.Enqueue(new QueueEntity() {ClientId = client.Id, Query = client.Query});
+                    Queue.Enqueue(new QueueEntity {ClientId = client.Id, Query = client.Query});
                 }
             }
         }
 
         /// <summary>
-        /// Удаление клиента
+        ///     Удаление клиента
         /// </summary>
         /// <param name="client">клиент</param>
         public static void RemoveClient(Client client)
         {
-            lock (clientSyncObject)
+            lock (ClientSyncObject)
             {
                 if (Clients.Contains(client))
                 {
@@ -80,7 +96,7 @@ namespace rbn.QueueHandler
         }
 
         /// <summary>
-        /// Ответ сервера
+        ///     Ответ сервера
         /// </summary>
         /// <param name="clientId">номер клиента</param>
         /// <param name="answer">пакет ответа</param>
@@ -89,7 +105,7 @@ namespace rbn.QueueHandler
             Logger.Write("Получен ответ для клиента " + clientId);
             try
             {
-                lock (clientSyncObject)
+                lock (ClientSyncObject)
                 {
                     int count = Clients.Count;
                     for (int i = 0; i < count; i++)
@@ -109,39 +125,37 @@ namespace rbn.QueueHandler
         }
 
         /// <summary>
-        /// отправка ответа клиенту
+        ///     отправка ответа клиенту
         /// </summary>
         /// <param name="client">клиент</param>
         /// <param name="answer">пакет ответа</param>
-        static void SendAnswer(Client client, string answer)
+        private static void SendAnswer(Client client, string answer)
         {
-            var packet = new Packet(PacketType.Answer,answer);
+            var packet = new Packet(PacketType.Answer, answer);
             byte[] bytes = packet.ToBytes();
             client.AnswerPacketData = answer;
             if (client.Connection.Connected)
                 client.Connection.GetStream().Write(bytes, 0, bytes.Length);
         }
 
-        private static Mutex sendMutex = new Mutex();
-
         /// <summary>
-        /// Выбор клиента и отправка его запроса на сервер
+        ///     Выбор клиента и отправка его запроса на сервер
         /// </summary>
-        static public void SendRequestToServer()
+        public static void SendRequestToServer()
         {
-            sendMutex.WaitOne(1000);
-            if (_queue.Count > 0)
+            SendMutex.WaitOne(1000);
+            if (Queue.Count > 0)
             {
-                QueueEntity qe = _queue.Peek();
-                if (SendRequest(qe)) _queue.Dequeue();
+                QueueEntity qe = Queue.Peek();
+                if (SendRequest(qe)) Queue.Dequeue();
             }
-            sendMutex.ReleaseMutex();
+            SendMutex.ReleaseMutex();
         }
 
         /// <summary>
-        /// Отправка запроса серверу
+        ///     Отправка запроса серверу
         /// </summary>
-        static bool SendRequest(QueueEntity queueEntity)
+        private static bool SendRequest(QueueEntity queueEntity)
         {
             ServersHandler.Server server = Servers.GetNextReadyServer();
             if (server != null)
@@ -156,15 +170,20 @@ namespace rbn.QueueHandler
             return true;
         }
 
-        static Client GetClientById(int Id)
+        /// <summary>
+        ///     Получение клиента по ID
+        /// </summary>
+        /// <param name="id">ID клиента</param>
+        /// <returns>клиент</returns>
+        private static Client GetClientById(int id)
         {
-            lock (clientSyncObject)
+            lock (ClientSyncObject)
             {
-                for (int i = 0; i < Clients.Count; i++)
+                foreach (Client client in Clients)
                 {
-                    if (Clients[i].Id == Id)
+                    if (client.Id == id)
                     {
-                        return Clients[i];
+                        return client;
                     }
                 }
             }

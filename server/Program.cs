@@ -21,6 +21,8 @@
 using System.IO;
 using System.Threading;
 using Balancer.Common;
+using server.DataBase;
+using server.Properties;
 
 namespace server
 {
@@ -32,16 +34,16 @@ namespace server
 
             string configFilePath = "server.cfg";
             ConfigFile.SetConfigPath(configFilePath);
-            if (!File.Exists(configFilePath)) ConfigFile.SaveSettings(Properties.Resources.defaultConfig);
+            if (!File.Exists(configFilePath)) ConfigFile.SaveSettings(Resources.defaultConfig);
             ConfigFile.LoadSettings();
 
-            int maxThreadsCount = Environment.ProcessorCount;//*2;
+            int maxThreadsCount = Environment.ProcessorCount;
 
             ThreadPool.SetMaxThreads(maxThreadsCount, maxThreadsCount);
 
             ThreadPool.SetMinThreads(1, 1);
 
-            if (!DataBase.DB.Init())
+            if (!Database.Init())
             {
                 Logger.Write("Ошибка подключения к БД. Выход.");
                 return;

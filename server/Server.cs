@@ -31,17 +31,30 @@ using server.DataBase;
 
 namespace server
 {
+    /// <summary>
+    ///     СЕРВЕР БД
+    /// </summary>
     internal class Server
     {
+        /// <summary>
+        ///     Слушатель новых соедиений
+        /// </summary>
         private readonly TcpListener _listener;
 
+        /// <summary>
+        ///     текущее содинение
+        /// </summary>
         private readonly TcpClient _tcpClient;
 
-        private bool serverIsLife;
+        /// <summary>
+        ///     длина очереди на сервере
+        /// </summary>
+        private int _queueLength;
 
-        private int _queueLength = 0;
-
-        Mutex mutex = new Mutex();
+        /// <summary>
+        ///     признак жизни потока слушателя
+        /// </summary>
+        private bool _serverIsLife;
 
         public Server(int port)
         {
@@ -49,11 +62,11 @@ namespace server
 
             _listener.Start();
 
-            serverIsLife = true;
+            _serverIsLife = true;
 
             Logger.Write("Начато прослушивание " + IPAddress.Any + ":" + port);
 
-            while (serverIsLife)
+            while (_serverIsLife)
             {
                 _tcpClient = _listener.AcceptTcpClient();
 
@@ -64,15 +77,12 @@ namespace server
                 {
                     SendStatus();
 
-                    string onePacketData = ""; 
-                    
                     var buffer = new byte[1400];
 
                     try
                     {
                         int count;
                         while ((count = _tcpClient.GetStream().Read(buffer, 0, buffer.Length)) > 0)
-                        //Client.Receive(buffer))>0)//.
                         {
                             packetData += Encoding.ASCII.GetString(buffer, 0, count);
                             if (packetData.Contains(Packet.PacketEnd)) break;
@@ -80,8 +90,7 @@ namespace server
                         while (packetData.Contains(Packet.PacketEnd))
                         {
                             int index = packetData.IndexOf(Packet.PacketEnd, StringComparison.Ordinal);
-                            onePacketData =
-                                packetData.Remove(index);
+                            string onePacketData = packetData.Remove(index);
                             packetData =
                                 packetData.Substring(
                                     index +
@@ -94,16 +103,17 @@ namespace server
                     }
                     catch (Exception ex)
                     {
-                        Logger.Write("Исключение при чтении запроса: "+ ex.Message);
+                        Logger.Write("Исключение при чтении запроса: " + ex.Message);
                     }
                 }
             }
         }
 
-        void SendStatus()
+        /// <summary>
+        ///     Отправка статуса сервера
+        /// </summary>
+        private void SendStatus()
         {
-            //int workerThreads, completionPortThreads;
-            //ThreadPool.GetAvailableThreads(out workerThreads, out completionPortThreads);
             bool status = (_queueLength <= Environment.ProcessorCount*2);
             var sp = new StatusPacket(status);
             Byte[] statusPacket = sp.GetPacket().ToBytes();
@@ -115,15 +125,17 @@ namespace server
             {
                 Logger.Write("Исключение при отсылке статуса: " + ex.Message);
             }
-            Logger.Write("Отослан статус " + status.ToString());
+            Logger.Write("Отослан статус " + status);
         }
 
+        /// <summary>
+        ///     Обработчик запроса в MySQL
+        /// </summary>
+        /// <param name="data"></param>
         private void MySqlWorker(object data)
         {
             var packetData = (string) data;
             var packet = new Packet(packetData);
-
-            //Logger.Write("Принят запрос: " + packet.Data);
 
             Logger.Write("Принят запрос от клиента: " + packet.ClientId);
             DataTable dt = null;
@@ -134,7 +146,7 @@ namespace server
                 sw.Start();
                 try
                 {
-                    dt = DB.CustomQuery(packet.Data);
+                    dt = Database.CustomQuery(packet.Data);
                 }
                 catch (Exception ex)
                 {
@@ -145,7 +157,7 @@ namespace server
             }
             if (dt != null)
             {
-                Logger.Write("Отправка результата клиенту "+ packet.ClientId);
+                Logger.Write("Отправка результата клиенту " + packet.ClientId);
                 var dbAnswerPacket = new DbAnswerPacket(dt);
                 Packet answerPacket = dbAnswerPacket.GetPacket();
                 answerPacket.Type = PacketType.Answer;
@@ -159,11 +171,11 @@ namespace server
         }
 
         /// <summary>
-        /// убийца - деструктор
+        ///     убийца - деструктор
         /// </summary>
         ~Server()
         {
-            serverIsLife = false;
+            _serverIsLife = false;
             if (_listener != null)
             {
                 _listener.Stop();
