@@ -30,9 +30,10 @@ namespace server
     {
         private static void Main()
         {
+            Logger.SetLogFile("serverLog.txt");
             Logger.Write("Сервер запущен");
 
-            string configFilePath = "server.cfg";
+            const string configFilePath = "server.cfg";
             ConfigFile.SetConfigPath(configFilePath);
             if (!File.Exists(configFilePath)) ConfigFile.SaveSettings(Resources.defaultConfig);
             ConfigFile.LoadSettings();
