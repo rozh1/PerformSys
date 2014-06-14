@@ -28,7 +28,7 @@ namespace client
 
         private static void EndWorkClient()
         {
-            Console.WriteLine("Время работы: " + (DateTime.Now - _startTime));
+            Console.WriteLine(@"Время работы: " + (DateTime.Now - _startTime));
         }
     }
 }

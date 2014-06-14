@@ -10,6 +10,7 @@ namespace rbn
     {
         private static void Main()
         {
+            Logger.SetLogFile("rbnLog.txt");
             Logger.Write("Сервер запущен");
 
             string configFilePath = Environment.CurrentDirectory + "/rbn.cfg";
