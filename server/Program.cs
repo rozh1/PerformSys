@@ -19,8 +19,11 @@
 
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Threading;
 using Balancer.Common;
+using server.Config;
+using server.Config.Data;
 using server.DataBase;
 using server.Properties;
 
@@ -33,10 +36,13 @@ namespace server
             Logger.SetLogFile("serverLog.txt");
             Logger.Write("Сервер запущен");
 
-            const string configFilePath = "server.cfg";
-            ConfigFile.SetConfigPath(configFilePath);
-            if (!File.Exists(configFilePath)) ConfigFile.SaveSettings(Resources.defaultConfig);
-            ConfigFile.LoadSettings();
+            const string configFilePath = "serverConfig.xml";
+            if (!File.Exists(configFilePath))
+            {
+                server.Config.ServerConfig.Load(
+                    new MemoryStream(Encoding.UTF8.GetBytes(Properties.Resources.defaultConfig))).Save(configFilePath);
+            }
+            ServerConfig.Load(configFilePath);
 
             int maxThreadsCount = Environment.ProcessorCount;
 
@@ -44,14 +50,17 @@ namespace server
 
             ThreadPool.SetMinThreads(1, 1);
 
-            if (!Database.Init())
+            if (ServerConfig.Instance.Server.WorkMode == WorkMode.Normal)
             {
-                Logger.Write("Ошибка подключения к БД. Выход.");
-                return;
+                if (!Database.Init())
+                {
+                    Logger.Write("Ошибка подключения к БД. Выход.");
+                    return;
+                }
             }
 
             Logger.Write("Сервер конфигурирован");
-            new Server(int.Parse(ConfigFile.GetConfigValue("ServerPort")));
+            new Server(ServerConfig.Instance.Server.Port);
         }
     }
 }

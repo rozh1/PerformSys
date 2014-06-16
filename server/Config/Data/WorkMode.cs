@@ -17,16 +17,12 @@
  */
 #endregion
 
-﻿using System.Net.Sockets;
-
-namespace rbn.QueueHandler
+﻿namespace server.Config.Data
 {
-    internal class Client
+    public enum WorkMode
     {
-        public TcpClient Connection { get; set; }
-        public string RequestPacketData { get; set; }
-        public string AnswerPacketData { get; set; }
-        public bool RequestSended { get; set; }
-        public int Id { get; set; }
+        Normal,
+        Simulation,
+        Modelling
     }
 }

@@ -94,7 +94,7 @@ namespace rbn
                         //Logger.Write("Принят запрос: " + packet.Data);
 
                         client.Connection = tcpClient;
-                        client.Query = packet.Data;
+                        client.RequestPacketData = packet.Data;
 
                         RbnQueue.AddClient(client);
                     }

@@ -118,12 +118,20 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="defaultConfig" xml:space="preserve">
-    <value>DataBase=mysql;
-MySQL_server=localhost;
-MySQL_port=3306;
-MySQL_database=BetonInvest;
-MySQL_user=BetonInvest;
-MySQL_password=BetonInvest;
-ServerPort=3409;</value>
+    <value>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;ServerConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;DataBase&gt;
+    &lt;DataBaseType&gt;MySQL&lt;/DataBaseType&gt;
+    &lt;Host&gt;localhost&lt;/Host&gt;
+    &lt;Port&gt;3306&lt;/Port&gt;
+    &lt;UserName&gt;root&lt;/UserName&gt;
+    &lt;Password&gt;0000&lt;/Password&gt;
+    &lt;DataBaseName&gt;tpch1&lt;/DataBaseName&gt;
+  &lt;/DataBase&gt;
+  &lt;Server&gt;
+    &lt;Port&gt;3410&lt;/Port&gt;
+    &lt;WorkMode&gt;Normal&lt;/WorkMode&gt;
+  &lt;/Server&gt;
+&lt;/ServerConfig&gt;</value>
   </data>
 </root>
