@@ -13,7 +13,7 @@ namespace server.DataBase
         private string _database;
         private int _comandTimeout = int.MaxValue;
 
-        public MySqlDb(string user, string password, string database, string server, string port)
+        public MySqlDb(string user, string password, string database, string server, uint port)
         {
             _connectionString = new MySqlConnectionStringBuilder
             {
@@ -21,7 +21,7 @@ namespace server.DataBase
                 Password = password,
                 Server = server,
                 Database = database,
-                Port = (uint) int.Parse(port),
+                Port = port,
                 MaximumPoolSize = 50,
                 MinimumPoolSize = 2,
                 Pooling = true

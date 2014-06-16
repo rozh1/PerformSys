@@ -8,6 +8,7 @@ using System.Threading;
 using Balancer.Common;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
+using server.Config.Data;
 using server.DataBase;
 
 namespace server
@@ -37,9 +38,9 @@ namespace server
         /// </summary>
         private bool _serverIsLife;
 
-        public Server(int port)
+        public Server(uint port)
         {
-            _listener = new TcpListener(IPAddress.Any, port);
+            _listener = new TcpListener(IPAddress.Any, (int)port);
 
             _listener.Start();
 
@@ -118,28 +119,18 @@ namespace server
             var packetData = (string) data;
             var packet = new Packet(packetData);
 
+            var requestPacket = new DbRequestPacket(packet.Data);
+
             Logger.Write("Принят запрос от клиента: " + packet.ClientId);
             DataTable dt = null;
             if (packet.Type == PacketType.Request)
             {
-                Logger.Write("Запрос начал выполнение");
-                var sw = new Stopwatch();
-                sw.Start();
-                try
-                {
-                    dt = Database.CustomQuery(packet.Data);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Write(ex.Message);
-                }
-                sw.Stop();
-                Logger.Write("Запрос выполнен за " + sw.ElapsedMilliseconds + " мс");
+                dt = ProcessQuery(requestPacket);
             }
             if (dt != null)
             {
                 Logger.Write("Отправка результата клиенту " + packet.ClientId);
-                var dbAnswerPacket = new DbAnswerPacket(dt);
+                var dbAnswerPacket = new DbAnswerPacket(dt, requestPacket.QueryNumber);
                 Packet answerPacket = dbAnswerPacket.GetPacket();
                 answerPacket.Type = PacketType.Answer;
                 answerPacket.ClientId = packet.ClientId;
@@ -149,6 +140,54 @@ namespace server
             }
             _queueLength--;
             SendStatus();
+        }
+
+        private DataTable ProcessQuery(DbRequestPacket requestPacket)
+        {
+            DataTable dt = null;
+            Logger.Write("Запрос начал выполнение");
+            var sw = new Stopwatch();
+            sw.Start();
+
+            switch (Config.ServerConfig.Instance.Server.WorkMode)
+            {
+                case WorkMode.Normal:
+                    dt = ProcessQueryWithMySQL(requestPacket);
+                    break;
+                case WorkMode.Simulation:
+                    dt = ProcessQuerySimulated(requestPacket);
+                    break;
+            }
+
+            sw.Stop();
+            Logger.Write("Запрос " + requestPacket.QueryNumber + " выполнен за " + sw.ElapsedMilliseconds + " мс");
+            return dt;
+        }
+
+        private DataTable ProcessQueryWithMySQL(DbRequestPacket requestPacket)
+        {
+            DataTable dt=null;
+            try
+            {
+                dt = Database.CustomQuery(requestPacket.Query);
+            }
+            catch (Exception ex)
+            {
+                Logger.Write(ex.Message);
+            }
+            return dt;
+        }
+
+        private DataTable ProcessQuerySimulated(DbRequestPacket requestPacket)
+        {
+            Thread.Sleep(SimulatedTimes.Times[requestPacket.QueryNumber]);
+            DataTable dt = new DataTable();
+            dt.TableName = "randomTable";
+            dt.Columns.Add("Data");
+            DataRow dr = dt.NewRow();
+            dr[0] = "RandomData";
+            dt.Rows.Add(dr);
+            return dt; 
         }
 
         /// <summary>

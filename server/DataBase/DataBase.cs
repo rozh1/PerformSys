@@ -12,7 +12,7 @@ namespace server.DataBase
     {
         private static MySqlDb _mysqldb;
 
-        private static string _database = "";
+        private static Config.Data.DataBaseType _database;
 
         private static NumberFormatInfo _nfi;
 
@@ -24,17 +24,17 @@ namespace server.DataBase
         /// <returns>true в случае успеха</returns>
         public static bool Init()
         {
-            _database = ConfigFile.GetConfigValue("DataBase");
+            _database = Config.ServerConfig.Instance.DataBase.DataBaseType;
             _nfi = new NumberFormatInfo {NumberDecimalSeparator = "."};
             switch (_database)
             {
-                case "mysql":
+                case Config.Data.DataBaseType.MySQL:
                     _mysqldb = new MySqlDb(
-                        ConfigFile.GetConfigValue("MySQL_user"),
-                        ConfigFile.GetConfigValue("MySQL_password"),
-                        ConfigFile.GetConfigValue("MySQL_database"),
-                        ConfigFile.GetConfigValue("MySQL_server"),
-                        ConfigFile.GetConfigValue("MySQL_port"));
+                        Config.ServerConfig.Instance.DataBase.UserName,
+                        Config.ServerConfig.Instance.DataBase.Password,
+                        Config.ServerConfig.Instance.DataBase.DataBaseName,
+                        Config.ServerConfig.Instance.DataBase.Host,
+                        Config.ServerConfig.Instance.DataBase.Port);
                     _mysqldb.ConnectionError += mysqldb_ConnectionError;
                     return _mysqldb.MySqlConnectionOpen();
             }
@@ -53,7 +53,7 @@ namespace server.DataBase
         {
             switch (_database)
             {
-                case "mysql":
+                case Config.Data.DataBaseType.MySQL:
                     if (_mysqldb == null) Init();
                     break;
             }
@@ -70,7 +70,7 @@ namespace server.DataBase
             //Logger.Write("Запрос на запись к базе: " + query, 7);
             switch (_database)
             {
-                case "mysql":
+                case Config.Data.DataBaseType.MySQL:
                     _mysqldb.Insert(query);
                     break;
             }
@@ -87,7 +87,7 @@ namespace server.DataBase
             //Logger.Write("Запрос на чтение к базе: " + query, 7);
             switch (_database)
             {
-                case "mysql":
+                case Config.Data.DataBaseType.MySQL:
                     return _mysqldb.Select(query);
             }
             return null;
@@ -104,7 +104,7 @@ namespace server.DataBase
             int updatedRows = 0;
             switch (_database)
             {
-                case "mysql":
+                case Config.Data.DataBaseType.MySQL:
                     updatedRows = _mysqldb.Update(query);
                     break;
             }
@@ -122,7 +122,7 @@ namespace server.DataBase
             int deletedRows = 0;
             switch (_database)
             {
-                case "mysql":
+                case Config.Data.DataBaseType.MySQL:
                     deletedRows = _mysqldb.Delete(query);
                     break;
             }

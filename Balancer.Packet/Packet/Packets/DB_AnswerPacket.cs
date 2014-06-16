@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Runtime.Serialization;
 
 namespace Balancer.Common.Packet.Packets
 {
@@ -9,12 +10,14 @@ namespace Balancer.Common.Packet.Packets
         public DbAnswerPacket(string answerPacketData)
         {
             _answerString = answerPacketData;
-            AnswerDataTable = (DataTable)SerializeMapper.Deserialize(answerPacketData);
+            var packetData = (PacketData)SerializeMapper.Deserialize(answerPacketData);
+            AnswerDataTable = packetData.DataTable;
+            QueryNumber = packetData.QueryNumber;
         }
 
-        public DbAnswerPacket(DataTable answer)
+        public DbAnswerPacket(DataTable answer, int queryNumber)
         {
-            _answerString = SerializeMapper.Serialize(answer);
+            _answerString = SerializeMapper.Serialize(new PacketData() {DataTable = answer, QueryNumber = queryNumber});
             AnswerDataTable = answer;
         }
 
@@ -25,10 +28,20 @@ namespace Balancer.Common.Packet.Packets
         }
 
         public DataTable AnswerDataTable { get; set; }
+        public int QueryNumber { get; set; }
 
         public Packet GetPacket()
         {
-            return new Packet(PacketType.Request, _answerString);
+            return new Packet(PacketType.Answer, _answerString);
+        }
+
+        [DataContract]
+        internal class PacketData
+        {
+            [DataMember]
+            public DataTable DataTable { get; set; }
+            [DataMember]
+            public int QueryNumber { get; set; }
         }
     }
 }

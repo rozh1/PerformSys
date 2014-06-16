@@ -46,7 +46,7 @@ namespace client
             if (tcpClient.Connected)
             {
                 string query = Resources.ResourceManager.GetString("q" + _queryNumber);
-                var dbRequestPacket = new DbRequestPacket(query);
+                var dbRequestPacket = new DbRequestPacket(query, _queryNumber);
                 Byte[] requestPacket = dbRequestPacket.GetPacket().ToBytes();
                 tcpClient.GetStream().Write(requestPacket, 0, requestPacket.Length);
 

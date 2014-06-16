@@ -48,15 +48,15 @@ namespace rbn.QueueHandler
                 if (Clients.Contains(client))
                 {
                     Client tmpClient = Clients[Clients.IndexOf(client)];
-                    tmpClient.Query = client.Query;
+                    tmpClient.RequestPacketData = client.RequestPacketData;
                     tmpClient.AnswerPacketData = "";
-                    Queue.Enqueue(new QueueEntity {ClientId = tmpClient.Id, Query = tmpClient.Query});
+                    Queue.Enqueue(new QueueEntity {ClientId = tmpClient.Id, Query = tmpClient.RequestPacketData});
                 }
                 else
                 {
                     client.Id = _id++;
                     Clients.Add(client);
-                    Queue.Enqueue(new QueueEntity {ClientId = client.Id, Query = client.Query});
+                    Queue.Enqueue(new QueueEntity {ClientId = client.Id, Query = client.RequestPacketData});
                 }
             }
         }
@@ -144,7 +144,7 @@ namespace rbn.QueueHandler
                 Servers.SendRequest(server, queueEntity.Query, queueEntity.ClientId);
                 Client client = GetClientById(queueEntity.ClientId);
                 if (client == null) return false;
-                client.QuerySended = true;
+                client.RequestSended = true;
                 Logger.Write("Отправлен запрос от клиента " + client.Id);
             }
             else return false;
