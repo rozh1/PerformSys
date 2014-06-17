@@ -24,7 +24,6 @@ namespace rbn.GlobalBalancerHandler
             _globalBalancersThreads = new List<Thread>();
 
             int port = 3400;
-            int.TryParse(ConfigFile.GetConfigValue("Server_count"), out port);
 
             _listener = new TcpListener(IPAddress.Any, port);
 

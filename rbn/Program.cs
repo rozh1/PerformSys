@@ -1,28 +1,30 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using System.Text;
 using Balancer.Common;
+using rbn.Config;
 using rbn.Properties;
 using rbn.ServersHandler;
 
 namespace rbn
 {
-    internal class Program
+    internal static class Program
     {
         private static void Main()
         {
             Logger.SetLogFile("rbnLog.txt");
             Logger.Write("Сервер запущен");
 
-            string configFilePath = Environment.CurrentDirectory + "/rbn.cfg";
-            ConfigFile.SetConfigPath(configFilePath);
-            if (!File.Exists(configFilePath)) ConfigFile.SaveSettings(Resources.defaultConfig);
-            ConfigFile.LoadSettings();
-
-            Settings.Init();
-
+            const string configFilePath = "rbnConfig.xml";
+            if (!File.Exists(configFilePath))
+            {
+                RBNConfig.Load(
+                    new MemoryStream(Encoding.UTF8.GetBytes(Resources.defaultConfig))).Save(configFilePath);
+            }
+            RBNConfig.Load(configFilePath);
+            
             Servers.Init();
 
-            new Server(int.Parse(ConfigFile.GetConfigValue("RBN_Port")));
+            new Server((int)RBNConfig.Instance.RBN.Port);
         }
     }
 }
