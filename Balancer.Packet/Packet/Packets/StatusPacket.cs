@@ -21,6 +21,7 @@
             set { _status = value; }
         }
 
+        public uint GlobalId { get; set; }
         public uint RegionId { get; set; }
         public uint ClientId { get; set; }
 
