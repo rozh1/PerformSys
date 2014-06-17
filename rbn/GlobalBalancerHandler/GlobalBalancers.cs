@@ -108,7 +108,8 @@ namespace rbn.GlobalBalancerHandler
                             if (globalBalancer.Status) RbnQueue.SendRequestToServer();
                             break;
                         case PacketType.Answer:
-                            RbnQueue.ServerAnswer(int.Parse(packet.ClientId), packet.Data);
+                            var answer = new DbAnswerPacket(packet.Data);
+                            RbnQueue.ServerAnswer((int)answer.ClientId, packet.Data);
                             break;
                     }
                 }

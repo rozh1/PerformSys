@@ -21,6 +21,9 @@
             set { _status = value; }
         }
 
+        public uint RegionId { get; set; }
+        public uint ClientId { get; set; }
+
         public Packet GetPacket()
         {
             return new Packet(PacketType.Status, (_status ? "1" : "0"));

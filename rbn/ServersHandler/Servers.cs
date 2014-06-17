@@ -178,7 +178,8 @@ namespace rbn.ServersHandler
                             //if (server.Status) RbnQueue.SendRequestToServer();
                             break;
                         case PacketType.Answer:
-                            RbnQueue.ServerAnswer(int.Parse(packet.ClientId), packet.Data);
+                            var answer = new DbAnswerPacket(packet.Data);
+                            RbnQueue.ServerAnswer((int)answer.ClientId, packet.Data);
                             break;
                     }
                 }
@@ -197,8 +198,9 @@ namespace rbn.ServersHandler
         /// <param name="clientId"></param>
         public static void SendRequest(Server server, string query, int clientId)
         {
-            var packet = new Packet(PacketType.Request, query, Settings.GlobalId, Settings.RegionId, clientId);
-            byte[] packetBytes = packet.ToBytes();
+            var packet = new DbRequestPacket(query);
+            packet.ClientId = (uint)clientId;
+            byte[] packetBytes = packet.GetPacket().ToBytes();
             if (server.Connection.Connected)
             {
                 server.StatusRecived = false;

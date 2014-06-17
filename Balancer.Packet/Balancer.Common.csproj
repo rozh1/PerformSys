@@ -42,6 +42,7 @@
     <Compile Include="ConfigFile.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Packet\Packets\IPacket.cs" />
+    <Compile Include="Packet\Packets\PacketBase.cs" />
     <Compile Include="Packet\Packets\StatusPacket.cs" />
     <Compile Include="Packet\Packets\DB_RequestPacket.cs" />
     <Compile Include="Packet\Packet.cs" />
