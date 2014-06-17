@@ -61,11 +61,20 @@ namespace rbn.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Region_id=1;
-        ///Global_id=1;
-        ///RBN_Port=3409;
-        ///Server_count=1;
-        ///Server_1=127.0.0.1:3410;.
+        ///   Ищет локализованную строку, похожую на &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;RBNConfig xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;RBN&gt;
+        ///    &lt;GlobalId&gt;1&lt;/GlobalId&gt;
+        ///    &lt;RegionId&gt;1&lt;/RegionId&gt;
+        ///    &lt;Port&gt;3409&lt;/Port&gt;
+        ///  &lt;/RBN&gt;
+        ///  &lt;Servers&gt;
+        ///    &lt;Server&gt;
+        ///      &lt;Port&gt;3410&lt;/Port&gt;
+        ///      &lt;Host&gt;localhost&lt;/Host&gt;
+        ///    &lt;/Server&gt;
+        ///  &lt;/Servers&gt;
+        ///&lt;/RBNConfig&gt;.
         /// </summary>
         internal static string defaultConfig {
             get {

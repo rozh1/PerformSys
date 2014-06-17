@@ -17,20 +17,17 @@
  */
 #endregion
 
-﻿using Balancer.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace rbn
+namespace rbn.Config.Data
 {
-    internal static class Settings
+    public class RBN
     {
-        public static int GlobalId { get; set; }
-        public static int RegionId { get; set; }
-
-        public static void Init()
-        {
-            GlobalId = int.Parse(ConfigFile.GetConfigValue("Global_id"));
-
-            RegionId = int.Parse(ConfigFile.GetConfigValue("Region_id"));
-        }
+        public uint GlobalId { get; set; }
+        public uint RegionId { get; set; }
+        public uint Port { get; set; }
     }
 }

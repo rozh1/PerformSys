@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\Data\RBN.cs" />
     <Compile Include="Config\Data\Server.cs" />
     <Compile Include="Config\RBNConfig.cs" />
     <Compile Include="Program.cs" />
@@ -55,7 +56,6 @@
     <Compile Include="Server.cs" />
     <Compile Include="ServersHandler\Server.cs" />
     <Compile Include="ServersHandler\Servers.cs" />
-    <Compile Include="Settings.cs" />
     <Compile Include="GlobalBalancerHandler\GlobalBalancer.cs" />
     <Compile Include="GlobalBalancerHandler\GlobalBalancers.cs" />
   </ItemGroup>

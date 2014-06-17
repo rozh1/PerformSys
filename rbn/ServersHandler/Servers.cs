@@ -25,6 +25,7 @@ using System.Threading;
 using Balancer.Common;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
+using rbn.Config;
 using rbn.QueueHandler;
 
 namespace rbn.ServersHandler
@@ -59,22 +60,12 @@ namespace rbn.ServersHandler
         /// </summary>
         public static void Init()
         {
-            int serverCount;
-            if (!int.TryParse(ConfigFile.GetConfigValue("Server_count"), out serverCount))
-            {
-                Logger.Write("Не удалось прочитать количество серверов.");
-                Logger.Write("Выход...");
-                Environment.Exit(-1);
-            }
-
-            for (int i = 1; i <= serverCount; i++)
+            foreach (Config.Data.Server serverConfig in RBNConfig.Instance.Servers)
             {
                 try
                 {
-                    string connString = ConfigFile.GetConfigValue("Server_" + i);
-                    string[] conn = connString.Split(':');
                     var tcpClient = new TcpClient();
-                    tcpClient.Connect(conn[0], int.Parse(conn[1]));
+                    tcpClient.Connect(serverConfig.Host, (int)serverConfig.Port);
                     var server = new Server {Connection = tcpClient};
                     AddServer(server);
                     var serverThread = new Thread(ServerListenThread);
@@ -83,7 +74,7 @@ namespace rbn.ServersHandler
                 }
                 catch (Exception e)
                 {
-                    Logger.Write("Не удалось подключиться к серверу Server_" + i + " " + e.Message);
+                    Logger.Write("Не удалось подключиться к серверу " + serverConfig.Host + ":" + serverConfig.Port + " " + e.Message);
                 }
             }
 

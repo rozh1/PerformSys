@@ -118,10 +118,19 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="defaultConfig" xml:space="preserve">
-    <value>Region_id=1;
-Global_id=1;
-RBN_Port=3409;
-Server_count=1;
-Server_1=127.0.0.1:3410;</value>
+    <value>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;RBNConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;RBN&gt;
+    &lt;GlobalId&gt;1&lt;/GlobalId&gt;
+    &lt;RegionId&gt;1&lt;/RegionId&gt;
+    &lt;Port&gt;3409&lt;/Port&gt;
+  &lt;/RBN&gt;
+  &lt;Servers&gt;
+    &lt;Server&gt;
+      &lt;Port&gt;3410&lt;/Port&gt;
+      &lt;Host&gt;localhost&lt;/Host&gt;
+    &lt;/Server&gt;
+  &lt;/Servers&gt;
+&lt;/RBNConfig&gt;</value>
   </data>
 </root>

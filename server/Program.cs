@@ -39,8 +39,8 @@ namespace server
             const string configFilePath = "serverConfig.xml";
             if (!File.Exists(configFilePath))
             {
-                server.Config.ServerConfig.Load(
-                    new MemoryStream(Encoding.UTF8.GetBytes(Properties.Resources.defaultConfig))).Save(configFilePath);
+                ServerConfig.Load(
+                    new MemoryStream(Encoding.UTF8.GetBytes(Resources.defaultConfig))).Save(configFilePath);
             }
             ServerConfig.Load(configFilePath);
 
