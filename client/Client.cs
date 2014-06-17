@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -18,21 +19,19 @@ namespace client
         private readonly int _port;
         private readonly int _queryNumber;
         public ClientStatsData ClientStatsData;
+        private Config.Config _config;
 
-        public Client(string address, int port, int number, int queryNumber)
+        public Client(Config.Config config, int number, int queryNumber)
         {
-            _address = address;
-            _port = port;
+            _address = config.BalancerHost;
+            Debug.Assert(config.BalancerPort != null, "config.BalancerPort != null");
+            _port = (int)config.BalancerPort;
             _number = number;
             _queryNumber = queryNumber;
+            _config = config;
             var t = new Thread(ClientThread);
             t.Start();
         }
-
-        /// <summary>
-        ///     Событие окончания работы клиента
-        /// </summary>
-        public event Action EndWork;
 
         /// <summary>
         ///     поток эмулятора клиента
@@ -43,46 +42,49 @@ namespace client
 
             var tcpClient = new TcpClient();
             tcpClient.Connect(_address, _port);
-            if (tcpClient.Connected)
+            for (int i = 0; i < _config.QueryCount; i++)
             {
-                string query = Resources.ResourceManager.GetString("q" + _queryNumber);
-                var dbRequestPacket = new DbRequestPacket(query, _queryNumber);
-                Byte[] requestPacket = dbRequestPacket.GetPacket().ToBytes();
-                tcpClient.GetStream().Write(requestPacket, 0, requestPacket.Length);
-
-                DateTime startTime = DateTime.Now;
-
-                var buffer = new byte[1400];
-                Packet packet;
-                do
+                if (tcpClient.Connected)
                 {
-                    string packetData = "";
+                    string query = Resources.ResourceManager.GetString("q" + _queryNumber);
+                    var dbRequestPacket = new DbRequestPacket(query, _queryNumber);
+                    Byte[] requestPacket = dbRequestPacket.GetPacket().ToBytes();
+                    tcpClient.GetStream().Write(requestPacket, 0, requestPacket.Length);
 
-                    int count;
-                    while ((count = tcpClient.GetStream().Read(buffer, 0, buffer.Length)) > 0)
+                    DateTime startTime = DateTime.Now;
+
+                    var buffer = new byte[1400];
+                    Packet packet;
+                    do
                     {
-                        packetData += Encoding.ASCII.GetString(buffer, 0, count);
-                        if (packetData.IndexOf(Packet.PacketEnd, StringComparison.Ordinal) >= 0) break;
-                    }
-                    packet = new Packet(packetData);
-                } while (packet.Type != PacketType.Answer);
+                        string packetData = "";
 
-                //var dt = (DataTable)SerializeMapper.Deserialize(packet.Data);
-                //
-                //string answer = "";
-                //for (int i = 0; i < dt.Columns.Count; i++)  answer += dt.Columns[i].ColumnName + "\t";
-                //for (int j = 0; j < dt.Rows.Count; j++)
-                //{
-                //    answer += "\n";
-                //    for (int i = 0; i < dt.Columns.Count; i++) answer += dt.Rows[j][i] + "\t";
-                //}
+                        int count;
+                        while ((count = tcpClient.GetStream().Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            packetData += Encoding.ASCII.GetString(buffer, 0, count);
+                            if (packetData.IndexOf(Packet.PacketEnd, StringComparison.Ordinal) >= 0) break;
+                        }
+                        packet = new Packet(packetData);
+                    } while (packet.Type != PacketType.Answer);
 
-                ClientStatsData.WaitTime = DateTime.Now - startTime;
-                ClientStatsData.Answer = null; //answer;
+                    //var dt = (DataTable)SerializeMapper.Deserialize(packet.Data);
+                    //
+                    //string answer = "";
+                    //for (int i = 0; i < dt.Columns.Count; i++)  answer += dt.Columns[i].ColumnName + "\t";
+                    //for (int j = 0; j < dt.Rows.Count; j++)
+                    //{
+                    //    answer += "\n";
+                    //    for (int i = 0; i < dt.Columns.Count; i++) answer += dt.Rows[j][i] + "\t";
+                    //}
+
+                    ClientStatsData.WaitTime = DateTime.Now - startTime;
+                    ClientStatsData.Answer = null; //answer;
+                    Console.WriteLine("Клиент: " +_number + "\tЗапрос: " + i + "\tВремя выполнения: " + ClientStatsData.WaitTime);
+                }
             }
             tcpClient.Close();
-            Console.WriteLine(_number + "\t" + ClientStatsData.WaitTime);
-            if (EndWork != null) EndWork();
+            Console.WriteLine("Клиент: " +_number + "\tОбщее время работы: " + ClientStatsData.WaitTime);
         }
     }
 }

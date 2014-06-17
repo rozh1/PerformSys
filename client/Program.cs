@@ -1,34 +1,34 @@
 ﻿using System;
+using System.Diagnostics;
+using client.ComandLineParamsParser;
 
 namespace client
 {
-    internal class Program
+    internal static class Program
     {
-        private static DateTime _startTime;
-
         private static void Main(string[] args)
         {
-            int count = 1;
-            int port = 3409;
-            int.TryParse(args[0], out count);
-            int.TryParse(args[2], out port);
-
-            //Random random = new Random();
-
-            var clients = new Client[count];
-
-            _startTime = DateTime.Now;
-
-            for (int i = 0; i < count; i++)
+            if (args.Length < 5)
             {
-                clients[i] = new Client(args[1], port, i, (i%14) + 1); //random.Next(1,5));
-                clients[i].EndWork += EndWorkClient;
+                Console.WriteLine(string.Format("Использование эмулятора клиентов {0}:", AppDomain.CurrentDomain.FriendlyName));
+                Console.WriteLine(string.Format("{0} --clients 10 --queries 5 --host localhost --port 3409", AppDomain.CurrentDomain.FriendlyName));
+                Console.WriteLine(string.Format("\t--clients, -c\t- количество эмулируемых клиентов"));
+                Console.WriteLine(string.Format("\t--queries, -q\t- количество запросов от одного клиента"));
+                Console.WriteLine(string.Format("\t--host, -h\t- адрес балансировщика"));
+                Console.WriteLine(string.Format("\t--port, -p\t- порт балансировщика"));
+                Environment.Exit(-1);
             }
-        }
 
-        private static void EndWorkClient()
-        {
-            Console.WriteLine(@"Время работы: " + (DateTime.Now - _startTime));
+            Parser parser = new Parser(args);
+            Config.Config config = parser.GetConfig();
+
+            Debug.Assert(config.ClientCount != null, "config.ClientCount != null");
+            var clients = new Client[(int)config.ClientCount];
+            
+            for (int i = 0; i < (int)config.ClientCount; i++)
+            {
+                clients[i] = new Client(config, i, (i%14) + 1);
+            }
         }
     }
 }
