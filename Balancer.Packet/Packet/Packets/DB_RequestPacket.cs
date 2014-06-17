@@ -27,7 +27,26 @@ namespace Balancer.Common.Packet.Packets
 
         public DbRequestPacket(string query, int queryNumber)
         {
-            _serializedQuery = SerializeMapper.Serialize(new PacketData() { Query = query, QueryNumber = queryNumber });
+            _serializedQuery = SerializeMapper.Serialize(new PacketData()
+            {
+                Query = query,
+                QueryNumber = queryNumber,
+                ClientId = 0,
+                RegionId = 0
+            });
+            Query = query;
+            QueryNumber = queryNumber;
+        }
+
+        public DbRequestPacket(string query, int queryNumber, PacketBase packetBase)
+        {
+            _serializedQuery = SerializeMapper.Serialize(new PacketData()
+            {
+                Query = query,
+                QueryNumber = queryNumber,
+                ClientId = packetBase.ClientId,
+                RegionId = packetBase.RegionId
+            });
             Query = query;
             QueryNumber = queryNumber;
         }
@@ -38,10 +57,15 @@ namespace Balancer.Common.Packet.Packets
             var packetData = (PacketData)SerializeMapper.Deserialize(serializedQuery);
             Query = packetData.Query;
             QueryNumber = packetData.QueryNumber;
+            RegionId = packetData.RegionId;
+            ClientId = packetData.ClientId;
         }
 
         public string Query { get; set; }
         public int QueryNumber { get; set; }
+
+        public uint RegionId { get; set; }
+        public uint ClientId { get; set; }
 
         public Packet GetPacket()
         {
@@ -49,7 +73,7 @@ namespace Balancer.Common.Packet.Packets
         }
 
         [DataContract]
-        private class PacketData
+        private class PacketData : PacketBase
         {
             [DataMember]
             public string Query { get; set; }

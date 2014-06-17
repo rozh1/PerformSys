@@ -140,7 +140,7 @@ namespace server
 
             var requestPacket = new DbRequestPacket(packet.Data);
 
-            Logger.Write("Принят запрос от клиента: " + packet.ClientId);
+            Logger.Write("Принят запрос от клиента: " + requestPacket.ClientId);
             DataTable dt = null;
             if (packet.Type == PacketType.Request)
             {
@@ -148,12 +148,10 @@ namespace server
             }
             if (dt != null)
             {
-                Logger.Write("Отправка результата клиенту " + packet.ClientId);
-                var dbAnswerPacket = new DbAnswerPacket(dt, requestPacket.QueryNumber);
+                Logger.Write("Отправка результата клиенту " + requestPacket.ClientId);
+                var dbAnswerPacket = new DbAnswerPacket(dt, requestPacket.QueryNumber, new PacketBase() { ClientId = requestPacket.ClientId, RegionId = requestPacket.RegionId});
                 Packet answerPacket = dbAnswerPacket.GetPacket();
                 answerPacket.Type = PacketType.Answer;
-                answerPacket.ClientId = packet.ClientId;
-                answerPacket.Id = packet.Id;
                 Byte[] answerPacketBytes = answerPacket.ToBytes();
                 _tcpClient.GetStream().Write(answerPacketBytes, 0, answerPacketBytes.Length);
             }

@@ -17,12 +17,23 @@
  */
 #endregion
 
-﻿namespace Balancer.Common.Packet.Packets
+﻿using System;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
+
+namespace Balancer.Common.Packet.Packets
 {
-    internal interface IPacket
+    [DataContract]
+    public class PacketBase
     {
-        uint RegionId { get; set; }
-        uint ClientId { get; set; }
-        Packet GetPacket();
+        [DataMember]
+        public uint GlobalId { get; set; }
+        [DataMember]
+        public uint RegionId { get; set; }
+        [DataMember]
+        public uint ClientId { get; set; }
     }
 }
