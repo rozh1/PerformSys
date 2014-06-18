@@ -6,10 +6,12 @@ namespace client.ComandLineParamsParser
     /// <summary>
     ///     Обработчик входных параметров
     /// </summary>
-    internal class Parser
+    public class Parser
     {
         private readonly string[] _args;
         private readonly Config.Config _config;
+
+        public string ErrorText { get; private set; }
 
         public Parser(string[] args)
         {
@@ -64,11 +66,7 @@ namespace client.ComandLineParamsParser
             if (_config.BalancerHost == string.Empty) error += "Не указан адрес балансировщика!\n";
             if (_config.BalancerPort == null) error += "Не указан порт балансировщика!\n";
 
-            if (error != string.Empty)
-            {
-                Logger.Write(error);
-                Environment.Exit(-1);
-            }
+            ErrorText = error;
         }
 
         /// <summary>

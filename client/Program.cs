@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using Balancer.Common;
 using client.ComandLineParamsParser;
 
 namespace client
@@ -20,6 +21,13 @@ namespace client
             }
 
             Parser parser = new Parser(args);
+
+            if (parser.ErrorText != string.Empty)
+            {
+                Logger.Write(parser.ErrorText);
+                Environment.Exit(-1);
+            }
+
             Config.Config config = parser.GetConfig();
 
             Debug.Assert(config.ClientCount != null, "config.ClientCount != null");
