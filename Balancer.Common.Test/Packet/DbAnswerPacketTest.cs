@@ -31,7 +31,11 @@ namespace Balancer.Common.Test.Packet
         public void DbAnswerPacketSeralizationTest()
         {
             DataTable dt = new DataTable();
-            dt.TableName = "test table";
+            dt.TableName = "randomTable";
+            dt.Columns.Add("Data");
+            DataRow dr = dt.NewRow();
+            dr[0] = "RandomData";
+            dt.Rows.Add(dr);
             PacketBase packetBase = new PacketBase()
             {
                 ClientId = 1,
