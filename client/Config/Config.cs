@@ -19,7 +19,7 @@
 
 ﻿namespace client.Config
 {
-    internal class Config
+    public class Config
     {
         /// <summary>
         ///     Количество клиентов
