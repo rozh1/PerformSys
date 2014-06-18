@@ -132,7 +132,6 @@ namespace server
                 Logger.Write("Отправка результата клиенту " + requestPacket.ClientId);
                 var dbAnswerPacket = new DbAnswerPacket(dt, requestPacket.QueryNumber, new PacketBase() { ClientId = requestPacket.ClientId, RegionId = requestPacket.RegionId});
                 Packet answerPacket = dbAnswerPacket.GetPacket();
-                answerPacket.Type = PacketType.Answer;
                 Byte[] answerPacketBytes = answerPacket.ToBytes();
                 _tcpClient.GetStream().Write(answerPacketBytes, 0, answerPacketBytes.Length);
             }

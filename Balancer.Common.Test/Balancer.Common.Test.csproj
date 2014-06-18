@@ -56,6 +56,7 @@
     <Compile Include="Packet\DbAnswerPacketTest.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Packet\PacketTest.cs" />
     <Compile Include="Packet\StatusPacketTest.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
