@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rbn", "rbn\rbn.csproj", "{C84123A6-B2D1-489A-BAC2-7D3BDA5B35E3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "server", "server\server.csproj", "{266AD27C-D6AC-42E6-931B-56ACA10F7C59}"
@@ -9,11 +11,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Balancer.Common", "Balancer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "client", "client\client.csproj", "{03862B72-E0A9-470A-A140-706390979B12}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Balancer.Common.Test", "Balancer.Common.Test\Balancer.Common.Test.csproj", "{8B80E569-00BA-4E90-948E-69CBC66CC89D}"
+EndProject
 Global
-	GlobalSection(SubversionScc) = preSolution
-		Svn-Managed = True
-		Manager = AnkhSVN - Subversion Support for Visual Studio
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -35,8 +35,16 @@ Global
 		{03862B72-E0A9-470A-A140-706390979B12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03862B72-E0A9-470A-A140-706390979B12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03862B72-E0A9-470A-A140-706390979B12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B80E569-00BA-4E90-948E-69CBC66CC89D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B80E569-00BA-4E90-948E-69CBC66CC89D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B80E569-00BA-4E90-948E-69CBC66CC89D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B80E569-00BA-4E90-948E-69CBC66CC89D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
 	EndGlobalSection
 EndGlobal
