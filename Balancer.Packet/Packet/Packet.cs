@@ -56,13 +56,11 @@ namespace Balancer.Common.Packet
         public PacketType Type
         {
             get { return _type; }
-            set { _type = value; }
         }
 
         public String Data
         {
             get { return _data; }
-            set { _data = value; }
         }
 
         public static String PacketEnd
