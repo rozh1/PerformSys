@@ -58,7 +58,6 @@
     </Compile>
     <Compile Include="Packet\PacketTest.cs" />
     <Compile Include="Packet\StatusPacketTest.cs" />
-    <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\CustomComparators.cs" />
     <Compile Include="Util\CustomComparatorsTest.cs" />

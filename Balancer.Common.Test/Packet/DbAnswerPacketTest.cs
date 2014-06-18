@@ -17,9 +17,9 @@
  */
 #endregion
 
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using Balancer.Common.Packet.Packets;
+using Balancer.Common.Test.Util;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Balancer.Common.Test.Packet
@@ -30,30 +30,32 @@ namespace Balancer.Common.Test.Packet
         [TestMethod]
         public void DbAnswerPacketSeralizationTest()
         {
-            DataTable dt = new DataTable();
+            var dt = new DataTable();
             dt.TableName = "randomTable";
             dt.Columns.Add("Data");
             DataRow dr = dt.NewRow();
             dr[0] = "RandomData";
             dt.Rows.Add(dr);
-            PacketBase packetBase = new PacketBase()
+            var packetBase = new PacketBase
             {
                 ClientId = 1,
                 GlobalId = 2,
                 RegionId = 3
             };
 
-            DbAnswerPacket dbAnswerPacket = new DbAnswerPacket(dt, 1, packetBase);
+            var dbAnswerPacket = new DbAnswerPacket(dt, 1, packetBase);
 
-            Balancer.Common.Packet.Packet packet = dbAnswerPacket.GetPacket();
+            Common.Packet.Packet packet = dbAnswerPacket.GetPacket();
 
-            DbAnswerPacket dbAnswerPacketDeserialized = new DbAnswerPacket(packet.Data);
+            var dbAnswerPacketDeserialized = new DbAnswerPacket(packet.Data);
 
             Assert.AreEqual(dbAnswerPacketDeserialized.QueryNumber, dbAnswerPacket.QueryNumber, "Разные номера запросов");
             Assert.AreEqual(dbAnswerPacketDeserialized.ClientId, dbAnswerPacket.ClientId, "Разные номера клиентов");
             Assert.AreEqual(dbAnswerPacketDeserialized.RegionId, dbAnswerPacket.RegionId, "Разные номера регионов");
             Assert.AreEqual(dbAnswerPacketDeserialized.GlobalId, dbAnswerPacket.GlobalId, "Разные глобальные номера");
-            Assert.IsTrue(Util.CustomComparators.AreTablesEqual(dbAnswerPacketDeserialized.AnswerDataTable, dbAnswerPacket.AnswerDataTable), "Разные данные в ответе");
+            Assert.IsTrue(
+                CustomComparators.AreTablesEqual(dbAnswerPacketDeserialized.AnswerDataTable,
+                    dbAnswerPacket.AnswerDataTable), "Разные данные в ответе");
         }
     }
 }
