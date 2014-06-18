@@ -26,6 +26,7 @@ namespace Balancer.Common.Packet.Packets
             QueryNumber = packetData.QueryNumber;
             RegionId = packetData.RegionId;
             ClientId = packetData.ClientId;
+            GlobalId = packetData.GlobalId;
         }
 
         string SerializePacketData()
