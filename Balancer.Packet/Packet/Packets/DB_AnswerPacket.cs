@@ -19,6 +19,7 @@
 
 ﻿using System.Data;
 using System.Runtime.Serialization;
+using Balancer.Common.Utils;
 
 namespace Balancer.Common.Packet.Packets
 {

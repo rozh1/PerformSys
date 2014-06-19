@@ -35,6 +35,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.2.1402.2112\lib\net40\Moq.dll</HintPath>
+    </Reference>
+    <Reference Include="Moq.AutoMock">
+      <HintPath>..\packages\Moq.AutoMock.0.3.2.1\lib\net40\Moq.AutoMock.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -61,12 +67,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util\CustomComparators.cs" />
     <Compile Include="Util\CustomComparatorsTest.cs" />
+    <Compile Include="Util\PacketTransmitHelperTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Balancer.Packet\Balancer.Common.csproj">
       <Project>{1f3c64f3-bf67-4593-8f40-f245cb445af4}</Project>
       <Name>Balancer.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

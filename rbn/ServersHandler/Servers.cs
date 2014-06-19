@@ -98,7 +98,7 @@ namespace rbn.ServersHandler
         ///     Добавление сервера в список
         /// </summary>
         /// <param name="server"></param>
-        public static void AddServer(Server server)
+        private static void AddServer(Server server)
         {
             if (!ServersList.Contains(server))
             {
@@ -110,7 +110,7 @@ namespace rbn.ServersHandler
         ///     Удаление сервера из списка
         /// </summary>
         /// <param name="server"></param>
-        public static void RemoveServer(Server server)
+        private static void RemoveServer(Server server)
         {
             if (ServersList.Contains(server))
             {
@@ -152,50 +152,22 @@ namespace rbn.ServersHandler
         {
             var server = (Server) param;
             TcpClient connection = server.Connection;
-            string nextPacketData = "";
             while (connection.Connected)
             {
-                string packetData = "";
-                var buffer = new byte[1400];
+                var packet = Balancer.Common.Utils.PacketTransmitHelper.Recive(connection.GetStream());
 
-                try
+                switch (packet.Type)
                 {
-                    int count;
-                    while ((count = connection.GetStream().Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        packetData += nextPacketData + Encoding.ASCII.GetString(buffer, 0, count);
-                        if (packetData.Contains(Packet.PacketEnd))
-                        {
-                            int index = packetData.IndexOf(Packet.PacketEnd, StringComparison.Ordinal);
-                            nextPacketData =
-                                packetData.Substring(
-                                    index +
-                                    Packet.PacketEnd.Length);
-                            packetData =
-                                packetData.Remove(index);
-                            break;
-                        }
-                        nextPacketData = "";
-                    }
-                    var packet = new Packet(packetData);
-
-                    switch (packet.Type)
-                    {
-                        case PacketType.Status:
-                            var sp = new StatusPacket(packet.Data);
-                            server.Status = sp.Status;
-                            server.StatusRecived = true;
-                            //if (server.Status) RbnQueue.SendRequestToServer();
-                            break;
-                        case PacketType.Answer:
-                            var answer = new DbAnswerPacket(packet.Data);
-                            RbnQueue.ServerAnswer((int)answer.ClientId, packet.Data);
-                            break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Write("Исключение при чтении ответа: " + ex.Message);
+                    case PacketType.Status:
+                        var sp = new StatusPacket(packet.Data);
+                        server.Status = sp.Status;
+                        server.StatusRecived = true;
+                        //if (server.Status) RbnQueue.SendRequestToServer();
+                        break;
+                    case PacketType.Answer:
+                        var answer = new DbAnswerPacket(packet.Data);
+                        RbnQueue.ServerAnswer((int) answer.ClientId, packet.Data);
+                        break;
                 }
             }
         }
@@ -208,14 +180,10 @@ namespace rbn.ServersHandler
         /// <param name="clientId"></param>
         public static void SendRequest(Server server, string query, int clientId)
         {
-            var packet = new DbRequestPacket(query);
-            packet.ClientId = (uint)clientId;
-            byte[] packetBytes = packet.GetPacket().ToBytes();
-            if (server.Connection.Connected)
-            {
+            var packet = new DbRequestPacket(query) {ClientId = (uint) clientId};
+            if (!server.Connection.Connected) return;
+            if (Balancer.Common.Utils.PacketTransmitHelper.Send(packet.GetPacket(), server.Connection.GetStream()))
                 server.StatusRecived = false;
-                server.Connection.GetStream().Write(packetBytes, 0, packetBytes.Length);
-            }
         }
 
         /// <summary>

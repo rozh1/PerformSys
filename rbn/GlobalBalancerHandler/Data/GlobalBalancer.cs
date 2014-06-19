@@ -17,18 +17,14 @@
  */
 #endregion
 
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Net.Sockets;
 
-namespace rbn.Config.Data
+namespace rbn.GlobalBalancerHandler
 {
-    public class RBN
+    internal class GlobalBalancer
     {
-        public uint GlobalId { get; set; }
-        public uint RegionId { get; set; }
-        public uint Port { get; set; }
-        public uint GlobalBalancerPort { get; set; }
+        public TcpClient Connection { get; set; }
+        public bool Status { get; set; }
+        public bool StatusRecived { get; set; }
     }
 }
