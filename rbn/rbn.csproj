@@ -56,8 +56,8 @@
     <Compile Include="Server.cs" />
     <Compile Include="ServersHandler\Server.cs" />
     <Compile Include="ServersHandler\Servers.cs" />
+    <Compile Include="GlobalBalancerHandler\Data\GlobalBalancer.cs" />
     <Compile Include="GlobalBalancerHandler\GlobalBalancer.cs" />
-    <Compile Include="GlobalBalancerHandler\GlobalBalancers.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Balancer.Packet\Balancer.Common.csproj">
