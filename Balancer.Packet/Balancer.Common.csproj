@@ -48,6 +48,7 @@
     <Compile Include="Packet\Packets\DB_AnswerPacket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\PacketTransmitHelper.cs" />
+    <Compile Include="Utils\SerializableDictionary.cs" />
     <Compile Include="Utils\SerializeMapper.cs" />
   </ItemGroup>
   <ItemGroup />

@@ -75,7 +75,10 @@ namespace server.Properties {
         ///    &lt;Port&gt;3410&lt;/Port&gt;
         ///    &lt;WorkMode&gt;Normal&lt;/WorkMode&gt;
         ///  &lt;/Server&gt;
-        ///&lt;/ServerConfig&gt;.
+        ///  &lt;SimulatedTimes&gt;
+        ///    &lt;item&gt;
+        ///      &lt;key&gt;
+        ///        &lt; [остаток строки не уместился]&quot;;.
         /// </summary>
         internal static string defaultConfig {
             get {

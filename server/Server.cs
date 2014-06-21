@@ -177,7 +177,7 @@ namespace server
 
         private DataTable ProcessQuerySimulated(DbRequestPacket requestPacket)
         {
-            Thread.Sleep(SimulatedTimes.Times[requestPacket.QueryNumber]);
+            Thread.Sleep(Config.ServerConfig.Instance.SimulatedTimes[requestPacket.QueryNumber]);
             DataTable dt = new DataTable();
             dt.TableName = "randomTable";
             dt.Columns.Add("Data");
