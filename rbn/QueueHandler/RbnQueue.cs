@@ -39,7 +39,7 @@ namespace rbn.QueueHandler
         /// <summary>
         ///     Очередь
         /// </summary>
-        private static readonly Queue<QueueEntity> Queue = new Queue<QueueEntity>();
+        public static readonly Queue<QueueEntity> Queue = new Queue<QueueEntity>();
 
         /// <summary>
         ///     Уникальный идентификатор пользователя
@@ -50,12 +50,7 @@ namespace rbn.QueueHandler
         ///     Объект синхронизации работы с клиентами
         /// </summary>
         private static readonly object ClientSyncObject = new object();
-
-        /// <summary>
-        ///     Мьтекс отправки данных серверу
-        /// </summary>
-        private static readonly Mutex SendMutex = new Mutex();
-
+        
         /// <summary>
         ///     Добавление клиента в конец
         /// </summary>
@@ -139,43 +134,11 @@ namespace rbn.QueueHandler
         }
 
         /// <summary>
-        ///     Выбор клиента и отправка его запроса на сервер
-        /// </summary>
-        public static void SendRequestToServer()
-        {
-            SendMutex.WaitOne(1000);
-            if (Queue.Count > 0)
-            {
-                QueueEntity qe = Queue.Peek();
-                if (SendRequest(qe)) Queue.Dequeue();
-            }
-            SendMutex.ReleaseMutex();
-        }
-
-        /// <summary>
-        ///     Отправка запроса серверу
-        /// </summary>
-        private static bool SendRequest(QueueEntity queueEntity)
-        {
-            ServersHandler.Server server = Servers.GetNextReadyServer();
-            if (server != null)
-            {
-                Servers.SendRequest(server, queueEntity.Query, queueEntity.ClientId);
-                Client client = GetClientById(queueEntity.ClientId);
-                if (client == null) return false;
-                client.RequestSended = true;
-                Logger.Write("Отправлен запрос от клиента " + client.Id);
-            }
-            else return false;
-            return true;
-        }
-
-        /// <summary>
         ///     Получение клиента по ID
         /// </summary>
         /// <param name="id">ID клиента</param>
         /// <returns>клиент</returns>
-        private static Client GetClientById(int id)
+        public static Client GetClientById(int id)
         {
             lock (ClientSyncObject)
             {

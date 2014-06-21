@@ -76,11 +76,8 @@ namespace rbn.GlobalBalancerHandler
 
                 switch (packet.Type)
                 {
-                    case PacketType.Status:
+                    case PacketType.TransmitRequest:
                         var sp = new StatusPacket(packet.Data);
-                        globalBalancer.Status = sp.Status;
-                        globalBalancer.StatusRecived = true;
-                        if (globalBalancer.Status) RbnQueue.SendRequestToServer();
                         break;
                     case PacketType.Answer:
                         var answer = new DbAnswerPacket(packet.Data);
