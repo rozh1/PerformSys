@@ -47,24 +47,14 @@ namespace rbn.ServersHandler
         private readonly List<Thread> _serversThreads;
 
         /// <summary>
-        ///     Признак работы потока отправки
-        /// </summary>
-        private bool _sendThreadLife = true;
-
-        /// <summary>
         ///     Индекс сервера, на каторый был оправлен последний запрос
         /// </summary>
         private int _lastReadyServerIndex;
 
         /// <summary>
-        /// Событие иницирования отправки запроса из очереди
+        ///     Признак работы потока отправки
         /// </summary>
-        public event Action<IServer> SendRequestFromQueueEvent;
-
-        /// <summary>
-        /// Событие получения ответа
-        /// </summary>
-        public event Action<int, DbAnswerPacket> AnswerRecivedEvent;
+        private bool _sendThreadLife = true;
 
         public Servers()
         {
@@ -92,6 +82,31 @@ namespace rbn.ServersHandler
             var t = new Thread(SendThread);
             t.Start();
         }
+
+        /// <summary>
+        ///     Событие иницирования отправки запроса из очереди
+        /// </summary>
+        public event Action<IServer> SendRequestFromQueueEvent;
+
+        /// <summary>
+        ///     Отправка запроса серверу
+        /// </summary>
+        public bool SendRequest(QueueEntity queueEntity)
+        {
+            Server server = GetNextReadyServer();
+            if (server != null)
+            {
+                SendRequest(server, queueEntity.RequestData, queueEntity.ClientId);
+                Logger.Write("Отправлен запрос от клиента " + queueEntity.ClientId);
+            }
+            else return false;
+            return true;
+        }
+
+        /// <summary>
+        ///     Событие получения ответа
+        /// </summary>
+        public event Action<int, DbAnswerPacket> AnswerRecivedEvent;
 
         /// <summary>
         ///     Поток отправки запросов серверам
@@ -176,7 +191,8 @@ namespace rbn.ServersHandler
                         break;
                     case PacketType.Answer:
                         var answer = new DbAnswerPacket(packet.Data);
-                        if (AnswerRecivedEvent!=null) AnswerRecivedEvent((int)answer.ClientId, new DbAnswerPacket(packet.Data));
+                        if (AnswerRecivedEvent != null)
+                            AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
                         break;
                 }
             }
@@ -194,21 +210,6 @@ namespace rbn.ServersHandler
             if (!server.Connection.Connected) return;
             if (PacketTransmitHelper.Send(packet.GetPacket(), server.Connection.GetStream()))
                 server.StatusRecived = false;
-        }
-
-        /// <summary>
-        ///     Отправка запроса серверу
-        /// </summary>
-        public bool SendRequest(QueueEntity queueEntity)
-        {
-            Server server = GetNextReadyServer();
-            if (server != null)
-            {
-                SendRequest(server, queueEntity.RequestData, queueEntity.ClientId);
-                Logger.Write("Отправлен запрос от клиента " + queueEntity.ClientId);
-            }
-            else return false;
-            return true;
         }
 
         /// <summary>

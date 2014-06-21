@@ -18,7 +18,6 @@
 #endregion
 
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -26,6 +25,7 @@ using Balancer.Common;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
+using rbn.Config;
 using rbn.Interfaces;
 using rbn.QueueHandler;
 
@@ -36,10 +36,29 @@ namespace rbn.GlobalBalancerHandler
         private GlobalBalancer _globalBalancer;
         private Thread _globalBalancersThread;
         private TcpListener _listener;
+        public event Action<IServer> SendRequestFromQueueEvent;
+
+        /// <summary>
+        ///     Отправка запроса серверу
+        /// </summary>
+        public bool SendRequest(QueueEntity queueEntity)
+        {
+            GlobalBalancer globalBalancer = _globalBalancer;
+            if (globalBalancer != null)
+            {
+                if (!globalBalancer.Connection.Connected) return false;
+                var dbRequestPacket = new DbRequestPacket(queueEntity.RequestData);
+                if (!PacketTransmitHelper.Send(dbRequestPacket.GetPacket(), globalBalancer.Connection.GetStream()))
+                    return false;
+                Logger.Write("Отправлен запрос от клиента " + queueEntity.ClientId);
+            }
+            else return false;
+            return true;
+        }
 
         private void Init()
         {
-            var port = (int) Config.RBNConfig.Instance.RBN.GlobalBalancerPort;
+            var port = (int) RBNConfig.Instance.RBN.GlobalBalancerPort;
 
             _listener = new TcpListener(IPAddress.Any, port);
             _listener.Start();
@@ -66,7 +85,7 @@ namespace rbn.GlobalBalancerHandler
 
             while (connection.Connected)
             {
-                var packet = PacketTransmitHelper.Recive(connection.GetStream());
+                Packet packet = PacketTransmitHelper.Recive(connection.GetStream());
 
                 switch (packet.Type)
                 {
@@ -75,32 +94,17 @@ namespace rbn.GlobalBalancerHandler
                         break;
                     case PacketType.Answer:
                         var answer = new DbAnswerPacket(packet.Data);
-                        if (AnswerRecivedEvent!=null) AnswerRecivedEvent((int)answer.ClientId, new DbAnswerPacket(packet.Data));
+                        if (AnswerRecivedEvent != null)
+                            AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
                         break;
                 }
             }
             Init();
         }
 
-        public event Action<int, DbAnswerPacket> AnswerRecivedEvent;
-        public event Action<IServer> SendRequestFromQueueEvent;
-
         /// <summary>
-        ///     Отправка запроса серверу
+        ///     Событие получения ответа
         /// </summary>
-        public bool SendRequest(QueueEntity queueEntity)
-        {
-            GlobalBalancer globalBalancer = _globalBalancer;
-            if (globalBalancer != null)
-            {
-                if (!globalBalancer.Connection.Connected) return false;
-                var dbRequestPacket = new DbRequestPacket(queueEntity.RequestData);
-                if (!PacketTransmitHelper.Send(dbRequestPacket.GetPacket(), globalBalancer.Connection.GetStream())) 
-                    return false;
-                Logger.Write("Отправлен запрос от клиента " + queueEntity.ClientId);
-            }
-            else return false;
-            return true;
-        }
+        public event Action<int, DbAnswerPacket> AnswerRecivedEvent;
     }
 }

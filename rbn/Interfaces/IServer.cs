@@ -27,11 +27,6 @@ namespace rbn.Interfaces
     public interface IServer
     {
         /// <summary>
-        /// Событие получения ответа
-        /// </summary>
-        event Action<int, DbAnswerPacket> AnswerRecivedEvent;
-
-        /// <summary>
         /// Событие иницирования отправки запроса из очереди
         /// </summary>
         event Action<IServer> SendRequestFromQueueEvent;
