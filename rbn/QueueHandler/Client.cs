@@ -2,7 +2,7 @@
 
 namespace rbn.QueueHandler
 {
-    internal class Client
+    public class Client
     {
         public TcpClient Connection { get; set; }
         public string RequestPacketData { get; set; }

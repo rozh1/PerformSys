@@ -7,6 +7,7 @@ using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
 using rbn.Config;
+using rbn.Interfaces;
 using rbn.QueueHandler;
 
 namespace rbn.ServersHandler
@@ -14,33 +15,42 @@ namespace rbn.ServersHandler
     /// <summary>
     ///     Сервера БД
     /// </summary>
-    public class Servers
+    public class Servers : IServer
     {
         /// <summary>
         ///     Список серверов
         /// </summary>
-        private static readonly List<Server> ServersList = new List<Server>();
+        private readonly List<Server> _serversList;
 
         /// <summary>
         ///     Список потоков серверов
         /// </summary>
-        private static readonly List<Thread> ServersThreads = new List<Thread>();
+        private readonly List<Thread> _serversThreads;
 
         /// <summary>
         ///     Признак работы потока отправки
         /// </summary>
-        private static bool _sendThreadLife = true;
+        private bool _sendThreadLife = true;
 
         /// <summary>
         ///     Индекс сервера, на каторый был оправлен последний запрос
         /// </summary>
-        private static int _lastReadyServerIndex;
+        private int _lastReadyServerIndex;
 
         /// <summary>
-        ///     Инициализация рабоы с серверами
+        /// Событие иницирования отправки запроса из очереди
         /// </summary>
-        public static void Init()
+        public event Action<IServer> SendRequestFromQueueEvent;
+
+        /// <summary>
+        /// Событие получения ответа
+        /// </summary>
+        public event Action<int, DbAnswerPacket> AnswerRecivedEvent;
+
+        public Servers()
         {
+            _serversList = new List<Server>();
+            _serversThreads = new List<Thread>();
             foreach (Config.Data.Server serverConfig in RBNConfig.Instance.Servers)
             {
                 try
@@ -50,7 +60,7 @@ namespace rbn.ServersHandler
                     var server = new Server {Connection = tcpClient};
                     AddServer(server);
                     var serverThread = new Thread(ServerListenThread);
-                    ServersThreads.Add(serverThread);
+                    _serversThreads.Add(serverThread);
                     serverThread.Start(server);
                 }
                 catch (Exception e)
@@ -67,11 +77,11 @@ namespace rbn.ServersHandler
         /// <summary>
         ///     Поток отправки запросов серверам
         /// </summary>
-        private static void SendThread()
+        private void SendThread()
         {
             while (_sendThreadLife)
             {
-                RbnQueue.SendRequestToServer();
+                if (SendRequestFromQueueEvent != null) SendRequestFromQueueEvent(this);
                 Thread.Sleep(100);
             }
         }
@@ -80,11 +90,11 @@ namespace rbn.ServersHandler
         ///     Добавление сервера в список
         /// </summary>
         /// <param name="server"></param>
-        private static void AddServer(Server server)
+        private void AddServer(Server server)
         {
-            if (!ServersList.Contains(server))
+            if (!_serversList.Contains(server))
             {
-                ServersList.Add(server);
+                _serversList.Add(server);
             }
         }
 
@@ -92,12 +102,12 @@ namespace rbn.ServersHandler
         ///     Удаление сервера из списка
         /// </summary>
         /// <param name="server"></param>
-        private static void RemoveServer(Server server)
+        private void RemoveServer(Server server)
         {
-            if (ServersList.Contains(server))
+            if (_serversList.Contains(server))
             {
                 server.Connection.Close();
-                ServersList.Remove(server);
+                _serversList.Remove(server);
             }
         }
 
@@ -105,22 +115,22 @@ namespace rbn.ServersHandler
         ///     Полчение следующего свободного сервера по круговому алгоритму
         /// </summary>
         /// <returns></returns>
-        private static Server GetNextReadyServer()
+        private Server GetNextReadyServer()
         {
-            for (int i = _lastReadyServerIndex; i < ServersList.Count; i++)
+            for (int i = _lastReadyServerIndex; i < _serversList.Count; i++)
             {
-                if (ServersList[i].Status && ServersList[i].StatusRecived)
+                if (_serversList[i].Status && _serversList[i].StatusRecived)
                 {
                     _lastReadyServerIndex = i + 1;
-                    return ServersList[i];
+                    return _serversList[i];
                 }
             }
-            for (int i = 0; i < ServersList.Count; i++)
+            for (int i = 0; i < _serversList.Count; i++)
             {
-                if (ServersList[i].Status && ServersList[i].StatusRecived)
+                if (_serversList[i].Status && _serversList[i].StatusRecived)
                 {
                     _lastReadyServerIndex = i;
-                    return ServersList[i];
+                    return _serversList[i];
                 }
             }
             return null;
@@ -130,7 +140,7 @@ namespace rbn.ServersHandler
         ///     Поток обработки ответов сервера
         /// </summary>
         /// <param name="param"></param>
-        private static void ServerListenThread(object param)
+        private void ServerListenThread(object param)
         {
             var server = (Server) param;
             TcpClient connection = server.Connection;
@@ -144,11 +154,10 @@ namespace rbn.ServersHandler
                         var sp = new StatusPacket(packet.Data);
                         server.Status = sp.Status;
                         server.StatusRecived = true;
-                        //if (server.Status) RbnQueue.SendRequestToServer();
                         break;
                     case PacketType.Answer:
                         var answer = new DbAnswerPacket(packet.Data);
-                        RbnQueue.ServerAnswer((int) answer.ClientId, packet.Data);
+                        if (AnswerRecivedEvent!=null) AnswerRecivedEvent((int)answer.ClientId, new DbAnswerPacket(packet.Data));
                         break;
                 }
             }
@@ -160,7 +169,7 @@ namespace rbn.ServersHandler
         /// <param name="server"></param>
         /// <param name="query"></param>
         /// <param name="clientId"></param>
-        private static void SendRequest(Server server, string query, int clientId)
+        private void SendRequest(Server server, string query, int clientId)
         {
             var packet = new DbRequestPacket(query) {ClientId = (uint) clientId};
             if (!server.Connection.Connected) return;
@@ -171,16 +180,13 @@ namespace rbn.ServersHandler
         /// <summary>
         ///     Отправка запроса серверу
         /// </summary>
-        public static bool SendRequest(QueueEntity queueEntity)
+        public bool SendRequest(QueueEntity queueEntity)
         {
             Server server = GetNextReadyServer();
             if (server != null)
             {
-                Client client = RbnQueue.GetClientById(queueEntity.ClientId);
-                if (client == null) return false;
-                client.RequestSended = true;
-                SendRequest(server, queueEntity.Query, queueEntity.ClientId);
-                Logger.Write("Отправлен запрос от клиента " + client.Id);
+                SendRequest(server, queueEntity.RequestData, queueEntity.ClientId);
+                Logger.Write("Отправлен запрос от клиента " + queueEntity.ClientId);
             }
             else return false;
             return true;
@@ -192,7 +198,7 @@ namespace rbn.ServersHandler
         ~Servers()
         {
             _sendThreadLife = false;
-            foreach (Server server in ServersList)
+            foreach (Server server in _serversList)
             {
                 server.Connection.Close();
             }

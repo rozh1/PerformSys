@@ -2,7 +2,7 @@
 
 namespace rbn.GlobalBalancerHandler
 {
-    internal class GlobalBalancer
+    public class GlobalBalancer
     {
         public TcpClient Connection { get; set; }
         public bool Status { get; set; }
