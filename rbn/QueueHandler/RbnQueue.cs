@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Threading;
 using Balancer.Common;
 using Balancer.Common.Packet;
+using rbn.GlobalBalancerHandler;
 using rbn.ServersHandler;
 
 namespace rbn.QueueHandler
 {
     /// <summary>
-    /// Очередь регионального балансировщика
+    ///     Очередь регионального балансировщика
     /// </summary>
     internal static class RbnQueue
     {
@@ -20,7 +21,7 @@ namespace rbn.QueueHandler
         /// <summary>
         ///     Очередь
         /// </summary>
-        public static readonly Queue<QueueEntity> Queue = new Queue<QueueEntity>();
+        private static readonly Queue<QueueEntity> Queue = new Queue<QueueEntity>();
 
         /// <summary>
         ///     Уникальный идентификатор пользователя
@@ -31,7 +32,12 @@ namespace rbn.QueueHandler
         ///     Объект синхронизации работы с клиентами
         /// </summary>
         private static readonly object ClientSyncObject = new object();
-        
+
+        /// <summary>
+        ///     Мьтекс отправки данных серверу
+        /// </summary>
+        private static readonly Mutex SendMutex = new Mutex();
+
         /// <summary>
         ///     Добавление клиента в конец
         /// </summary>
@@ -132,6 +138,34 @@ namespace rbn.QueueHandler
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        ///     Выбор клиента и отправка его запроса в межрегиональный балансировщик
+        /// </summary>
+        public static void SendRequestToGlobalBalancer()
+        {
+            SendMutex.WaitOne(1000);
+            if (Queue.Count > 0)
+            {
+                QueueEntity qe = Queue.Peek();
+                if (GlobalBalancers.SendRequest(qe)) Queue.Dequeue();
+            }
+            SendMutex.ReleaseMutex();
+        }
+
+        /// <summary>
+        ///     Выбор клиента и отправка его запроса на сервер
+        /// </summary>
+        public static void SendRequestToServer()
+        {
+            SendMutex.WaitOne(1000);
+            if (Queue.Count > 0)
+            {
+                QueueEntity qe = Queue.Peek();
+                if (Servers.SendRequest(qe)) Queue.Dequeue();
+            }
+            SendMutex.ReleaseMutex();
         }
     }
 }

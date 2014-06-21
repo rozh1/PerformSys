@@ -37,11 +37,6 @@ namespace rbn.ServersHandler
         private static int _lastReadyServerIndex;
 
         /// <summary>
-        ///     Мьтекс отправки данных серверу
-        /// </summary>
-        private static readonly Mutex SendMutex = new Mutex();
-
-        /// <summary>
         ///     Инициализация рабоы с серверами
         /// </summary>
         public static void Init()
@@ -76,7 +71,7 @@ namespace rbn.ServersHandler
         {
             while (_sendThreadLife)
             {
-                SendRequestToServer(RbnQueue.Queue);
+                RbnQueue.SendRequestToServer();
                 Thread.Sleep(100);
             }
         }
@@ -174,31 +169,17 @@ namespace rbn.ServersHandler
         }
 
         /// <summary>
-        ///     Выбор клиента и отправка его запроса на сервер
-        /// </summary>
-        private static void SendRequestToServer(Queue<QueueEntity> queue)
-        {
-            SendMutex.WaitOne(1000);
-            if (queue.Count > 0)
-            {
-                QueueEntity qe = queue.Peek();
-                if (SendRequest(qe)) queue.Dequeue();
-            }
-            SendMutex.ReleaseMutex();
-        }
-
-        /// <summary>
         ///     Отправка запроса серверу
         /// </summary>
-        private static bool SendRequest(QueueEntity queueEntity)
+        public static bool SendRequest(QueueEntity queueEntity)
         {
             Server server = GetNextReadyServer();
             if (server != null)
             {
-                SendRequest(server, queueEntity.Query, queueEntity.ClientId);
                 Client client = RbnQueue.GetClientById(queueEntity.ClientId);
                 if (client == null) return false;
                 client.RequestSended = true;
+                SendRequest(server, queueEntity.Query, queueEntity.ClientId);
                 Logger.Write("Отправлен запрос от клиента " + client.Id);
             }
             else return false;

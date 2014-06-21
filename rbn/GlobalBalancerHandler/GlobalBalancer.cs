@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using Balancer.Common;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
+using Balancer.Common.Utils;
 using rbn.QueueHandler;
 
 namespace rbn.GlobalBalancerHandler
@@ -20,7 +19,7 @@ namespace rbn.GlobalBalancerHandler
 
         public static void Init()
         {
-            int port = (int)Config.RBNConfig.Instance.RBN.GlobalBalancerPort;
+            var port = (int)Config.RBNConfig.Instance.RBN.GlobalBalancerPort;
 
             _listener = new TcpListener(IPAddress.Any, port);
 
@@ -53,12 +52,12 @@ namespace rbn.GlobalBalancerHandler
 
             while (connection.Connected)
             {
-                var packet = Balancer.Common.Utils.PacketTransmitHelper.Recive(connection.GetStream());
+                var packet = PacketTransmitHelper.Recive(connection.GetStream());
 
                 switch (packet.Type)
                 {
                     case PacketType.TransmitRequest:
-                        var sp = new StatusPacket(packet.Data);
+                        RbnQueue.SendRequestToGlobalBalancer();
                         break;
                     case PacketType.Answer:
                         var answer = new DbAnswerPacket(packet.Data);
@@ -66,6 +65,30 @@ namespace rbn.GlobalBalancerHandler
                         break;
                 }
             }
+        }
+
+        /// <summary>
+        ///     Отправка запроса серверу
+        /// </summary>
+        public static bool SendRequest(QueueEntity queueEntity)
+        {
+            GlobalBalancer globalBalancer = _globalBalancer;
+            if (globalBalancer != null)
+            {
+                if (!globalBalancer.Connection.Connected) return false;
+
+                var client = RbnQueue.GetClientById(queueEntity.ClientId);
+                if (client == null) return false;
+
+                var dbRequestPacket = new DbRequestPacket(client.RequestPacketData);
+                if (!PacketTransmitHelper.Send(dbRequestPacket.GetPacket(), globalBalancer.Connection.GetStream())) 
+                    return false;
+                
+                client.RequestSended = true;
+                Logger.Write("Отправлен запрос от клиента " + client.Id);
+            }
+            else return false;
+            return true;
         }
     }
 }
