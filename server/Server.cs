@@ -77,35 +77,40 @@ namespace server
                 while (_tcpClient.Connected)
                 {
                     SendStatus();
+                    Packet onePacketData = Balancer.Common.Utils.PacketTransmitHelper.Recive(_tcpClient.GetStream());
+                    _queueLength++;
+                    SendStatus();
+                    ThreadPool.QueueUserWorkItem(MySqlWorker, onePacketData);
+                    //var buffer = new byte[1400];
+                    //
+                    //try
+                    //{
+                    //    int count;
+                    //    while ((count = _tcpClient.GetStream().Read(buffer, 0, buffer.Length)) > 0)
+                    //    {
+                    //        packetData += Encoding.ASCII.GetString(buffer, 0, count);
+                    //        if (packetData.Contains(Packet.PacketEnd)) break;
+                    //    }
+                    //    while (packetData.Contains(Packet.PacketEnd))
+                    //    {
+                    //        int index = packetData.IndexOf(Packet.PacketEnd, StringComparison.Ordinal);
+                    //        string onePacketData = packetData.Remove(index);
+                    //        packetData =
+                    //            packetData.Substring(
+                    //                index +
+                    //                Packet.PacketEnd.Length);
+                    //
+                    //        _queueLength++;
+                    //        SendStatus();
+                    //        ThreadPool.QueueUserWorkItem(MySqlWorker, onePacketData);
+                    //    }
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    Logger.Write("Исключение при чтении запроса: " + ex.Message);
+                    //}
 
-                    var buffer = new byte[1400];
 
-                    try
-                    {
-                        int count;
-                        while ((count = _tcpClient.GetStream().Read(buffer, 0, buffer.Length)) > 0)
-                        {
-                            packetData += Encoding.ASCII.GetString(buffer, 0, count);
-                            if (packetData.Contains(Packet.PacketEnd)) break;
-                        }
-                        while (packetData.Contains(Packet.PacketEnd))
-                        {
-                            int index = packetData.IndexOf(Packet.PacketEnd, StringComparison.Ordinal);
-                            string onePacketData = packetData.Remove(index);
-                            packetData =
-                                packetData.Substring(
-                                    index +
-                                    Packet.PacketEnd.Length);
-
-                            _queueLength++;
-                            SendStatus();
-                            ThreadPool.QueueUserWorkItem(MySqlWorker, onePacketData);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Write("Исключение при чтении запроса: " + ex.Message);
-                    }
                 }
             }
         }
@@ -117,31 +122,21 @@ namespace server
         {
             bool status = (_queueLength <= Environment.ProcessorCount*2);
             var sp = new StatusPacket(status);
-            Byte[] statusPacket = sp.GetPacket().ToBytes();
-            try
-            {
-                _tcpClient.GetStream().Write(statusPacket, 0, statusPacket.Length);
-            }
-            catch (Exception ex)
-            {
-                Logger.Write("Исключение при отсылке статуса: " + ex.Message);
-            }
+            Balancer.Common.Utils.PacketTransmitHelper.Send(sp.GetPacket(), _tcpClient.GetStream());
             Logger.Write("Отослан статус " + status);
         }
 
         /// <summary>
         ///     Обработчик запроса в MySQL
         /// </summary>
-        /// <param name="data"></param>
-        private void MySqlWorker(object data)
+        /// <param name="packet"></param>
+        private void MySqlWorker(object packetObj)
         {
-            var packetData = (string) data;
-            var packet = new Packet(packetData);
-
+            DataTable dt = null;
+            Packet packet = (Packet) packetObj;
             var requestPacket = new DbRequestPacket(packet.Data);
 
             Logger.Write("Принят запрос от клиента: " + requestPacket.ClientId);
-            DataTable dt = null;
             if (packet.Type == PacketType.Request)
             {
                 dt = ProcessQuery(requestPacket);
@@ -149,10 +144,8 @@ namespace server
             if (dt != null)
             {
                 Logger.Write("Отправка результата клиенту " + requestPacket.ClientId);
-                var dbAnswerPacket = new DbAnswerPacket(dt, requestPacket.QueryNumber, new PacketBase() { ClientId = requestPacket.ClientId, RegionId = requestPacket.RegionId});
-                Packet answerPacket = dbAnswerPacket.GetPacket();
-                Byte[] answerPacketBytes = answerPacket.ToBytes();
-                _tcpClient.GetStream().Write(answerPacketBytes, 0, answerPacketBytes.Length);
+                var dbAnswerPacket = new DbAnswerPacket(dt, requestPacket.QueryNumber, new PacketBase { ClientId = requestPacket.ClientId, RegionId = requestPacket.RegionId});
+                Balancer.Common.Utils.PacketTransmitHelper.Send(dbAnswerPacket.GetPacket(), _tcpClient.GetStream());
             }
             _queueLength--;
             SendStatus();
@@ -197,8 +190,7 @@ namespace server
         private DataTable ProcessQuerySimulated(DbRequestPacket requestPacket)
         {
             Thread.Sleep(Config.ServerConfig.Instance.SimulatedTimes[requestPacket.QueryNumber]);
-            DataTable dt = new DataTable();
-            dt.TableName = "randomTable";
+            var dt = new DataTable {TableName = "randomTable"};
             dt.Columns.Add("Data");
             DataRow dr = dt.NewRow();
             dr[0] = "RandomData";
