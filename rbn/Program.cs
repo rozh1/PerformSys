@@ -41,8 +41,6 @@ namespace rbn
             }
             RBNConfig.Load(configFilePath);
             
-            Servers.Init();
-
             new Server((int)RBNConfig.Instance.RBN.Port);
         }
     }

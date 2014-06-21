@@ -120,7 +120,7 @@ namespace server
         /// </summary>
         private void SendStatus()
         {
-            bool status = (_queueLength <= Environment.ProcessorCount*2);
+            bool status = (_queueLength < Environment.ProcessorCount*2);
             var sp = new StatusPacket(status);
             Balancer.Common.Utils.PacketTransmitHelper.Send(sp.GetPacket(), _tcpClient.GetStream());
             Logger.Write("Отослан статус " + status);

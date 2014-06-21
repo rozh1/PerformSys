@@ -17,16 +17,28 @@
  */
 #endregion
 
-п»їusing System.Net.Sockets;
+using System;
+using Balancer.Common.Packet.Packets;
+using rbn.QueueHandler;
+using rbn.ServersHandler;
 
-namespace rbn.QueueHandler
+namespace rbn.Interfaces
 {
-    public class Client
+    public interface IServer
     {
-        public TcpClient Connection { get; set; }
-        public string RequestPacketData { get; set; }
-        public string AnswerPacketData { get; set; }
-        public bool RequestSended { get; set; }
-        public int Id { get; set; }
+        /// <summary>
+        /// Событие получения ответа
+        /// </summary>
+        event Action<int, DbAnswerPacket> AnswerRecivedEvent;
+
+        /// <summary>
+        /// Событие иницирования отправки запроса из очереди
+        /// </summary>
+        event Action<IServer> SendRequestFromQueueEvent;
+
+        /// <summary>
+        ///     Отправка запроса серверу
+        /// </summary>
+        bool SendRequest(QueueEntity queueEntity);
     }
 }

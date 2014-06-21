@@ -25,6 +25,7 @@ using System.Threading;
 using Balancer.Common;
 using Balancer.Common.Packet;
 using rbn.QueueHandler;
+using rbn.ServersHandler;
 
 namespace rbn
 {
@@ -43,15 +44,29 @@ namespace rbn
         /// </summary>
         private bool _serverIsLife;
 
+        /// <summary>
+        /// Очередь регионального балансировщика
+        /// </summary>
+        private readonly RbnQueue _rbnQueue;
+
+        /// <summary>
+        /// Сервера региона
+        /// </summary>
+        private readonly Servers _servers;
+
         public Server(int port)
         {
             _listener = new TcpListener(IPAddress.Any, port);
-
             _listener.Start();
+            Logger.Write("Начато прослушивание " + IPAddress.Any + ":" + port);
+
+            _rbnQueue = new RbnQueue();
+            _servers = new Servers();
+            _servers.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
+            _servers.SendRequestFromQueueEvent += _rbnQueue.SendRequestToServer;
 
             _serverIsLife = true;
 
-            Logger.Write("Начато прослушивание " + IPAddress.Any + ":" + port);
 
             while (_serverIsLife)
             {
@@ -96,7 +111,7 @@ namespace rbn
                         client.Connection = tcpClient;
                         client.RequestPacketData = packet.Data;
 
-                        RbnQueue.AddClient(client);
+                        _rbnQueue.AddClient(client);
                     }
                 }
                 catch (Exception ex)
@@ -105,7 +120,7 @@ namespace rbn
                 }
             }
             Logger.Write("Клиент отключен:");
-            RbnQueue.RemoveClient(client);
+            _rbnQueue.RemoveClient(client);
         }
 
         /// <summary>
