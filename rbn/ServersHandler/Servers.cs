@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using Balancer.Common;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
+using Balancer.Common.Utils;
 using rbn.Config;
 using rbn.QueueHandler;
 
 namespace rbn.ServersHandler
 {
     /// <summary>
-    /// Сервера БД
+    ///     Сервера БД
     /// </summary>
-    internal class Servers
+    public class Servers
     {
         /// <summary>
         ///     Список серверов
@@ -27,14 +27,19 @@ namespace rbn.ServersHandler
         private static readonly List<Thread> ServersThreads = new List<Thread>();
 
         /// <summary>
-        /// Признак работы потока отправки
+        ///     Признак работы потока отправки
         /// </summary>
         private static bool _sendThreadLife = true;
 
         /// <summary>
-        /// Индекс сервера, на каторый был оправлен последний запрос
+        ///     Индекс сервера, на каторый был оправлен последний запрос
         /// </summary>
         private static int _lastReadyServerIndex;
+
+        /// <summary>
+        ///     Мьтекс отправки данных серверу
+        /// </summary>
+        private static readonly Mutex SendMutex = new Mutex();
 
         /// <summary>
         ///     Инициализация рабоы с серверами
@@ -46,7 +51,7 @@ namespace rbn.ServersHandler
                 try
                 {
                     var tcpClient = new TcpClient();
-                    tcpClient.Connect(serverConfig.Host, (int)serverConfig.Port);
+                    tcpClient.Connect(serverConfig.Host, (int) serverConfig.Port);
                     var server = new Server {Connection = tcpClient};
                     AddServer(server);
                     var serverThread = new Thread(ServerListenThread);
@@ -55,7 +60,8 @@ namespace rbn.ServersHandler
                 }
                 catch (Exception e)
                 {
-                    Logger.Write("Не удалось подключиться к серверу " + serverConfig.Host + ":" + serverConfig.Port + " " + e.Message);
+                    Logger.Write("Не удалось подключиться к серверу " + serverConfig.Host + ":" + serverConfig.Port +
+                                 " " + e.Message);
                 }
             }
 
@@ -70,7 +76,7 @@ namespace rbn.ServersHandler
         {
             while (_sendThreadLife)
             {
-                RbnQueue.SendRequestToServer();
+                SendRequestToServer(RbnQueue.Queue);
                 Thread.Sleep(100);
             }
         }
@@ -104,7 +110,7 @@ namespace rbn.ServersHandler
         ///     Полчение следующего свободного сервера по круговому алгоритму
         /// </summary>
         /// <returns></returns>
-        public static Server GetNextReadyServer()
+        private static Server GetNextReadyServer()
         {
             for (int i = _lastReadyServerIndex; i < ServersList.Count; i++)
             {
@@ -135,7 +141,7 @@ namespace rbn.ServersHandler
             TcpClient connection = server.Connection;
             while (connection.Connected)
             {
-                var packet = Balancer.Common.Utils.PacketTransmitHelper.Recive(connection.GetStream());
+                Packet packet = PacketTransmitHelper.Recive(connection.GetStream());
 
                 switch (packet.Type)
                 {
@@ -159,12 +165,44 @@ namespace rbn.ServersHandler
         /// <param name="server"></param>
         /// <param name="query"></param>
         /// <param name="clientId"></param>
-        public static void SendRequest(Server server, string query, int clientId)
+        private static void SendRequest(Server server, string query, int clientId)
         {
             var packet = new DbRequestPacket(query) {ClientId = (uint) clientId};
             if (!server.Connection.Connected) return;
-            if (Balancer.Common.Utils.PacketTransmitHelper.Send(packet.GetPacket(), server.Connection.GetStream()))
+            if (PacketTransmitHelper.Send(packet.GetPacket(), server.Connection.GetStream()))
                 server.StatusRecived = false;
+        }
+
+        /// <summary>
+        ///     Выбор клиента и отправка его запроса на сервер
+        /// </summary>
+        private static void SendRequestToServer(Queue<QueueEntity> queue)
+        {
+            SendMutex.WaitOne(1000);
+            if (queue.Count > 0)
+            {
+                QueueEntity qe = queue.Peek();
+                if (SendRequest(qe)) queue.Dequeue();
+            }
+            SendMutex.ReleaseMutex();
+        }
+
+        /// <summary>
+        ///     Отправка запроса серверу
+        /// </summary>
+        private static bool SendRequest(QueueEntity queueEntity)
+        {
+            Server server = GetNextReadyServer();
+            if (server != null)
+            {
+                SendRequest(server, queueEntity.Query, queueEntity.ClientId);
+                Client client = RbnQueue.GetClientById(queueEntity.ClientId);
+                if (client == null) return false;
+                client.RequestSended = true;
+                Logger.Write("Отправлен запрос от клиента " + client.Id);
+            }
+            else return false;
+            return true;
         }
 
         /// <summary>
