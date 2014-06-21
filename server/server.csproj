@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\Data\SimulatedTimes.cs" />
     <Compile Include="Config\Data\Server.cs" />
     <Compile Include="Config\ServerConfig.cs" />
     <Compile Include="Config\Data\DataBase.cs" />
@@ -73,7 +74,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Server.cs" />
-    <Compile Include="SimulatedTimes.cs" />
     <Compile Include="Config\Data\WorkMode.cs" />
   </ItemGroup>
   <ItemGroup>

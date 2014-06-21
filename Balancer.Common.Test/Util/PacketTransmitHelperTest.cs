@@ -22,8 +22,6 @@ using System.IO;
 using System.Net.Sockets;
 using Balancer.Common.Packet.Packets;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using Moq.AutoMock;
 
 namespace Balancer.Common.Test.Util
 {

@@ -34,9 +34,14 @@ namespace server.Config
         public Data.DataBase DataBase { get; set; }
 
         /// <summary>
-        ///     Конфиг базы данных
+        ///     Конфиг сервера
         /// </summary>
         public Data.Server Server { get; set; }
+
+        /// <summary>
+        ///     Конфиг времен выполения запросов для режима симуляции
+        /// </summary>
+        public Data.SimulatedTimes SimulatedTimes { get; set; }
 
         public void Save(string fileName)
         {
