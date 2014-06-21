@@ -15,6 +15,7 @@ namespace Balancer.Common.Utils
                 try
                 {
                     networkStream.Write(packetBytes, 0, packetBytes.Length);
+                    networkStream.Flush();
                     result = true;
                 }
                 catch (Exception ex)
@@ -35,27 +36,24 @@ namespace Balancer.Common.Utils
             var packet = new Packet.Packet("");
             try
             {
-                if (networkStream.DataAvailable)
+                int count;
+                while ((count = networkStream.Read(buffer, 0, buffer.Length)) > 0)
                 {
-                    int count;
-                    while ((count = networkStream.Read(buffer, 0, buffer.Length)) > 0)
+                    packetData += _nextPacketData + Encoding.ASCII.GetString(buffer, 0, count);
+                    if (packetData.Contains(Packet.Packet.PacketEnd))
                     {
-                        packetData += _nextPacketData + Encoding.ASCII.GetString(buffer, 0, count);
-                        if (packetData.Contains(Packet.Packet.PacketEnd))
-                        {
-                            int index = packetData.IndexOf(Packet.Packet.PacketEnd, StringComparison.Ordinal);
-                            _nextPacketData =
-                                packetData.Substring(
-                                    index +
-                                    Packet.Packet.PacketEnd.Length);
-                            packetData =
-                                packetData.Remove(index);
-                            break;
-                        }
-                        _nextPacketData = "";
+                        int index = packetData.IndexOf(Packet.Packet.PacketEnd, StringComparison.Ordinal);
+                        _nextPacketData =
+                            packetData.Substring(
+                                index +
+                                Packet.Packet.PacketEnd.Length);
+                        packetData =
+                            packetData.Remove(index);
+                        break;
                     }
-                    packet = new Packet.Packet(packetData);
+                    _nextPacketData = "";
                 }
+                packet = new Packet.Packet(packetData);
 
             }
             catch (Exception ex)

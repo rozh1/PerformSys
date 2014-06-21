@@ -5,13 +5,6 @@ using System.Text;
 
 namespace Balancer.Common.Packet
 {
-    public enum PacketType
-    {
-        Status,
-        Request,
-        Answer
-    };
-
     public class Packet
     {
         private String _data;

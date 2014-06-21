@@ -22,7 +22,7 @@ namespace client
 
             Parser parser = new Parser(args);
 
-            if (parser.ErrorText != string.Empty)
+            if (!string.IsNullOrEmpty(parser.ErrorText))
             {
                 Logger.Write(parser.ErrorText);
                 Environment.Exit(-1);
