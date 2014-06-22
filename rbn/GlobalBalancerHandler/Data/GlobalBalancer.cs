@@ -19,7 +19,7 @@
 
 ﻿using System.Net.Sockets;
 
-namespace rbn.GlobalBalancerHandler
+namespace rbn.GlobalBalancerHandler.Data
 {
     public class GlobalBalancer
     {
