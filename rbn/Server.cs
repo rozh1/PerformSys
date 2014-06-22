@@ -24,6 +24,7 @@ using System.Text;
 using System.Threading;
 using Balancer.Common;
 using Balancer.Common.Packet;
+using Balancer.Common.Packet.Packets;
 using rbn.QueueHandler;
 using rbn.ServersHandler;
 
@@ -88,35 +89,21 @@ namespace rbn
             var client = new Client();
             while (tcpClient.Connected)
             {
-                string packetData = "";
-                var buffer = new byte[1400];
-
-                try
+                var packet = Balancer.Common.Utils.PacketTransmitHelper.Recive(tcpClient.GetStream());
+                if (packet != null)
                 {
-                    int count;
-                    while ((count = tcpClient.GetStream().Read(buffer, 0, buffer.Length)) > 0)
-                    {
-                        packetData += Encoding.ASCII.GetString(buffer, 0, count);
-                        if (packetData.IndexOf(Packet.PacketEnd, StringComparison.Ordinal) >= 0) break;
-                    }
+                    var dbRequestPacket = new DbRequestPacket(packet.Data);
+                    dbRequestPacket.GlobalId = Config.RBNConfig.Instance.RBN.GlobalId;
+                    dbRequestPacket.RegionId = Config.RBNConfig.Instance.RBN.RegionId;
 
-                    if (count <= 0) tcpClient.Close();
+                    client.Connection = tcpClient;
+                    client.RequestPacketData = dbRequestPacket.GetPacket().Data;
 
-                    if (packetData.Length > 0)
-                    {
-                        var packet = new Packet(packetData);
-
-                        //Logger.Write("Принят запрос: " + packet.Data);
-
-                        client.Connection = tcpClient;
-                        client.RequestPacketData = packet.Data;
-
-                        _rbnQueue.AddClient(client);
-                    }
+                    _rbnQueue.AddClient(client);
                 }
-                catch (Exception ex)
+                else
                 {
-                    Logger.Write("Исключение при чтении запроса: " + ex.Message);
+                    tcpClient.Close();
                 }
             }
             Logger.Write("Клиент отключен:");

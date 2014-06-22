@@ -72,7 +72,15 @@ namespace Balancer.Common.Utils
                     }
                     _nextPacketData = "";
                 }
-                packet = new Packet.Packet(packetData);
+                if (count > 0)
+                {
+                    packet = new Packet.Packet(packetData);
+                }
+                else
+                {
+                    if (count == 0) Logger.Write("Произошло отключение");
+                    if (count < 0) Logger.Write("Ошибка соедиения");
+                }
 
             }
             catch (Exception ex)

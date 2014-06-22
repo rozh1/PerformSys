@@ -182,18 +182,25 @@ namespace rbn.ServersHandler
             {
                 Packet packet = PacketTransmitHelper.Recive(connection.GetStream());
 
-                switch (packet.Type)
+                if (packet != null)
                 {
-                    case PacketType.Status:
-                        var sp = new StatusPacket(packet.Data);
-                        server.Status = sp.Status;
-                        server.StatusRecived = true;
-                        break;
-                    case PacketType.Answer:
-                        var answer = new DbAnswerPacket(packet.Data);
-                        if (AnswerRecivedEvent != null)
-                            AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
-                        break;
+                    switch (packet.Type)
+                    {
+                        case PacketType.Status:
+                            var sp = new StatusPacket(packet.Data);
+                            server.Status = sp.Status;
+                            server.StatusRecived = true;
+                            break;
+                        case PacketType.Answer:
+                            var answer = new DbAnswerPacket(packet.Data);
+                            if (AnswerRecivedEvent != null)
+                                AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
+                            break;
+                    }
+                }
+                else
+                {
+                    connection.Close();
                 }
             }
         }
