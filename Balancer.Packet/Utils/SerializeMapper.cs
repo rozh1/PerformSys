@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
 
 namespace Balancer.Common.Utils
 {
-    public class SerializeMapper
+    public static class SerializeMapper
     {
         public static string Serialize(object obj)
         {

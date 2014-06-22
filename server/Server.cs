@@ -3,7 +3,6 @@ using System.Data;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using Balancer.Common;
 using Balancer.Common.Packet;
@@ -53,7 +52,6 @@ namespace server
                 _tcpClient = _listener.AcceptTcpClient();
 
                 Logger.Write("Принято соединие");
-                string packetData = "";
 
                 while (_tcpClient.Connected)
                 {
@@ -62,36 +60,6 @@ namespace server
                     _queueLength++;
                     SendStatus();
                     ThreadPool.QueueUserWorkItem(MySqlWorker, onePacketData);
-                    //var buffer = new byte[1400];
-                    //
-                    //try
-                    //{
-                    //    int count;
-                    //    while ((count = _tcpClient.GetStream().Read(buffer, 0, buffer.Length)) > 0)
-                    //    {
-                    //        packetData += Encoding.ASCII.GetString(buffer, 0, count);
-                    //        if (packetData.Contains(Packet.PacketEnd)) break;
-                    //    }
-                    //    while (packetData.Contains(Packet.PacketEnd))
-                    //    {
-                    //        int index = packetData.IndexOf(Packet.PacketEnd, StringComparison.Ordinal);
-                    //        string onePacketData = packetData.Remove(index);
-                    //        packetData =
-                    //            packetData.Substring(
-                    //                index +
-                    //                Packet.PacketEnd.Length);
-                    //
-                    //        _queueLength++;
-                    //        SendStatus();
-                    //        ThreadPool.QueueUserWorkItem(MySqlWorker, onePacketData);
-                    //    }
-                    //}
-                    //catch (Exception ex)
-                    //{
-                    //    Logger.Write("Исключение при чтении запроса: " + ex.Message);
-                    //}
-
-
                 }
             }
         }
@@ -110,7 +78,7 @@ namespace server
         /// <summary>
         ///     Обработчик запроса в MySQL
         /// </summary>
-        /// <param name="packet"></param>
+        /// <param name="packetObj"></param>
         private void MySqlWorker(object packetObj)
         {
             DataTable dt = null;
