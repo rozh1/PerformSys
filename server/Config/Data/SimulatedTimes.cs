@@ -2,7 +2,7 @@
 
 namespace server.Config.Data
 {
-    public class SimulatedTimes : SerializableDictionary<int, int>
+    public class SimulationParams : SerializableDictionary<int, int[]>
     {
     }
 }
