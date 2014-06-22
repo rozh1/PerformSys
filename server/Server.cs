@@ -22,6 +22,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using Balancer.Common;
 using Balancer.Common.Packet;
@@ -157,11 +158,16 @@ namespace server
 
         private DataTable ProcessQuerySimulated(DbRequestPacket requestPacket)
         {
-            Thread.Sleep(Config.ServerConfig.Instance.SimulatedTimes[requestPacket.QueryNumber]);
+            var rand= new Random();
+            Thread.Sleep(Config.ServerConfig.Instance.SimulationParams[requestPacket.QueryNumber][0]);
+            var data = new byte[Config.ServerConfig.Instance.SimulationParams[requestPacket.QueryNumber][1]];
+            
+            rand.NextBytes(data);
+
             var dt = new DataTable {TableName = "randomTable"};
             dt.Columns.Add("Data");
             DataRow dr = dt.NewRow();
-            dr[0] = "RandomData";
+            dr[0] = Encoding.ASCII.GetString(data);
             dt.Rows.Add(dr);
             return dt; 
         }

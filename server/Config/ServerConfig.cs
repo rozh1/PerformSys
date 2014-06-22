@@ -41,7 +41,7 @@ namespace server.Config
         /// <summary>
         ///     Конфиг времен выполения запросов для режима симуляции
         /// </summary>
-        public Data.SimulatedTimes SimulatedTimes { get; set; }
+        public Data.SimulationParams SimulationParams { get; set; }
 
         public void Save(string fileName)
         {
