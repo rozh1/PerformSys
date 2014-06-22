@@ -33,7 +33,7 @@ namespace Balancer.Common.Utils
         {
             var buffer = new byte[1400];
             string packetData = "";
-            var packet = new Packet.Packet("");
+            Packet.Packet packet = null;
             try
             {
                 int count;

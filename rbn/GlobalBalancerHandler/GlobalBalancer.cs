@@ -12,11 +12,12 @@ using rbn.QueueHandler;
 
 namespace rbn.GlobalBalancerHandler
 {
-    internal class GlobalBalancers : IServer
+    internal class GlobalBalancer : IServer
     {
-        private GlobalBalancer _globalBalancer;
+        private Data.GlobalBalancer _globalBalancer;
         private Thread _globalBalancersThread;
         private TcpListener _listener;
+
         public event Action<IServer> SendRequestFromQueueEvent;
 
         /// <summary>
@@ -24,7 +25,7 @@ namespace rbn.GlobalBalancerHandler
         /// </summary>
         public bool SendRequest(QueueEntity queueEntity)
         {
-            GlobalBalancer globalBalancer = _globalBalancer;
+            Data.GlobalBalancer globalBalancer = _globalBalancer;
             if (globalBalancer != null)
             {
                 if (!globalBalancer.Connection.Connected) return false;
@@ -36,6 +37,11 @@ namespace rbn.GlobalBalancerHandler
             else return false;
             return true;
         }
+
+        /// <summary>
+        ///     Событие получения ответа
+        /// </summary>
+        public event Action<int, DbAnswerPacket> AnswerRecivedEvent;
 
         private void Init()
         {
@@ -49,7 +55,7 @@ namespace rbn.GlobalBalancerHandler
             TcpClient tcpClient = _listener.AcceptTcpClient();
             Logger.Write("Принято соединие");
 
-            _globalBalancer = new GlobalBalancer
+            _globalBalancer = new Data.GlobalBalancer
             {
                 Connection = tcpClient,
                 Status = false,
@@ -61,7 +67,7 @@ namespace rbn.GlobalBalancerHandler
 
         private void GlobalBalancerListenThread(object param)
         {
-            var globalBalancer = (GlobalBalancer) param;
+            var globalBalancer = (Data.GlobalBalancer) param;
             TcpClient connection = globalBalancer.Connection;
 
             while (connection.Connected)
@@ -82,10 +88,5 @@ namespace rbn.GlobalBalancerHandler
             }
             Init();
         }
-
-        /// <summary>
-        ///     Событие получения ответа
-        /// </summary>
-        public event Action<int, DbAnswerPacket> AnswerRecivedEvent;
     }
 }

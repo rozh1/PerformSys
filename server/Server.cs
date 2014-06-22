@@ -8,6 +8,8 @@ using System.Threading;
 using Balancer.Common;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
+using Balancer.Common.Utils;
+using server.Config;
 using server.Config.Data;
 using server.DataBase;
 
@@ -40,8 +42,7 @@ namespace server
 
         public Server(uint port)
         {
-            _listener = new TcpListener(IPAddress.Any, (int)port);
-
+            _listener = new TcpListener(IPAddress.Any, (int) port);
             _listener.Start();
 
             _serverIsLife = true;
@@ -57,10 +58,18 @@ namespace server
                 while (_tcpClient.Connected)
                 {
                     SendStatus();
-                    Packet onePacketData = Balancer.Common.Utils.PacketTransmitHelper.Recive(_tcpClient.GetStream());
-                    _queueLength++;
-                    SendStatus();
-                    ThreadPool.QueueUserWorkItem(MySqlWorker, onePacketData);
+                    Packet onePacketData = PacketTransmitHelper.Recive(_tcpClient.GetStream());
+
+                    if (onePacketData != null)
+                    {
+                        _queueLength++;
+                        SendStatus();
+                        ThreadPool.QueueUserWorkItem(MySqlWorker, onePacketData);
+                    }
+                    else
+                    {
+                        Logger.Write("Получен пустой пакет или разорвано соединение");
+                    }
                 }
             }
         }
@@ -72,8 +81,11 @@ namespace server
         {
             bool status = (_queueLength < Environment.ProcessorCount*2);
             var sp = new StatusPacket(status);
-            Balancer.Common.Utils.PacketTransmitHelper.Send(sp.GetPacket(), _tcpClient.GetStream());
-            Logger.Write("Отослан статус " + status);
+            if (_tcpClient.Connected)
+            {
+                PacketTransmitHelper.Send(sp.GetPacket(), _tcpClient.GetStream());
+                Logger.Write("Отослан статус " + status);
+            }
         }
 
         /// <summary>
@@ -83,7 +95,7 @@ namespace server
         private void MySqlWorker(object packetObj)
         {
             DataTable dt = null;
-            Packet packet = (Packet) packetObj;
+            var packet = (Packet) packetObj;
             var requestPacket = new DbRequestPacket(packet.Data);
 
             Logger.Write("Принят запрос от клиента: " + requestPacket.ClientId);
@@ -94,13 +106,19 @@ namespace server
             if (dt != null)
             {
                 Logger.Write("Отправка результата клиенту " + requestPacket.ClientId);
-                var dbAnswerPacket = new DbAnswerPacket(dt, requestPacket.QueryNumber, new PacketBase { ClientId = requestPacket.ClientId, RegionId = requestPacket.RegionId});
-                Balancer.Common.Utils.PacketTransmitHelper.Send(dbAnswerPacket.GetPacket(), _tcpClient.GetStream());
+                var dbAnswerPacket = new DbAnswerPacket(dt, requestPacket.QueryNumber,
+                    new PacketBase {ClientId = requestPacket.ClientId, RegionId = requestPacket.RegionId});
+                PacketTransmitHelper.Send(dbAnswerPacket.GetPacket(), _tcpClient.GetStream());
             }
             _queueLength--;
             SendStatus();
         }
 
+        /// <summary>
+        ///     Обработчик запросов
+        /// </summary>
+        /// <param name="requestPacket">пакет запроса</param>
+        /// <returns></returns>
         private DataTable ProcessQuery(DbRequestPacket requestPacket)
         {
             DataTable dt = null;
@@ -108,7 +126,7 @@ namespace server
             var sw = new Stopwatch();
             sw.Start();
 
-            switch (Config.ServerConfig.Instance.Server.WorkMode)
+            switch (ServerConfig.Instance.Server.WorkMode)
             {
                 case WorkMode.Normal:
                     dt = ProcessQueryWithMySQL(requestPacket);
@@ -123,9 +141,14 @@ namespace server
             return dt;
         }
 
+        /// <summary>
+        ///     Обрабочик запроса с помощью MySQL
+        /// </summary>
+        /// <param name="requestPacket">пакет запроса</param>
+        /// <returns></returns>
         private DataTable ProcessQueryWithMySQL(DbRequestPacket requestPacket)
         {
-            DataTable dt=null;
+            DataTable dt = null;
             try
             {
                 dt = Database.CustomQuery(requestPacket.Query);
@@ -137,12 +160,17 @@ namespace server
             return dt;
         }
 
+        /// <summary>
+        ///     Симулятор обрботки запросов
+        /// </summary>
+        /// <param name="requestPacket">пакет запроса</param>
+        /// <returns></returns>
         private DataTable ProcessQuerySimulated(DbRequestPacket requestPacket)
         {
-            var rand= new Random();
-            Thread.Sleep(Config.ServerConfig.Instance.SimulationParams[requestPacket.QueryNumber][0]);
-            var data = new byte[Config.ServerConfig.Instance.SimulationParams[requestPacket.QueryNumber][1]];
-            
+            var rand = new Random();
+            Thread.Sleep(ServerConfig.Instance.SimulationParams[requestPacket.QueryNumber][0]);
+            var data = new byte[ServerConfig.Instance.SimulationParams[requestPacket.QueryNumber][1]];
+
             rand.NextBytes(data);
 
             var dt = new DataTable {TableName = "randomTable"};
@@ -150,7 +178,7 @@ namespace server
             DataRow dr = dt.NewRow();
             dr[0] = Encoding.ASCII.GetString(data);
             dt.Rows.Add(dr);
-            return dt; 
+            return dt;
         }
 
         /// <summary>
