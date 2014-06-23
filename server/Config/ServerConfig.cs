@@ -18,7 +18,7 @@ namespace server.Config
         ///     Конфиг сервера
         /// </summary>
         public Data.Server Server { get; set; }
-
+        
         /// <summary>
         ///     Конфиг времен выполения запросов для режима симуляции
         /// </summary>
