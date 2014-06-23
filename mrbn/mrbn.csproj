@@ -50,6 +50,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Server.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Balancer.Packet\Balancer.Common.csproj">
