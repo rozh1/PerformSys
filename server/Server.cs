@@ -40,11 +40,6 @@ namespace server
     internal class Server
     {
         /// <summary>
-        ///     Слушатель новых соедиений
-        /// </summary>
-        private readonly TcpListener _listener;
-
-        /// <summary>
         ///     текущее содинение
         /// </summary>
         private readonly TcpClient _tcpClient;
@@ -59,20 +54,24 @@ namespace server
         /// </summary>
         private bool _serverIsLife;
 
-        public Server(uint port)
+        public Server()
         {
-            _listener = new TcpListener(IPAddress.Any, (int) port);
-            _listener.Start();
-
-            _serverIsLife = true;
-
-            Logger.Write("Начато прослушивание " + IPAddress.Any + ":" + port);
-
+            _tcpClient = new TcpClient();
             while (_serverIsLife)
             {
-                _tcpClient = _listener.AcceptTcpClient();
+                try
+                {
+                    _tcpClient.Connect(
+                        ServerConfig.Instance.Server.RBN.Host, 
+                        (int)ServerConfig.Instance.Server.RBN.Port);
+                }
+                catch (Exception)
+                {
+                    Logger.Write("Не удалось подключиться. Переплдключение");
+                    continue;
+                }
 
-                Logger.Write("Принято соединие");
+                Logger.Write("Подключение установлено");
 
                 while (_tcpClient.Connected)
                 {
@@ -206,9 +205,9 @@ namespace server
         ~Server()
         {
             _serverIsLife = false;
-            if (_listener != null)
+            if (_tcpClient != null)
             {
-                _listener.Stop();
+                if ( _tcpClient.Connected) _tcpClient.Close();
             }
         }
     }

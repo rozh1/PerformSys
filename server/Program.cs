@@ -60,7 +60,7 @@ namespace server
             }
 
             Logger.Write("Сервер конфигурирован");
-            new Server(ServerConfig.Instance.Server.Port);
+            new Server();
         }
     }
 }

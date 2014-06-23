@@ -19,9 +19,9 @@
 
 ﻿namespace server.Config.Data
 {
-    public class Server
+    public class RBN
     {
-        public RBN RBN { get; set; }
-        public WorkMode WorkMode { get; set; }
+        public uint Port { get; set; }
+        public string Host { get; set; }
     }
 }
