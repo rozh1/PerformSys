@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Config\Data\RBN.cs" />
     <Compile Include="Config\Data\Server.cs" />
+    <Compile Include="Config\Data\MRBN.cs" />
     <Compile Include="Config\RBNConfig.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

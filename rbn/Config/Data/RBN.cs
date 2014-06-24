@@ -10,6 +10,5 @@ namespace rbn.Config.Data
         public uint GlobalId { get; set; }
         public uint RegionId { get; set; }
         public uint Port { get; set; }
-        public uint GlobalBalancerPort { get; set; }
     }
 }

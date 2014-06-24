@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Balancer.Common;
@@ -12,11 +11,9 @@ using rbn.QueueHandler;
 
 namespace rbn.GlobalBalancerHandler
 {
-    internal class GlobalBalancer : IServer
+    internal class GlobalBalancer : IServer, IDisposable
     {
-        private Data.GlobalBalancer _globalBalancer;
-        private Thread _globalBalancersThread;
-        private TcpListener _listener;
+        private readonly Data.GlobalBalancer _globalBalancer;
 
         public event Action<IServer> SendRequestFromQueueEvent;
 
@@ -43,26 +40,16 @@ namespace rbn.GlobalBalancerHandler
         /// </summary>
         public event Action<int, DbAnswerPacket> AnswerRecivedEvent;
 
-        private void Init()
+        public GlobalBalancer()
         {
-            var port = (int) RBNConfig.Instance.RBN.GlobalBalancerPort;
-
-            _listener = new TcpListener(IPAddress.Any, port);
-            _listener.Start();
-
-            Logger.Write("Начато прослушивание " + IPAddress.Any + ":" + port);
-
-            TcpClient tcpClient = _listener.AcceptTcpClient();
-            Logger.Write("Принято соединие");
-
             _globalBalancer = new Data.GlobalBalancer
             {
-                Connection = tcpClient,
-                Status = false,
+                Connection = null,
+                Status = true,
                 StatusRecived = false
             };
-            _globalBalancersThread = new Thread(GlobalBalancerListenThread);
-            _globalBalancersThread.Start(_globalBalancer);
+            var globalBalancersThread = new Thread(GlobalBalancerListenThread);
+            globalBalancersThread.Start(_globalBalancer);
         }
 
         private void GlobalBalancerListenThread(object param)
@@ -70,23 +57,51 @@ namespace rbn.GlobalBalancerHandler
             var globalBalancer = (Data.GlobalBalancer) param;
             TcpClient connection = globalBalancer.Connection;
 
-            while (connection.Connected)
+            while (globalBalancer.Status)
             {
-                Packet packet = PacketTransmitHelper.Recive(connection.GetStream());
-
-                switch (packet.Type)
+                try
                 {
-                    case PacketType.TransmitRequest:
-                        if (SendRequestFromQueueEvent != null) SendRequestFromQueueEvent(this);
-                        break;
-                    case PacketType.Answer:
-                        var answer = new DbAnswerPacket(packet.Data);
-                        if (AnswerRecivedEvent != null)
-                            AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
-                        break;
+                    connection.Connect(
+                        RBNConfig.Instance.MRBN.Host,
+                        (int)RBNConfig.Instance.MRBN.Port);
+                }
+                catch (Exception)
+                {
+                    Logger.Write("Не удалось подключиться к межрегиональному балансировщику. Переподключение");
+                    Thread.Sleep(1000);
+                    continue;
+                }
+
+                Logger.Write("Подключение установлено");
+
+                while (connection.Connected)
+                {
+                    Packet packet = PacketTransmitHelper.Recive(connection.GetStream());
+
+                    switch (packet.Type)
+                    {
+                        case PacketType.TransmitRequest:
+                            if (SendRequestFromQueueEvent != null) SendRequestFromQueueEvent(this);
+                            break;
+                        case PacketType.Answer:
+                            var answer = new DbAnswerPacket(packet.Data);
+                            if (AnswerRecivedEvent != null)
+                                AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
+                            break;
+                    }
                 }
             }
-            Init();
+        }
+
+        public void Dispose()
+        {
+            _globalBalancer.Status = false;
+            _globalBalancer.Connection.Close();
+        }
+
+        ~GlobalBalancer()
+        {
+            Dispose();
         }
     }
 }
