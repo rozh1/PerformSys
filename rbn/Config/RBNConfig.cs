@@ -34,7 +34,7 @@ namespace rbn.Config
         /// <summary>
         ///     Конфиг серверов
         /// </summary>
-        public Data.Server[] Servers { get; set; }
+        public Data.Server Server { get; set; }
 
         public void Save(string fileName)
         {

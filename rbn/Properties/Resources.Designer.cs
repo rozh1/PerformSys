@@ -68,12 +68,9 @@ namespace rbn.Properties {
         ///    &lt;RegionId&gt;1&lt;/RegionId&gt;
         ///    &lt;Port&gt;3409&lt;/Port&gt;
         ///  &lt;/RBN&gt;
-        ///  &lt;Servers&gt;
-        ///    &lt;Server&gt;
+        ///  &lt;Server&gt;
         ///      &lt;Port&gt;3410&lt;/Port&gt;
-        ///      &lt;Host&gt;localhost&lt;/Host&gt;
-        ///    &lt;/Server&gt;
-        ///  &lt;/Servers&gt;
+        ///  &lt;/Server&gt;
         ///&lt;/RBNConfig&gt;.
         /// </summary>
         internal static string defaultConfig {

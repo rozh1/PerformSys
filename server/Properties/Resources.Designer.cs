@@ -72,13 +72,12 @@ namespace server.Properties {
         ///    &lt;DataBaseName&gt;tpch1&lt;/DataBaseName&gt;
         ///  &lt;/DataBase&gt;
         ///  &lt;Server&gt;
-        ///    &lt;Port&gt;3410&lt;/Port&gt;
-        ///    &lt;WorkMode&gt;Normal&lt;/WorkMode&gt;
-        ///  &lt;/Server&gt;
-        ///  &lt;SimulationParams&gt;
-        ///    &lt;item&gt;
-        ///      &lt;key&gt;
-        ///        [остаток строки не уместился]&quot;;.
+        ///    &lt;RBN&gt;
+        ///      &lt;Port&gt;3410&lt;/Port&gt;
+        ///      &lt;Host&gt;localhost&lt;/Host&gt;
+        ///    &lt;/RBN&gt;
+        ///    &lt;WorkMode&gt;Simulation&lt;/WorkMode&gt;
+        ///  &lt;/Serv [остаток строки не уместился]&quot;;.
         /// </summary>
         internal static string defaultConfig {
             get {

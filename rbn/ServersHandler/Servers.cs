@@ -19,13 +19,13 @@
 
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Balancer.Common;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
-using rbn.Config;
 using rbn.Interfaces;
 using rbn.QueueHandler;
 
@@ -34,7 +34,7 @@ namespace rbn.ServersHandler
     /// <summary>
     ///     Сервера БД
     /// </summary>
-    public class Servers : IServer
+    public class Servers : IServer, IDisposable
     {
         /// <summary>
         ///     Список серверов
@@ -56,30 +56,23 @@ namespace rbn.ServersHandler
         /// </summary>
         private bool _sendThreadLife = true;
 
-        public Servers()
+        private bool _serverIsLife = true;
+
+        private readonly TcpListener _listener;
+
+        public Servers(int port)
         {
             _serversList = new List<Server>();
             _serversThreads = new List<Thread>();
-            foreach (Config.Data.Server serverConfig in RBNConfig.Instance.Servers)
-            {
-                try
-                {
-                    var tcpClient = new TcpClient();
-                    tcpClient.Connect(serverConfig.Host, (int) serverConfig.Port);
-                    var server = new Server {Connection = tcpClient};
-                    AddServer(server);
-                    var serverThread = new Thread(ServerListenThread);
-                    _serversThreads.Add(serverThread);
-                    serverThread.Start(server);
-                }
-                catch (Exception e)
-                {
-                    Logger.Write("Не удалось подключиться к серверу " + serverConfig.Host + ":" + serverConfig.Port +
-                                 " " + e.Message);
-                }
-            }
+
+            _listener = new TcpListener(IPAddress.Any, port);
+            _listener.Start();
+            Logger.Write("Начато прослушивание " + IPAddress.Any + ":" + port);
 
             var t = new Thread(SendThread);
+            t.Start();
+
+            t = new Thread(ServerThread);
             t.Start();
         }
 
@@ -120,6 +113,24 @@ namespace rbn.ServersHandler
             }
         }
 
+        /// <summary>
+        ///     Поток отправки запросов серверам
+        /// </summary>
+        private void ServerThread()
+        {
+            while (_sendThreadLife)
+            {
+                while (_serverIsLife)
+                {
+                    TcpClient tcpClient = _listener.AcceptTcpClient();
+                    var server = new Server { Connection = tcpClient };
+                    AddServer(server);
+                    var serverThread = new Thread(ServerListenThread);
+                    _serversThreads.Add(serverThread);
+                    serverThread.Start(server);
+                }
+            }
+        }
         /// <summary>
         ///     Добавление сервера в список
         /// </summary>
@@ -224,10 +235,16 @@ namespace rbn.ServersHandler
         /// </summary>
         ~Servers()
         {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            _serverIsLife = false;
             _sendThreadLife = false;
             foreach (Server server in _serversList)
             {
-                server.Connection.Close();
+                RemoveServer(server);
             }
         }
     }

@@ -62,7 +62,7 @@ namespace rbn
             Logger.Write("Начато прослушивание " + IPAddress.Any + ":" + port);
 
             _rbnQueue = new RbnQueue();
-            _servers = new Servers();
+            _servers = new Servers((int)Config.RBNConfig.Instance.Server.Port);
             _servers.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
             _servers.SendRequestFromQueueEvent += _rbnQueue.SendRequestToServer;
 
