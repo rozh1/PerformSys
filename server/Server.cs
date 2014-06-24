@@ -33,7 +33,7 @@ namespace server
         /// <summary>
         ///     признак жизни потока слушателя
         /// </summary>
-        private bool _serverIsLife;
+        private bool _serverIsLife = true;
 
         public Server()
         {
