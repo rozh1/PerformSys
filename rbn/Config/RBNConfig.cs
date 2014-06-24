@@ -31,6 +31,8 @@ namespace rbn.Config
 
         public Data.RBN RBN { get; set; }
 
+        public Data.MRBN MRBN { get; set; }
+
         /// <summary>
         ///     Конфиг серверов
         /// </summary>

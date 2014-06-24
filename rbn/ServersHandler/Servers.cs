@@ -123,6 +123,7 @@ namespace rbn.ServersHandler
                 while (_serverIsLife)
                 {
                     TcpClient tcpClient = _listener.AcceptTcpClient();
+                    Logger.Write("Подключен сервер");
                     var server = new Server { Connection = tcpClient };
                     AddServer(server);
                     var serverThread = new Thread(ServerListenThread);

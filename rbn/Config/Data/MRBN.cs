@@ -17,17 +17,11 @@
  */
 #endregion
 
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace rbn.Config.Data
+﻿namespace rbn.Config.Data
 {
-    public class RBN
+    public class MRBN
     {
-        public uint GlobalId { get; set; }
-        public uint RegionId { get; set; }
+        public string Host { get; set; }
         public uint Port { get; set; }
     }
 }
