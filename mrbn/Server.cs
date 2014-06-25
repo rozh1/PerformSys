@@ -6,7 +6,7 @@ using Balancer.Common;
 namespace mrbn
 {
     /// <summary>
-    ///     РБН
+    ///     МРБН
     /// </summary>
     internal class Server
     {
@@ -20,7 +20,6 @@ namespace mrbn
         /// </summary>
         private bool _serverIsLife;
 
-
         public Server(int port)
         {
             _listener = new TcpListener(IPAddress.Any, port);
@@ -28,7 +27,6 @@ namespace mrbn
             Logger.Write("Начато прослушивание " + IPAddress.Any + ":" + port);
 
             _serverIsLife = true;
-
 
             while (_serverIsLife)
             {
