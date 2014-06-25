@@ -40,6 +40,8 @@ namespace mrbn
                     new MemoryStream(Encoding.UTF8.GetBytes(Resources.defaultConfig))).Save(configFilePath);
             }
             MRBNConfig.Load(configFilePath);
+
+            new Server((int)MRBNConfig.Instance.MRBN.Port);
         }
     }
 }

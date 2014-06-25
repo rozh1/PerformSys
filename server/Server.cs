@@ -67,7 +67,8 @@ namespace server
                 }
                 catch (Exception)
                 {
-                    Logger.Write("Не удалось подключиться. Переплдключение");
+                    Logger.Write("Не удалось подключиться. Переподключение");
+                    Thread.Sleep(1000);
                     continue;
                 }
 
@@ -89,6 +90,8 @@ namespace server
                         Logger.Write("Получен пустой пакет или разорвано соединение");
                     }
                 }
+                _tcpClient.Close();
+                _tcpClient = new TcpClient();
             }
         }
 

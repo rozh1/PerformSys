@@ -68,12 +68,6 @@ namespace mrbn.Properties {
         ///    &lt;RegionId&gt;1&lt;/RegionId&gt;
         ///    &lt;Port&gt;3401&lt;/Port&gt;
         ///  &lt;/MRBN&gt;
-        ///  &lt;RBNs&gt;
-        ///    &lt;RBN&gt;
-        ///      &lt;Port&gt;3409&lt;/Port&gt;
-        ///      &lt;Host&gt;localhost&lt;/Host&gt;
-        ///    &lt;/RBN&gt;
-        ///  &lt;/RBNs&gt;
         ///&lt;/MRBNConfig&gt;.
         /// </summary>
         internal static string defaultConfig {

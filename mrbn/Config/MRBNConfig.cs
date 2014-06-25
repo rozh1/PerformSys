@@ -31,12 +31,7 @@ namespace mrbn.Config
         public static MRBNConfig Instance;
 
         public MRBN MRBN { get; set; }
-
-        /// <summary>
-        ///     Конфиг серверов
-        /// </summary>
-        public RBN[] RBNs { get; set; }
-
+        
         public void Save(string fileName)
         {
             using (var writer = new StreamWriter(fileName))

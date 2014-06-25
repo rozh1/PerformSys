@@ -74,7 +74,7 @@ namespace rbn.GlobalBalancerHandler
         private void GlobalBalancerListenThread(object param)
         {
             var globalBalancer = (Data.GlobalBalancer) param;
-            TcpClient connection = globalBalancer.Connection;
+            TcpClient connection = new TcpClient();
 
             while (globalBalancer.Status)
             {
@@ -96,19 +96,23 @@ namespace rbn.GlobalBalancerHandler
                 while (connection.Connected)
                 {
                     Packet packet = PacketTransmitHelper.Recive(connection.GetStream());
-
-                    switch (packet.Type)
+                    if (packet != null)
                     {
-                        case PacketType.TransmitRequest:
-                            if (SendRequestFromQueueEvent != null) SendRequestFromQueueEvent(this);
-                            break;
-                        case PacketType.Answer:
-                            var answer = new DbAnswerPacket(packet.Data);
-                            if (AnswerRecivedEvent != null)
-                                AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
-                            break;
+                        switch (packet.Type)
+                        {
+                            case PacketType.TransmitRequest:
+                                if (SendRequestFromQueueEvent != null) SendRequestFromQueueEvent(this);
+                                break;
+                            case PacketType.Answer:
+                                var answer = new DbAnswerPacket(packet.Data);
+                                if (AnswerRecivedEvent != null)
+                                    AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
+                                break;
+                        }
                     }
                 }
+                connection.Close();
+                connection = new TcpClient();
             }
         }
 

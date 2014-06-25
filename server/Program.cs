@@ -33,30 +33,6 @@ namespace server
     {
         private static void Main()
         {
-            server.Config.ServerConfig serverConfig = new ServerConfig()
-            {
-                DataBase = new Config.Data.DataBase()
-                {
-                    DataBaseType = DataBaseType.MySQL,
-                    DataBaseName = "tpch1",
-                    Host = "localhost",
-                    Password = "0000",
-                    Port = 3306,
-                    UserName = "root"
-                },
-                Server = new Config.Data.Server()
-                {
-                    RBN = new RBN()
-                    {
-                        Host = "localhost",
-                        Port = 3410
-                    },
-                    WorkMode = WorkMode.Simulation
-                }
-            };
-
-            serverConfig.Save("config.xml");
-
             Logger.SetLogFile("serverLog.txt");
             Logger.Write("Сервер запущен");
 
