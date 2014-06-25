@@ -68,8 +68,12 @@ namespace rbn.Properties {
         ///    &lt;RegionId&gt;1&lt;/RegionId&gt;
         ///    &lt;Port&gt;3409&lt;/Port&gt;
         ///  &lt;/RBN&gt;
+        ///  &lt;MRBN&gt;
+        ///    &lt;Host&gt;localhost&lt;/Host&gt;
+        ///    &lt;Port&gt;3400&lt;/Port&gt;
+        ///  &lt;/MRBN&gt;
         ///  &lt;Server&gt;
-        ///      &lt;Port&gt;3410&lt;/Port&gt;
+        ///    &lt;Port&gt;3410&lt;/Port&gt;
         ///  &lt;/Server&gt;
         ///&lt;/RBNConfig&gt;.
         /// </summary>

@@ -37,8 +37,14 @@ namespace rbn.ServersHandler
         /// </summary>
         private bool _sendThreadLife = true;
 
+        /// <summary>
+        ///     Признак работы потока приема соединений от серверов
+        /// </summary>
         private bool _serverIsLife = true;
 
+        /// <summary>
+        ///     Слушатель соедиенений
+        /// </summary>
         private readonly TcpListener _listener;
 
         public Servers(int port)
@@ -48,13 +54,13 @@ namespace rbn.ServersHandler
 
             _listener = new TcpListener(IPAddress.Any, port);
             _listener.Start();
-            Logger.Write("Начато прослушивание " + IPAddress.Any + ":" + port);
+            Logger.Write("Начато прослушивание серверов " + IPAddress.Any + ":" + port);
 
-            var t = new Thread(SendThread);
-            t.Start();
+            var thread = new Thread(SendThread);
+            thread.Start();
 
-            t = new Thread(ServerThread);
-            t.Start();
+            thread = new Thread(ServerThread);
+            thread.Start();
         }
 
         /// <summary>
@@ -139,7 +145,7 @@ namespace rbn.ServersHandler
         }
 
         /// <summary>
-        ///     Полчение следующего свободного сервера по круговому алгоритму
+        ///     Получение следующего свободного сервера по круговому алгоритму
         /// </summary>
         /// <returns></returns>
         private Server GetNextReadyServer()
@@ -220,6 +226,9 @@ namespace rbn.ServersHandler
             Dispose();
         }
 
+        /// <summary>
+        /// Приказано уничтожить
+        /// </summary>
         public void Dispose()
         {
             _serverIsLife = false;

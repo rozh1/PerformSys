@@ -1,11 +1,9 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 using Balancer.Common;
-using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
+using rbn.GlobalBalancerHandler;
 using rbn.QueueHandler;
 using rbn.ServersHandler;
 
@@ -38,17 +36,19 @@ namespace rbn
 
         public Server(int port)
         {
-            _listener = new TcpListener(IPAddress.Any, port);
-            _listener.Start();
-            Logger.Write("Начато прослушивание " + IPAddress.Any + ":" + port);
-
             _rbnQueue = new RbnQueue();
             _servers = new Servers((int)Config.RBNConfig.Instance.Server.Port);
             _servers.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
             _servers.SendRequestFromQueueEvent += _rbnQueue.SendRequestToServer;
-
+            var globalBalancer = new GlobalBalancer();
+            globalBalancer.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
+            globalBalancer.SendRequestFromQueueEvent += _rbnQueue.SendRequestToServer;
+            
             _serverIsLife = true;
 
+            _listener = new TcpListener(IPAddress.Any, port);
+            _listener.Start();
+            Logger.Write("Начато прослушивание клиентов " + IPAddress.Any + ":" + port);
 
             while (_serverIsLife)
             {
@@ -73,9 +73,11 @@ namespace rbn
                 var packet = Balancer.Common.Utils.PacketTransmitHelper.Recive(tcpClient.GetStream());
                 if (packet != null)
                 {
-                    var dbRequestPacket = new DbRequestPacket(packet.Data);
-                    dbRequestPacket.GlobalId = Config.RBNConfig.Instance.RBN.GlobalId;
-                    dbRequestPacket.RegionId = Config.RBNConfig.Instance.RBN.RegionId;
+                    var dbRequestPacket = new DbRequestPacket(packet.Data)
+                    {
+                        GlobalId = Config.RBNConfig.Instance.RBN.GlobalId,
+                        RegionId = Config.RBNConfig.Instance.RBN.RegionId
+                    };
 
                     client.Connection = tcpClient;
                     client.RequestPacketData = dbRequestPacket.GetPacket().Data;

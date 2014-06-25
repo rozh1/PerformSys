@@ -3,7 +3,6 @@ using System.Text;
 using Balancer.Common;
 using rbn.Config;
 using rbn.Properties;
-using rbn.ServersHandler;
 
 namespace rbn
 {

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RBNConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <RBN>
+    <GlobalId>1</GlobalId>
+    <RegionId>1</RegionId>
+    <Port>3409</Port>
+  </RBN>
+  <MRBN>
+    <Host>localhost</Host>
+    <Port>3401</Port>
+  </MRBN>
+  <Server>
+    <Port>3410</Port>
+  </Server>
+</RBNConfig>

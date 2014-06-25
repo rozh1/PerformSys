@@ -117,17 +117,8 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="defaultConfig" xml:space="preserve">
-    <value>&lt;?xml version="1.0" encoding="utf-8"?&gt;
-&lt;RBNConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
-  &lt;RBN&gt;
-    &lt;GlobalId&gt;1&lt;/GlobalId&gt;
-    &lt;RegionId&gt;1&lt;/RegionId&gt;
-    &lt;Port&gt;3409&lt;/Port&gt;
-  &lt;/RBN&gt;
-  &lt;Server&gt;
-      &lt;Port&gt;3410&lt;/Port&gt;
-  &lt;/Server&gt;
-&lt;/RBNConfig&gt;</value>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="defaultConfig" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\defaultConfig.xml;System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
   </data>
 </root>
