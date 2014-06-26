@@ -17,14 +17,14 @@
  */
 #endregion
 
-﻿namespace Balancer.Common.Packet
+﻿using System.Net.Sockets;
+
+namespace mrbn.GlobalBalancer.Data
 {
-    public enum PacketType
+    class RBN
     {
-        ServerStatus,
-        RBNStatus,
-        Request,
-        Answer,
-        TransmitRequest
-    };
+        public TcpClient RbnClient { get; set; }
+        public int RegionId { get; set; }
+        public double Weight { get; set; }
+    }
 }

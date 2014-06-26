@@ -23,7 +23,7 @@ using Balancer.Common.Utils;
 
 namespace Balancer.Common.Packet.Packets
 {
-    public class DbAnswerPacket : IPacket
+    public class DbAnswerPacket : PacketBase, IPacket
     {
         public DbAnswerPacket(string answerPacketData)
         {
@@ -46,11 +46,7 @@ namespace Balancer.Common.Packet.Packets
 
         public DataTable AnswerDataTable { get; set; }
         public int QueryNumber { get; set; }
-
-        public uint GlobalId { get; set; }
-        public uint RegionId { get; set; }
-        public uint ClientId { get; set; }
-
+        
         public Packet GetPacket()
         {
             return new Packet(PacketType.Answer, SerializePacketData());

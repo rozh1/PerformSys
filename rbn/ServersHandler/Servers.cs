@@ -204,8 +204,8 @@ namespace rbn.ServersHandler
                 {
                     switch (packet.Type)
                     {
-                        case PacketType.Status:
-                            var sp = new StatusPacket(packet.Data);
+                        case PacketType.ServerStatus:
+                            var sp = new ServerStatusPacket(packet.Data);
                             server.Status = sp.Status;
                             server.StatusRecived = true;
                             break;

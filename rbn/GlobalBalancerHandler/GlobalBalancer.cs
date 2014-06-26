@@ -93,6 +93,11 @@ namespace rbn.GlobalBalancerHandler
 
                 Logger.Write("Подключение установлено");
 
+                globalBalancer.Connection = connection;
+
+                Thread statusSendThread = new Thread(StatusSendThread);
+                statusSendThread.Start(globalBalancer);
+
                 while (connection.Connected)
                 {
                     Packet packet = PacketTransmitHelper.Recive(connection.GetStream());
@@ -114,6 +119,19 @@ namespace rbn.GlobalBalancerHandler
                 connection.Close();
                 connection = new TcpClient();
             }
+        }
+
+        private void StatusSendThread(object param)
+        {
+            var globalBalancer = (Data.GlobalBalancer)param;
+            while (globalBalancer.Connection.Connected)
+            {
+                var packet = new RBNStatusPacket(1);
+                packet.RegionId = Config.RBNConfig.Instance.RBN.RegionId;
+                PacketTransmitHelper.Send(packet.GetPacket(), globalBalancer.Connection.GetStream());
+                Thread.Sleep(100);
+            }
+
         }
 
         public void Dispose()

@@ -22,60 +22,45 @@ using Balancer.Common.Utils;
 
 namespace Balancer.Common.Packet.Packets
 {
-    public class DbRequestPacket : PacketBase, IPacket
+    public class RBNStatusPacket : PacketBase, IPacket
     {
-        public DbRequestPacket(string query, int queryNumber)
+        public RBNStatusPacket(double weight)
         {
-            Query = query;
-            QueryNumber = queryNumber;
+            Weight = weight;
         }
 
-        public DbRequestPacket(string query, int queryNumber, PacketBase packetBase)
+        public RBNStatusPacket(string serializedPacketData)
         {
-            Query = query;
-            QueryNumber = queryNumber;
-            ClientId = packetBase.ClientId;
-            RegionId = packetBase.RegionId;
-            GlobalId = packetBase.GlobalId;
-        }
-
-        public DbRequestPacket(string serializedQuery)
-        {
-            var packetData = (PacketData)SerializeMapper.Deserialize(serializedQuery);
-            Query = packetData.Query;
-            QueryNumber = packetData.QueryNumber;
+            var packetData = (PacketData)SerializeMapper.Deserialize(serializedPacketData);
             RegionId = packetData.RegionId;
             ClientId = packetData.ClientId;
             GlobalId = packetData.GlobalId;
+            Weight = packetData.Weight;
         }
+
+        public double Weight { get; set; }
 
         string SerializePacketData()
         {
-            return SerializeMapper.Serialize(new PacketData()
+            return SerializeMapper.Serialize(new RBNStatusPacket.PacketData()
             {
-                Query = Query,
-                QueryNumber = QueryNumber,
                 ClientId = ClientId,
                 RegionId = RegionId,
                 GlobalId = GlobalId,
+                Weight = Weight,
             });
         }
 
-        public string Query { get; set; }
-        public int QueryNumber { get; set; }
-
         public Packet GetPacket()
         {
-            return new Packet(PacketType.Request, SerializePacketData());
+            return new Packet(PacketType.RBNStatus, SerializePacketData());
         }
 
         [DataContract]
         private class PacketData : PacketBase
         {
             [DataMember]
-            public string Query { get; set; }
-            [DataMember]
-            public int QueryNumber { get; set; }
+            public double Weight { get; set; }
         }
     }
 }

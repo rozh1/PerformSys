@@ -29,7 +29,7 @@ namespace Balancer.Common.Test.Packet
         [TestMethod]
         public void PacketSeralizationToBytesTest()
         {
-            var statusPacket = new StatusPacket(true);
+            var statusPacket = new ServerStatusPacket(true);
 
             Common.Packet.Packet packet = statusPacket.GetPacket();
 
@@ -39,7 +39,7 @@ namespace Balancer.Common.Test.Packet
 
             Assert.AreEqual(packet.Type, recivedPacket.Type, "Разные типы");
 
-            var statusPacketDeserialized = new StatusPacket(recivedPacket.Data);
+            var statusPacketDeserialized = new ServerStatusPacket(recivedPacket.Data);
 
             Assert.AreEqual(statusPacketDeserialized.Status, statusPacket.Status, "Разные статусы");
             Assert.AreEqual(statusPacketDeserialized.ClientId, statusPacket.ClientId, "Разные номера клиентов");
@@ -50,7 +50,7 @@ namespace Balancer.Common.Test.Packet
         [TestMethod]
         public void PacketSeralizationToStringTest()
         {
-            var statusPacket = new StatusPacket(true);
+            var statusPacket = new ServerStatusPacket(true);
 
             Common.Packet.Packet packet = statusPacket.GetPacket();
 
@@ -60,7 +60,7 @@ namespace Balancer.Common.Test.Packet
 
             Assert.AreEqual(packet.Type, recivedPacket.Type, "Разные типы");
 
-            var statusPacketDeserialized = new StatusPacket(recivedPacket.Data);
+            var statusPacketDeserialized = new ServerStatusPacket(recivedPacket.Data);
 
             Assert.AreEqual(statusPacketDeserialized.Status, statusPacket.Status, "Разные статусы");
             Assert.AreEqual(statusPacketDeserialized.ClientId, statusPacket.ClientId, "Разные номера клиентов");
@@ -73,9 +73,9 @@ namespace Balancer.Common.Test.Packet
         {
             var recivedPacket = new Common.Packet.Packet("12");
 
-            Assert.AreEqual(PacketType.Status, recivedPacket.Type, "Тип должен быть преобразован в статус");
+            Assert.AreEqual(PacketType.ServerStatus, recivedPacket.Type, "Тип должен быть преобразован в статус");
 
-            var statusPacketDeserialized = new StatusPacket(recivedPacket.Data);
+            var statusPacketDeserialized = new ServerStatusPacket(recivedPacket.Data);
 
             Assert.AreEqual(statusPacketDeserialized.Status, false, "Пакет должен быть статусом не готовности");
             Assert.AreEqual(statusPacketDeserialized.ClientId, (uint) 0, "Номер клиента должен быть 0");
@@ -86,7 +86,7 @@ namespace Balancer.Common.Test.Packet
         [TestMethod]
         public void PacketEndTest()
         {
-            var statusPacket = new StatusPacket(true);
+            var statusPacket = new ServerStatusPacket(true);
 
             Common.Packet.Packet packet = statusPacket.GetPacket();
 

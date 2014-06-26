@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GlobalBalancer\GlobalBalancer.cs" />
+    <Compile Include="GlobalBalancer\Data\RBN.cs" />
     <Compile Include="Config\Data\MRBN.cs" />
     <Compile Include="Config\MRBNConfig.cs" />
     <Compile Include="Program.cs" />
