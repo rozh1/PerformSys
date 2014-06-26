@@ -1,15 +1,15 @@
 ﻿namespace Balancer.Common.Packet.Packets
 {
-    public class StatusPacket : IPacket
+    public class ServerStatusPacket : PacketBase, IPacket
     {
         private bool _status;
 
-        public StatusPacket(bool status)
+        public ServerStatusPacket(bool status)
         {
             _status = status;
         }
 
-        public StatusPacket(string packetData)
+        public ServerStatusPacket(string packetData)
         {
 
             _status = packetData[0]=='1';
@@ -19,14 +19,10 @@
         {
             get { return _status; }
         }
-
-        public uint GlobalId { get; set; }
-        public uint RegionId { get; set; }
-        public uint ClientId { get; set; }
-
+        
         public Packet GetPacket()
         {
-            return new Packet(PacketType.Status, (_status ? "1" : "0"));
+            return new Packet(PacketType.ServerStatus, (_status ? "1" : "0"));
         }
     }
 }

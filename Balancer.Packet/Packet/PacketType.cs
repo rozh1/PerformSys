@@ -2,7 +2,8 @@
 {
     public enum PacketType
     {
-        Status,
+        ServerStatus,
+        RBNStatus,
         Request,
         Answer,
         TransmitRequest

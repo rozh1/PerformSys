@@ -9,11 +9,11 @@ namespace Balancer.Common.Test.Packet
         [TestMethod]
         public void StatusPacketSeralizationTest()
         {
-            var statusPacket = new StatusPacket(true);
+            var statusPacket = new ServerStatusPacket(true);
 
             Common.Packet.Packet packet = statusPacket.GetPacket();
 
-            var statusPacketDeserialized = new StatusPacket(packet.Data);
+            var statusPacketDeserialized = new ServerStatusPacket(packet.Data);
 
             Assert.AreEqual(statusPacketDeserialized.Status, statusPacket.Status, "Разные статусы");
             Assert.AreEqual(statusPacketDeserialized.ClientId, statusPacket.ClientId, "Разные номера клиентов");

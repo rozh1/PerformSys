@@ -3,7 +3,7 @@ using Balancer.Common.Utils;
 
 namespace Balancer.Common.Packet.Packets
 {
-    public class DbRequestPacket : IPacket
+    public class DbRequestPacket : PacketBase, IPacket
     {
         public DbRequestPacket(string query, int queryNumber)
         {
@@ -44,10 +44,6 @@ namespace Balancer.Common.Packet.Packets
 
         public string Query { get; set; }
         public int QueryNumber { get; set; }
-
-        public uint GlobalId { get; set; }
-        public uint RegionId { get; set; }
-        public uint ClientId { get; set; }
 
         public Packet GetPacket()
         {

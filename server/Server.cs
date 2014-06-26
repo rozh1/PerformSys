@@ -82,7 +82,7 @@ namespace server
         private void SendStatus()
         {
             bool status = (_queueLength < Environment.ProcessorCount*2);
-            var sp = new StatusPacket(status);
+            var sp = new ServerStatusPacket(status);
             if (_tcpClient.Connected)
             {
                 PacketTransmitHelper.Send(sp.GetPacket(), _tcpClient.GetStream());
