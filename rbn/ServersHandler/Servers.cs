@@ -9,6 +9,7 @@ using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
 using rbn.Interfaces;
 using rbn.QueueHandler;
+using rbn.QueueHandler.Data;
 
 namespace rbn.ServersHandler
 {

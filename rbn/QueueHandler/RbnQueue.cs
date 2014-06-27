@@ -6,6 +6,7 @@ using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
 using rbn.Interfaces;
+using rbn.QueueHandler.Data;
 
 namespace rbn.QueueHandler
 {
@@ -105,6 +106,9 @@ namespace rbn.QueueHandler
                         {
                             PacketTransmitHelper.Send(dbAnswerPacket.GetPacket(),
                                 _clients[i].Connection.GetStream());
+                            Client client = GetClientById(clientId);
+                            if (client.DisposeAfterTransmitAnswer)
+                                RemoveClient(client);
                             break;
                         }
                     }

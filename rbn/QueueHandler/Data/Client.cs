@@ -1,6 +1,6 @@
 ﻿using System.Net.Sockets;
 
-namespace rbn.QueueHandler
+namespace rbn.QueueHandler.Data
 {
     public class Client
     {
@@ -9,5 +9,6 @@ namespace rbn.QueueHandler
         public string AnswerPacketData { get; set; }
         public bool RequestSended { get; set; }
         public int Id { get; set; }
+        public bool DisposeAfterTransmitAnswer { get; set; }
     }
 }
