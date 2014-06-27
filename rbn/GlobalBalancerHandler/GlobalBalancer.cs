@@ -26,7 +26,7 @@ using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
 using rbn.Config;
 using rbn.Interfaces;
-using rbn.QueueHandler;
+using rbn.QueueHandler.Data;
 
 namespace rbn.GlobalBalancerHandler
 {
@@ -59,6 +59,11 @@ namespace rbn.GlobalBalancerHandler
         /// </summary>
         public event Action<int, DbAnswerPacket> AnswerRecivedEvent;
 
+        /// <summary>
+        ///     Событие получения запоса
+        /// </summary>
+        public event Action<Client> RequestRecivedEvent;
+
         public GlobalBalancer()
         {
             _globalBalancer = new Data.GlobalBalancer
@@ -74,7 +79,7 @@ namespace rbn.GlobalBalancerHandler
         private void GlobalBalancerListenThread(object param)
         {
             var globalBalancer = (Data.GlobalBalancer) param;
-            TcpClient connection = new TcpClient();
+            var connection = new TcpClient();
 
             while (globalBalancer.Status)
             {
@@ -95,7 +100,7 @@ namespace rbn.GlobalBalancerHandler
 
                 globalBalancer.Connection = connection;
 
-                Thread statusSendThread = new Thread(StatusSendThread);
+                var statusSendThread = new Thread(StatusSendThread);
                 statusSendThread.Start(globalBalancer);
 
                 while (connection.Connected)
@@ -113,6 +118,16 @@ namespace rbn.GlobalBalancerHandler
                                 if (AnswerRecivedEvent != null)
                                     AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
                                 break;
+                            case PacketType.Request:
+                                var client = new Client
+                                {
+                                    Connection = connection,
+                                    RequestPacketData = packet.Data,
+                                    DisposeAfterTransmitAnswer = true
+                                };
+                                if (RequestRecivedEvent != null)
+                                    RequestRecivedEvent(client);
+                                break;
                         }
                     }
                 }
@@ -126,8 +141,7 @@ namespace rbn.GlobalBalancerHandler
             var globalBalancer = (Data.GlobalBalancer)param;
             while (globalBalancer.Connection.Connected)
             {
-                var packet = new RBNStatusPacket(1);
-                packet.RegionId = Config.RBNConfig.Instance.RBN.RegionId;
+                var packet = new RBNStatusPacket(1) {RegionId = RBNConfig.Instance.RBN.RegionId};
                 PacketTransmitHelper.Send(packet.GetPacket(), globalBalancer.Connection.GetStream());
                 Thread.Sleep(100);
             }

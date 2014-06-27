@@ -24,6 +24,7 @@ using Balancer.Common;
 using Balancer.Common.Packet.Packets;
 using rbn.GlobalBalancerHandler;
 using rbn.QueueHandler;
+using rbn.QueueHandler.Data;
 using rbn.ServersHandler;
 
 namespace rbn
@@ -60,6 +61,7 @@ namespace rbn
             _servers.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
             _servers.SendRequestFromQueueEvent += _rbnQueue.SendRequestToServer;
             var globalBalancer = new GlobalBalancer();
+            globalBalancer.RequestRecivedEvent += _rbnQueue.AddClient;
             globalBalancer.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
             globalBalancer.SendRequestFromQueueEvent += _rbnQueue.SendRequestToServer;
             

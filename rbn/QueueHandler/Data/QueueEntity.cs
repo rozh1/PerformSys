@@ -17,7 +17,7 @@
  */
 #endregion
 
-﻿namespace rbn.QueueHandler
+﻿namespace rbn.QueueHandler.Data
 {
     public class QueueEntity
     {

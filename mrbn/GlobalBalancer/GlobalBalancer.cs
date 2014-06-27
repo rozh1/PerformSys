@@ -62,5 +62,33 @@ namespace mrbn.GlobalBalancer
                 }
             }
         }
+
+        public void ConnectRbns()
+        {
+            RBN lowLoadRbn;
+            RBN highLoadRbn = lowLoadRbn = new RBN() { RbnClient = null, RegionId = 0, Weight = 0 };
+
+            lock (_rbnsSyncObject)
+            {
+                foreach (var rbn in _rbns)
+                {
+                    if (rbn.Weight > highLoadRbn.Weight && rbn.RelayRbn == null) highLoadRbn = rbn;
+                    if (rbn.Weight < lowLoadRbn.Weight) lowLoadRbn = rbn;
+                }
+
+                if (highLoadRbn != lowLoadRbn)
+                {
+                    if (highLoadRbn.RegionId > 0)
+                    {
+                        highLoadRbn.RelayRbn = lowLoadRbn;
+                    }
+                }
+            }
+        }
+
+        public RBN GetRbnByRegionId(int id)
+        {
+            return _rbns.FirstOrDefault(curRbn => curRbn.RegionId == id);
+        }
     }
 }

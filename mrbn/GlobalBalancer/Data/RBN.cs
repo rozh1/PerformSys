@@ -26,5 +26,6 @@ namespace mrbn.GlobalBalancer.Data
         public TcpClient RbnClient { get; set; }
         public int RegionId { get; set; }
         public double Weight { get; set; }
+        public RBN RelayRbn { get; set; }
     }
 }

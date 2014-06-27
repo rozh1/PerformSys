@@ -93,6 +93,8 @@ namespace mrbn
                 return;
             }
 
+            bool transmitRequestSended = false;
+
             while (rbnClient.Connected)
             {
                 Packet packet = PacketTransmitHelper.Recive(rbnClient.GetStream());
@@ -101,8 +103,27 @@ namespace mrbn
                     switch (packet.Type)
                     {
                         case PacketType.RBNStatus:
+                            rbn.Weight = (new RBNStatusPacket(packet.Data)).Weight;
+                            break;
+                        case PacketType.Request:
+                            if (PacketTransmitHelper.Send(packet, rbn.RelayRbn.RbnClient.GetStream()))
+                            {
+                                rbn.RelayRbn = null;
+                                transmitRequestSended = false;
+                            }
+                            break;
+                        case PacketType.Answer:
+                            var dbAnswerPacket = new DbAnswerPacket(packet.Data);
+                            RBN remoteRbn = _balancer.GetRbnByRegionId((int) dbAnswerPacket.RegionId);
+                            PacketTransmitHelper.Send(packet, remoteRbn.RbnClient.GetStream());
                             break;
                     }
+                }
+                _balancer.ConnectRbns();
+                if (rbn.RelayRbn != null && (rbn.RelayRbn.RbnClient != null && !transmitRequestSended))
+                {
+                    PacketTransmitHelper.Send((new TransmitRequestPacket()).GetPacket(), rbn.RbnClient.GetStream());
+                    transmitRequestSended = true;
                 }
             }
 
