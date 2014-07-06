@@ -228,7 +228,7 @@ namespace rbn.QueueHandler
         /// </summary>
         /// <param name="packet"></param>
         /// <returns></returns>
-        double CalculateRelationsVolume(DbRequestPacket packet)
+        private double CalculateRelationsVolume(DbRequestPacket packet)
         {
             TableSizes tableSizes = null;
             UInt64 relationsVolume = 0;
@@ -237,12 +237,24 @@ namespace rbn.QueueHandler
                 if (tableSize.RegionId == packet.RegionId && tableSize.GlobalId == packet.GlobalId)
                     tableSizes = tableSize;
             }
-            if (tableSizes!=null)
+
+            if (tableSizes != null)
             {
+                string query = packet.Query.ToLower();
+                List<string> relationsList = new List<string>();
+                string[] words = query.Split(new char[] {' ', ',', '\t', '\n', '\r', ';'}, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (string word in words)
+                {
+                    if (tableSizes.Sizes.ContainsKey(word))
+                        relationsList.Add(word);
+                }
                 foreach (KeyValuePair<string, UInt64> pair in tableSizes.Sizes)
                 {
-                    relationsVolume += pair.Value;
+                    if (relationsList.Contains(pair.Key))
+                        relationsVolume += pair.Value;
                 }
+
             }
             return relationsVolume/1024.0/1024.0;
         }
