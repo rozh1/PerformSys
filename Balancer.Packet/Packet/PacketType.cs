@@ -6,6 +6,7 @@
         RBNStatus,
         Request,
         Answer,
-        TransmitRequest
+        TransmitRequest,
+        DataBaseInfo
     };
 }

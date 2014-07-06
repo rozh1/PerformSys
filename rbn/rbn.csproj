@@ -53,6 +53,7 @@
     </Compile>
     <Compile Include="QueueHandler\Data\Client.cs" />
     <Compile Include="QueueHandler\Data\QueueEntity.cs" />
+    <Compile Include="QueueHandler\Data\TableSizes.cs" />
     <Compile Include="QueueHandler\RbnQueue.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Interfaces\IServer.cs" />

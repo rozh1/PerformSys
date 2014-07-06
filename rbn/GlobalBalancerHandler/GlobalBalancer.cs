@@ -26,8 +26,7 @@ namespace rbn.GlobalBalancerHandler
             if (globalBalancer != null)
             {
                 if (!globalBalancer.Connection.Connected) return false;
-                var dbRequestPacket = new DbRequestPacket(queueEntity.RequestData);
-                if (!PacketTransmitHelper.Send(dbRequestPacket.GetPacket(), globalBalancer.Connection.GetStream()))
+                if (!PacketTransmitHelper.Send(queueEntity.RequestPacket.GetPacket(), globalBalancer.Connection.GetStream()))
                     return false;
                 Logger.Write("Отправлен запрос от клиента " + queueEntity.ClientId);
             }
