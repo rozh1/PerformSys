@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace rbn.QueueHandler.Data
 {
@@ -6,6 +7,6 @@ namespace rbn.QueueHandler.Data
     {
         public int RegionId { get; set; }
         public int GlobalId { get; set; }
-        public Dictionary<string, uint> Sizes { get; set; } 
+        public Dictionary<string, UInt64> Sizes { get; set; } 
     }
 }
