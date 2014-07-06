@@ -17,7 +17,8 @@
  */
 #endregion
 
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Balancer.Common.Utils;
 
@@ -25,7 +26,7 @@ namespace Balancer.Common.Packet.Packets
 {
     public class DataBaseInfoPacket : PacketBase, IPacket
     {
-        public DataBaseInfoPacket(Dictionary<string,uint> tableSizes)
+        public DataBaseInfoPacket(Dictionary<string, UInt64> tableSizes)
         {
             TableSizes = tableSizes;
         }
@@ -39,7 +40,7 @@ namespace Balancer.Common.Packet.Packets
             TableSizes = packetData.TableSizes;
         }
 
-        public Dictionary<string,uint> TableSizes { get; set; }
+        public Dictionary<string, UInt64> TableSizes { get; set; }
 
         string SerializePacketData()
         {
@@ -61,7 +62,7 @@ namespace Balancer.Common.Packet.Packets
         private class PacketData : PacketBase
         {
             [DataMember]
-            public Dictionary<string, uint> TableSizes { get; set; }
+            public Dictionary<string, UInt64> TableSizes { get; set; }
         }
     }
 }

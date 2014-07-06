@@ -78,27 +78,33 @@ namespace rbn.QueueHandler
         {
             lock (_clientSyncObject)
             {
+                DbRequestPacket requestPacket;
                 if (_clients.Contains(client))
                 {
                     Client tmpClient = _clients[_clients.IndexOf(client)];
                     tmpClient.RequestPacketData = client.RequestPacketData;
                     tmpClient.AnswerPacketData = "";
-                    var requestPacket = new DbRequestPacket(tmpClient.RequestPacketData)
+                    requestPacket = new DbRequestPacket(tmpClient.RequestPacketData)
                     {
                         ClientId = (uint) tmpClient.Id
                     };
-                    _queue.Enqueue(new QueueEntity {RequestPacket = requestPacket });
                 }
                 else
                 {
                     client.Id = _id++;
                     _clients.Add(client);
-                    var requestPacket = new DbRequestPacket(client.RequestPacketData)
+                    requestPacket = new DbRequestPacket(client.RequestPacketData)
                     {
                         ClientId = (uint) client.Id
                     };
-                    _queue.Enqueue(new QueueEntity {RequestPacket = requestPacket });
                 }
+
+                _queue.Enqueue(
+                    new QueueEntity
+                    {
+                        RequestPacket = requestPacket,
+                        relationVolume = CalculateRelationsVolume(requestPacket)
+                    });
             }
         }
 
@@ -204,12 +210,41 @@ namespace rbn.QueueHandler
                 _tableSizes.Remove(tableSizes);
             }
 
-            _tableSizes.Add(new TableSizes()
+            _tableSizes.Add(new TableSizes
             {
                 RegionId = (int)packet.RegionId, 
                 GlobalId = (int)packet.GlobalId, 
                 Sizes = packet.TableSizes
             });
+
+            foreach (QueueEntity queueEntity in _queue)
+            {
+                queueEntity.relationVolume = CalculateRelationsVolume(queueEntity.RequestPacket);
+            }
+        }
+
+        /// <summary>
+        /// Подсчитывает объем отношений в МБ
+        /// </summary>
+        /// <param name="packet"></param>
+        /// <returns></returns>
+        double CalculateRelationsVolume(DbRequestPacket packet)
+        {
+            TableSizes tableSizes = null;
+            UInt64 relationsVolume = 0;
+            foreach (TableSizes tableSize in _tableSizes)
+            {
+                if (tableSize.RegionId == packet.RegionId && tableSize.GlobalId == packet.GlobalId)
+                    tableSizes = tableSize;
+            }
+            if (tableSizes!=null)
+            {
+                foreach (KeyValuePair<string, UInt64> pair in tableSizes.Sizes)
+                {
+                    relationsVolume += pair.Value;
+                }
+            }
+            return relationsVolume/1024.0/1024.0;
         }
     }
 }

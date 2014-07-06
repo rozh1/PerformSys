@@ -114,11 +114,11 @@ namespace server
                     throw new ArgumentOutOfRangeException("Нет такого режима работы");
             }
 
-            var tableSizes = new Dictionary<string, uint>();
+            var tableSizes = new Dictionary<string, UInt64>();
             foreach (DataRow row in dt.Rows)
             {
                 if (!tableSizes.ContainsKey(row["table_name"].ToString()))
-                    tableSizes.Add(row["table_name"].ToString(), Convert.ToUInt32(row["data_length"]));
+                    tableSizes.Add(row["table_name"].ToString(), Convert.ToUInt64(row["data_length"]));
             }
 
             if (dt != null)
