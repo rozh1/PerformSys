@@ -191,11 +191,14 @@ namespace rbn.QueueHandler
                 _tableSizes.Remove(tableSizes);
             }
 
+            double dataBaseSize = packet.TableSizes.Aggregate<KeyValuePair<string, ulong>, double>(0, (current, pair) => current + pair.Value);
+
             _tableSizes.Add(new TableSizes
             {
                 RegionId = (int)packet.RegionId, 
                 GlobalId = (int)packet.GlobalId, 
-                Sizes = packet.TableSizes
+                Sizes = packet.TableSizes,
+                DataBaseSize = dataBaseSize/1024.0/1024.0
             });
 
             foreach (QueueEntity queueEntity in _queue)
@@ -238,6 +241,21 @@ namespace rbn.QueueHandler
 
             }
             return relationsVolume/1024.0/1024.0;
+        }
+
+        public double ComputeQueueWeight()
+        {
+            TableSizes tableSizes = null;
+            foreach (TableSizes tableSize in _tableSizes)
+            {
+                if (tableSize.RegionId == Config.RBNConfig.Instance.RBN.RegionId && tableSize.GlobalId == Config.RBNConfig.Instance.RBN.GlobalId)
+                    tableSizes = tableSize;
+            }
+            double requestVolume = _queue.Sum(queueEntity => queueEntity.relationVolume);
+            double normalize = Config.RBNConfig.Instance.RBN.ServersCount/
+                               (double) Config.RBNConfig.Instance.RBN.MaxServersCount;
+            if (tableSizes != null) return (requestVolume/(_queue.Count*tableSizes.DataBaseSize))*normalize;
+            return 0;
         }
     }
 }

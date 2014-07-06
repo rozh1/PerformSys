@@ -8,5 +8,6 @@ namespace rbn.QueueHandler.Data
         public int RegionId { get; set; }
         public int GlobalId { get; set; }
         public Dictionary<string, UInt64> Sizes { get; set; } 
+        public double DataBaseSize { get; set; }
     }
 }
