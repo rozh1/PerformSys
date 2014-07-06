@@ -30,6 +30,12 @@ using rbn.QueueHandler.Data;
 
 namespace rbn.GlobalBalancerHandler
 {
+    /// <summary>
+    /// Делегат передачи результата вычисления веса очереди
+    /// </summary>
+    /// <returns></returns>
+    internal delegate double QueryWeightCompute();
+
     internal class GlobalBalancer : IServer, IDisposable
     {
         private readonly Data.GlobalBalancer _globalBalancer;
@@ -62,6 +68,11 @@ namespace rbn.GlobalBalancerHandler
         ///     Событие получения запоса
         /// </summary>
         public event Action<Client> RequestRecivedEvent;
+
+        /// <summary>
+        ///     Событие получения запоса
+        /// </summary>
+        public event QueryWeightCompute QueryWeightComputeEvent;
 
         public GlobalBalancer()
         {
@@ -140,8 +151,15 @@ namespace rbn.GlobalBalancerHandler
             var globalBalancer = (Data.GlobalBalancer)param;
             while (globalBalancer.Connection.Connected)
             {
-                var packet = new RBNStatusPacket(1) {RegionId = RBNConfig.Instance.RBN.RegionId};
-                PacketTransmitHelper.Send(packet.GetPacket(), globalBalancer.Connection.GetStream());
+                if (QueryWeightComputeEvent != null)
+                {
+                    var packet = new RBNStatusPacket(QueryWeightComputeEvent()) { RegionId = RBNConfig.Instance.RBN.RegionId };
+                    PacketTransmitHelper.Send(packet.GetPacket(), globalBalancer.Connection.GetStream());
+                }
+                else
+                {
+                    return;
+                }
                 Thread.Sleep(100);
             }
 

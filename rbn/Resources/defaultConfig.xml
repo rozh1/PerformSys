@@ -4,6 +4,8 @@
     <GlobalId>1</GlobalId>
     <RegionId>1</RegionId>
     <Port>3409</Port>
+    <ServersCount>1</ServersCount>
+    <MaxServersCount>1</MaxServersCount>
   </RBN>
   <MRBN>
     <Host>localhost</Host>
