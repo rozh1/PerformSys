@@ -6,7 +6,7 @@
     <Port>3306</Port>
     <UserName>root</UserName>
     <Password>0000</Password>
-    <DataBaseName>tpch1</DataBaseName>
+    <DataBaseName>tpch</DataBaseName>
   </DataBase>
   <Server>
     <RBN>
@@ -171,4 +171,70 @@
       </value>
     </item>
   </SimulationParams>
+  <SimulationSizes>
+    <item>
+      <key>
+        <string>customer</string>
+      </key>
+      <value>
+        <unsignedLong>28884992</unsignedLong>
+      </value>
+    </item>
+    <item>
+      <key>
+        <string>lineitem</string>
+      </key>
+      <value>
+        <unsignedLong>870318080</unsignedLong>
+      </value>
+    </item>
+    <item>
+      <key>
+        <string>nation</string>
+      </key>
+      <value>
+        <unsignedLong>16384</unsignedLong>
+      </value>
+    </item>
+    <item>
+      <key>
+        <string>orders</string>
+      </key>
+      <value>
+        <unsignedLong>193658880</unsignedLong>
+      </value>
+    </item>
+    <item>
+      <key>
+        <string>part</string>
+      </key>
+      <value>
+        <unsignedLong>32047104</unsignedLong>
+      </value>
+    </item>
+    <item>
+      <key>
+        <string>partsupp</string>
+      </key>
+      <value>
+        <unsignedLong>141213696</unsignedLong>
+      </value>
+    </item>
+    <item>
+      <key>
+        <string>region</string>
+      </key>
+      <value>
+        <unsignedLong>16384</unsignedLong>
+      </value>
+    </item>
+    <item>
+      <key>
+        <string>supplier</string>
+      </key>
+      <value>
+        <unsignedLong>2637824</unsignedLong>
+      </value>
+    </item>
+  </SimulationSizes>
 </ServerConfig>

@@ -43,6 +43,11 @@ namespace server.Config
         /// </summary>
         public Data.SimulationParams SimulationParams { get; set; }
 
+        /// <summary>
+        ///     Конфиг размеров таблиц для симуляции
+        /// </summary>
+        public Data.SimulationSizes SimulationSizes { get; set; }
+
         public void Save(string fileName)
         {
             using (var writer = new StreamWriter(fileName))

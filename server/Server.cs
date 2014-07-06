@@ -107,8 +107,7 @@ namespace server
                     dt = ProcessQueryWithMySQL(requestPacket);
                     break;
                 case WorkMode.Simulation:
-                    throw new NotImplementedException();
-                    dt = ProcessQuerySimulated(requestPacket);
+                    dt = GenerateSimulatedSizesDataTable();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("Нет такого режима работы");
@@ -127,6 +126,22 @@ namespace server
                 var dataBaseInfoPacket = new DataBaseInfoPacket(tableSizes);
                 PacketTransmitHelper.Send(dataBaseInfoPacket.GetPacket(), _tcpClient.GetStream());
             }
+        }
+
+        private DataTable GenerateSimulatedSizesDataTable()
+        {
+            var dt = new DataTable() {TableName = "sizes"};
+            dt.Columns.Add("table_name");
+            dt.Columns.Add("data_length");
+
+            foreach (KeyValuePair<string,UInt64> pair in ServerConfig.Instance.SimulationSizes)
+            {
+                DataRow dr = dt.NewRow();
+                dr[0] = pair.Key;
+                dr[1] = pair.Value;
+                dt.Rows.Add(dr);
+            }
+            return dt;
         }
 
         /// <summary>
