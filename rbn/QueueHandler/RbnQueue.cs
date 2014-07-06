@@ -19,9 +19,9 @@
 
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Balancer.Common;
-using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
 using rbn.Interfaces;
@@ -59,12 +59,15 @@ namespace rbn.QueueHandler
         /// </summary>
         private int _id = 1;
 
+        private List<TableSizes> _tableSizes;
+
         public RbnQueue()
         {
             _sendMutex = new Mutex();
             _clientSyncObject = new object();
             _queue = new Queue<QueueEntity>();
             _clients = new List<Client>();
+            _tableSizes = new List<TableSizes>();
         }
 
         /// <summary>
@@ -80,13 +83,21 @@ namespace rbn.QueueHandler
                     Client tmpClient = _clients[_clients.IndexOf(client)];
                     tmpClient.RequestPacketData = client.RequestPacketData;
                     tmpClient.AnswerPacketData = "";
-                    _queue.Enqueue(new QueueEntity {ClientId = tmpClient.Id, RequestData = tmpClient.RequestPacketData});
+                    var requestPacket = new DbRequestPacket(tmpClient.RequestPacketData)
+                    {
+                        ClientId = (uint) tmpClient.Id
+                    };
+                    _queue.Enqueue(new QueueEntity {RequestPacket = requestPacket });
                 }
                 else
                 {
                     client.Id = _id++;
                     _clients.Add(client);
-                    _queue.Enqueue(new QueueEntity {ClientId = client.Id, RequestData = client.RequestPacketData});
+                    var requestPacket = new DbRequestPacket(client.RequestPacketData)
+                    {
+                        ClientId = (uint) client.Id
+                    };
+                    _queue.Enqueue(new QueueEntity {RequestPacket = requestPacket });
                 }
             }
         }
@@ -110,7 +121,7 @@ namespace rbn.QueueHandler
         ///     Ответ сервера
         /// </summary>
         /// <param name="clientId">номер клиента</param>
-        /// <param name="answer">пакет ответа</param>
+        /// <param name="dbAnswerPacket">пакет ответа</param>
         public void ServerAnswer(int clientId, DbAnswerPacket dbAnswerPacket)
         {
             Logger.Write("Получен ответ для клиента " + clientId);
@@ -176,6 +187,29 @@ namespace rbn.QueueHandler
                 }
             }
             _sendMutex.ReleaseMutex();
+        }
+
+        /// <summary>
+        /// Добавление информации о БД
+        /// </summary>
+        /// <param name="packet"></param>
+        public void AddDataBaseInfo(DataBaseInfoPacket packet)
+        {
+            List<TableSizes> tableSizeToRemove = _tableSizes.Where(
+                tableSizes => 
+                    tableSizes.RegionId == packet.RegionId && tableSizes.GlobalId == packet.GlobalId
+                    ).ToList();
+            foreach (TableSizes tableSizes in tableSizeToRemove)
+            {
+                _tableSizes.Remove(tableSizes);
+            }
+
+            _tableSizes.Add(new TableSizes()
+            {
+                RegionId = (int)packet.RegionId, 
+                GlobalId = (int)packet.GlobalId, 
+                Sizes = packet.TableSizes
+            });
         }
     }
 }

@@ -18,9 +18,9 @@
 #endregion
 
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -74,6 +74,8 @@ namespace server
 
                 Logger.Write("Подключение установлено");
 
+                SendDataBaseInfo();
+
                 while (_tcpClient.Connected)
                 {
                     SendStatus();
@@ -92,6 +94,38 @@ namespace server
                 }
                 _tcpClient.Close();
                 _tcpClient = new TcpClient();
+            }
+        }
+
+        void SendDataBaseInfo()
+        {
+            DataTable dt = null;
+            var requestPacket = new DbRequestPacket("SELECT table_name AS table_name, data_length FROM information_schema.tables WHERE table_schema=DATABASE();", 0);
+            switch (ServerConfig.Instance.Server.WorkMode)
+            {
+                case WorkMode.Normal:
+                    dt = ProcessQueryWithMySQL(requestPacket);
+                    break;
+                case WorkMode.Simulation:
+                    throw new NotImplementedException();
+                    dt = ProcessQuerySimulated(requestPacket);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("Нет такого режима работы");
+            }
+
+            var tableSizes = new Dictionary<string, uint>();
+            foreach (DataRow row in dt.Rows)
+            {
+                if (!tableSizes.ContainsKey(row["table_name"].ToString()))
+                    tableSizes.Add(row["table_name"].ToString(), Convert.ToUInt32(row["data_length"]));
+            }
+
+            if (dt != null)
+            {
+                Logger.Write("Отправка информации о БД РБНу ");
+                var dataBaseInfoPacket = new DataBaseInfoPacket(tableSizes);
+                PacketTransmitHelper.Send(dataBaseInfoPacket.GetPacket(), _tcpClient.GetStream());
             }
         }
 
@@ -142,7 +176,7 @@ namespace server
         /// <returns></returns>
         private DataTable ProcessQuery(DbRequestPacket requestPacket)
         {
-            DataTable dt = null;
+            DataTable dt;
             Logger.Write("Запрос начал выполнение");
             var sw = new Stopwatch();
             sw.Start();
@@ -155,6 +189,8 @@ namespace server
                 case WorkMode.Simulation:
                     dt = ProcessQuerySimulated(requestPacket);
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException("ServerConfig.Instance.Server.WorkMode Нет такого режима работы");
             }
 
             sw.Stop();

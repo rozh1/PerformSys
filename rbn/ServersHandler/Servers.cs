@@ -96,7 +96,7 @@ namespace rbn.ServersHandler
             Server server = GetNextReadyServer();
             if (server != null)
             {
-                SendRequest(server, queueEntity.RequestData, queueEntity.ClientId);
+                SendRequest(server, queueEntity.RequestPacket);
                 Logger.Write("Отправлен запрос от клиента " + queueEntity.ClientId);
             }
             else return false;
@@ -107,6 +107,11 @@ namespace rbn.ServersHandler
         ///     Событие получения ответа
         /// </summary>
         public event Action<int, DbAnswerPacket> AnswerRecivedEvent;
+
+        /// <summary>
+        ///     Событие получения ответа
+        /// </summary>
+        public event Action<DataBaseInfoPacket> DataBaseInfoRecivedEvent;
 
         /// <summary>
         ///     Поток отправки запросов серверам
@@ -215,6 +220,12 @@ namespace rbn.ServersHandler
                             if (AnswerRecivedEvent != null)
                                 AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
                             break;
+                        case PacketType.DataBaseInfo:
+                            var dataBaseInfoPacket = new DataBaseInfoPacket(packet.Data);
+                            dataBaseInfoPacket.RegionId = Config.RBNConfig.Instance.RBN.RegionId;
+                            dataBaseInfoPacket.GlobalId = Config.RBNConfig.Instance.RBN.GlobalId;
+                            if (DataBaseInfoRecivedEvent != null) DataBaseInfoRecivedEvent(dataBaseInfoPacket);
+                            break;
                     }
                 }
                 else
@@ -228,13 +239,12 @@ namespace rbn.ServersHandler
         ///     Отправка запроса серверу
         /// </summary>
         /// <param name="server"></param>
-        /// <param name="query"></param>
+        /// <param name="dbRequestPacket"></param>
         /// <param name="clientId"></param>
-        private void SendRequest(Server server, string query, int clientId)
+        private void SendRequest(Server server, DbRequestPacket dbRequestPacket)
         {
-            var packet = new DbRequestPacket(query) {ClientId = (uint) clientId};
             if (!server.Connection.Connected) return;
-            if (PacketTransmitHelper.Send(packet.GetPacket(), server.Connection.GetStream()))
+            if (PacketTransmitHelper.Send(dbRequestPacket.GetPacket(), server.Connection.GetStream()))
                 server.StatusRecived = false;
         }
 

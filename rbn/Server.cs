@@ -49,17 +49,15 @@ namespace rbn
         /// </summary>
         private readonly RbnQueue _rbnQueue;
 
-        /// <summary>
-        /// Сервера региона
-        /// </summary>
-        private readonly Servers _servers;
-
         public Server(int port)
         {
             _rbnQueue = new RbnQueue();
-            _servers = new Servers((int)Config.RBNConfig.Instance.Server.Port);
-            _servers.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
-            _servers.SendRequestFromQueueEvent += _rbnQueue.SendRequestToServer;
+
+            var servers = new Servers((int)Config.RBNConfig.Instance.Server.Port);
+            servers.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
+            servers.SendRequestFromQueueEvent += _rbnQueue.SendRequestToServer;
+            servers.DataBaseInfoRecivedEvent += _rbnQueue.AddDataBaseInfo;
+
             var globalBalancer = new GlobalBalancer();
             globalBalancer.RequestRecivedEvent += _rbnQueue.AddClient;
             globalBalancer.AnswerRecivedEvent += _rbnQueue.ServerAnswer;

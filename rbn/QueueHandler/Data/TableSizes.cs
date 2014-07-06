@@ -17,15 +17,14 @@
  */
 #endregion
 
-﻿namespace Balancer.Common.Packet
+﻿using System.Collections.Generic;
+
+namespace rbn.QueueHandler.Data
 {
-    public enum PacketType
+    class TableSizes
     {
-        ServerStatus,
-        RBNStatus,
-        Request,
-        Answer,
-        TransmitRequest,
-        DataBaseInfo
-    };
+        public int RegionId { get; set; }
+        public int GlobalId { get; set; }
+        public Dictionary<string, uint> Sizes { get; set; } 
+    }
 }
