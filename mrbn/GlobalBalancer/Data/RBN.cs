@@ -1,4 +1,6 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Sockets;
 
 namespace mrbn.GlobalBalancer.Data
 {
@@ -8,5 +10,6 @@ namespace mrbn.GlobalBalancer.Data
         public int RegionId { get; set; }
         public double Weight { get; set; }
         public RBN RelayRbn { get; set; }
+        public Dictionary<string, UInt64> TableSizes { get; set; } 
     }
 }

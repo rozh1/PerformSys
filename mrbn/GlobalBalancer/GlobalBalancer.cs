@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using mrbn.GlobalBalancer.Data;
 
@@ -47,7 +48,7 @@ namespace mrbn.GlobalBalancer
         public void ConnectRbns()
         {
             RBN lowLoadRbn;
-            RBN highLoadRbn = lowLoadRbn = new RBN() { RbnClient = null, RegionId = 0, Weight = 0 };
+            RBN highLoadRbn = lowLoadRbn = new RBN { RbnClient = null, RegionId = 0, Weight = 0 };
 
             lock (_rbnsSyncObject)
             {
@@ -70,6 +71,28 @@ namespace mrbn.GlobalBalancer
         public RBN GetRbnByRegionId(int id)
         {
             return _rbns.FirstOrDefault(curRbn => curRbn.RegionId == id);
+        }
+
+        public RBN[] GetAllRBNs()
+        {
+            RBN[] rbns;
+
+            lock (_rbnsSyncObject)
+            {
+                rbns = _rbns.ToArray();
+            }
+
+            return rbns;
+        }
+
+        public Dictionary<string, UInt64>[] GetAllTableSizes()
+        {
+            var tableSizes = new Dictionary<string, ulong>[_rbns.Count];
+            for (int i = 0; i < _rbns.Count; i++)
+            {
+                tableSizes[i] = _rbns[i].TableSizes;
+            }
+            return tableSizes;
         }
     }
 }

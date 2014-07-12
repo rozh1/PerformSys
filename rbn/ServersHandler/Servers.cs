@@ -90,7 +90,7 @@ namespace rbn.ServersHandler
         public event Action<int, DbAnswerPacket> AnswerRecivedEvent;
 
         /// <summary>
-        ///     Событие получения ответа
+        ///     Событие информации о БД
         /// </summary>
         public event Action<DataBaseInfoPacket> DataBaseInfoRecivedEvent;
 
