@@ -52,17 +52,19 @@ namespace rbn
         public Server(int port)
         {
             _rbnQueue = new RbnQueue();
-
             var servers = new Servers((int)Config.RBNConfig.Instance.Server.Port);
+            var globalBalancer = new GlobalBalancer();
+            
             servers.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
             servers.SendRequestFromQueueEvent += _rbnQueue.SendRequestToServer;
             servers.DataBaseInfoRecivedEvent += _rbnQueue.AddDataBaseInfo;
+            servers.DataBaseInfoRecivedEvent += globalBalancer.SendDataBaseInfo;
 
-            var globalBalancer = new GlobalBalancer();
             globalBalancer.RequestRecivedEvent += _rbnQueue.AddClient;
             globalBalancer.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
             globalBalancer.SendRequestFromQueueEvent += _rbnQueue.SendRequestToServer;
             globalBalancer.QueryWeightComputeEvent += _rbnQueue.ComputeQueueWeight;
+            globalBalancer.DataBaseInfoRecivedEvent += _rbnQueue.AddDataBaseInfo;
 
             _serverIsLife = true;
 

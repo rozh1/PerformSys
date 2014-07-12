@@ -59,7 +59,10 @@ namespace rbn.QueueHandler
         /// </summary>
         private int _id = 1;
 
-        private List<TableSizes> _tableSizes;
+        /// <summary>
+        /// Размеры таблиц БД регионов
+        /// </summary>
+        private readonly List<TableSizes> _tableSizes;
 
         public RbnQueue()
         {
@@ -161,7 +164,7 @@ namespace rbn.QueueHandler
         /// </summary>
         /// <param name="id">ID клиента</param>
         /// <returns>клиент</returns>
-        public Client GetClientById(int id)
+        private Client GetClientById(int id)
         {
             lock (_clientSyncObject)
             {
@@ -244,8 +247,8 @@ namespace rbn.QueueHandler
             if (tableSizes != null)
             {
                 string query = packet.Query.ToLower();
-                List<string> relationsList = new List<string>();
-                string[] words = query.Split(new char[] {' ', ',', '\t', '\n', '\r', ';'}, StringSplitOptions.RemoveEmptyEntries);
+                var relationsList = new List<string>();
+                string[] words = query.Split(new[] {' ', ',', '\t', '\n', '\r', ';'}, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (string word in words)
                 {

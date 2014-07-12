@@ -31,7 +31,7 @@ using rbn.QueueHandler.Data;
 namespace rbn.GlobalBalancerHandler
 {
     /// <summary>
-    /// Делегат передачи результата вычисления веса очереди
+    ///     Делегат передачи результата вычисления веса очереди
     /// </summary>
     /// <returns></returns>
     internal delegate double QueryWeightCompute();
@@ -39,6 +39,24 @@ namespace rbn.GlobalBalancerHandler
     internal class GlobalBalancer : IServer, IDisposable
     {
         private readonly Data.GlobalBalancer _globalBalancer;
+
+        public GlobalBalancer()
+        {
+            _globalBalancer = new Data.GlobalBalancer
+            {
+                Connection = null,
+                Status = true,
+                StatusRecived = false
+            };
+            var globalBalancersThread = new Thread(GlobalBalancerListenThread);
+            globalBalancersThread.Start(_globalBalancer);
+        }
+
+        public void Dispose()
+        {
+            _globalBalancer.Status = false;
+            _globalBalancer.Connection.Close();
+        }
 
         public event Action<IServer> SendRequestFromQueueEvent;
 
@@ -51,7 +69,9 @@ namespace rbn.GlobalBalancerHandler
             if (globalBalancer != null)
             {
                 if (!globalBalancer.Connection.Connected) return false;
-                if (!PacketTransmitHelper.Send(queueEntity.RequestPacket.GetPacket(), globalBalancer.Connection.GetStream()))
+                if (
+                    !PacketTransmitHelper.Send(queueEntity.RequestPacket.GetPacket(),
+                        globalBalancer.Connection.GetStream()))
                     return false;
                 Logger.Write("Отправлен запрос от клиента " + queueEntity.ClientId);
             }
@@ -70,21 +90,14 @@ namespace rbn.GlobalBalancerHandler
         public event Action<Client> RequestRecivedEvent;
 
         /// <summary>
-        ///     Событие получения запоса
+        ///     Событие подсчета веса
         /// </summary>
         public event QueryWeightCompute QueryWeightComputeEvent;
 
-        public GlobalBalancer()
-        {
-            _globalBalancer = new Data.GlobalBalancer
-            {
-                Connection = null,
-                Status = true,
-                StatusRecived = false
-            };
-            var globalBalancersThread = new Thread(GlobalBalancerListenThread);
-            globalBalancersThread.Start(_globalBalancer);
-        }
+        /// <summary>
+        ///     Событие информации о БД
+        /// </summary>
+        public event Action<DataBaseInfoPacket> DataBaseInfoRecivedEvent;
 
         private void GlobalBalancerListenThread(object param)
         {
@@ -97,7 +110,7 @@ namespace rbn.GlobalBalancerHandler
                 {
                     connection.Connect(
                         RBNConfig.Instance.MRBN.Host,
-                        (int)RBNConfig.Instance.MRBN.Port);
+                        (int) RBNConfig.Instance.MRBN.Port);
                 }
                 catch (Exception)
                 {
@@ -138,6 +151,10 @@ namespace rbn.GlobalBalancerHandler
                                 if (RequestRecivedEvent != null)
                                     RequestRecivedEvent(client);
                                 break;
+                            case PacketType.DataBaseInfo:
+                                var dataBaseInfoPacket = new DataBaseInfoPacket(packet.Data);
+                                if (DataBaseInfoRecivedEvent != null) DataBaseInfoRecivedEvent(dataBaseInfoPacket);
+                                break;
                         }
                     }
                 }
@@ -148,12 +165,15 @@ namespace rbn.GlobalBalancerHandler
 
         private void StatusSendThread(object param)
         {
-            var globalBalancer = (Data.GlobalBalancer)param;
+            var globalBalancer = (Data.GlobalBalancer) param;
             while (globalBalancer.Connection.Connected)
             {
                 if (QueryWeightComputeEvent != null)
                 {
-                    var packet = new RBNStatusPacket(QueryWeightComputeEvent()) { RegionId = RBNConfig.Instance.RBN.RegionId };
+                    var packet = new RBNStatusPacket(QueryWeightComputeEvent())
+                    {
+                        RegionId = RBNConfig.Instance.RBN.RegionId
+                    };
                     PacketTransmitHelper.Send(packet.GetPacket(), globalBalancer.Connection.GetStream());
                 }
                 else
@@ -162,18 +182,16 @@ namespace rbn.GlobalBalancerHandler
                 }
                 Thread.Sleep(100);
             }
-
-        }
-
-        public void Dispose()
-        {
-            _globalBalancer.Status = false;
-            _globalBalancer.Connection.Close();
         }
 
         ~GlobalBalancer()
         {
             Dispose();
+        }
+
+        public void SendDataBaseInfo(DataBaseInfoPacket dataBaseInfoPacket)
+        {
+            PacketTransmitHelper.Send(dataBaseInfoPacket.GetPacket(), _globalBalancer.Connection.GetStream());
         }
     }
 }

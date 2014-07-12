@@ -17,7 +17,10 @@
  */
 #endregion
 
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Balancer.Common;
@@ -42,7 +45,7 @@ namespace mrbn
         ///     Слушатель новых соединений (клиентов)
         /// </summary>
         private readonly TcpListener _listener;
-
+        
         /// <summary>
         ///     признак жизн потока
         /// </summary>
@@ -93,6 +96,17 @@ namespace mrbn
                 return;
             }
 
+            Dictionary<string, UInt64>[] tableSizes = _balancer.GetAllTableSizes();
+
+            foreach (Dictionary<string, ulong> tableSize in tableSizes)
+            {
+                if (tableSize != null)
+                {
+                    var dataBaseInfoPacket = new DataBaseInfoPacket(tableSize);
+                    PacketTransmitHelper.Send(dataBaseInfoPacket.GetPacket(), rbnClient.GetStream());
+                }
+            }
+
             bool transmitRequestSended = false;
 
             while (rbnClient.Connected)
@@ -106,6 +120,7 @@ namespace mrbn
                             rbn.Weight = (new RBNStatusPacket(packet.Data)).Weight;
                             break;
                         case PacketType.Request:
+                            Debug.Assert(rbn.RelayRbn.RbnClient != null, "rbn.RelayRbn.RbnClient != null");
                             if (PacketTransmitHelper.Send(packet, rbn.RelayRbn.RbnClient.GetStream()))
                             {
                                 rbn.RelayRbn = null;
@@ -116,6 +131,16 @@ namespace mrbn
                             var dbAnswerPacket = new DbAnswerPacket(packet.Data);
                             RBN remoteRbn = _balancer.GetRbnByRegionId((int) dbAnswerPacket.RegionId);
                             PacketTransmitHelper.Send(packet, remoteRbn.RbnClient.GetStream());
+                            break;
+                        case PacketType.DataBaseInfo:
+                            var dataBaseInfoPacket = new DataBaseInfoPacket(packet.Data);
+                            rbn.TableSizes = dataBaseInfoPacket.TableSizes;
+                            var rbns = _balancer.GetAllRBNs();
+                            foreach (RBN anotheRbn in rbns)
+                            {
+                                if (rbn!=anotheRbn)
+                                PacketTransmitHelper.Send(packet, anotheRbn.RbnClient.GetStream());
+                            }
                             break;
                     }
                 }
