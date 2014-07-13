@@ -59,14 +59,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\ConfigInit.cs" />
     <Compile Include="Config\Data\SimulatedTimes.cs" />
     <Compile Include="Config\Data\Server.cs" />
     <Compile Include="Config\Data\RBN.cs" />
     <Compile Include="Config\Data\SimulationSizes.cs" />
     <Compile Include="Config\ServerConfig.cs" />
     <Compile Include="Config\Data\DataBase.cs" />
-    <Compile Include="Config\Data\DataBaseType.cs" />
-    <Compile Include="DataBase\DataBase.cs" />
     <Compile Include="DataBase\MySQL.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

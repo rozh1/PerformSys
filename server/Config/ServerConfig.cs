@@ -29,24 +29,14 @@ namespace server.Config
         [XmlIgnore] public static ServerConfig Instance;
 
         /// <summary>
-        ///     Конфиг базы данных
-        /// </summary>
-        public Data.DataBase DataBase { get; set; }
-
-        /// <summary>
         ///     Конфиг сервера
         /// </summary>
         public Data.Server Server { get; set; }
-        
-        /// <summary>
-        ///     Конфиг времен выполения запросов для режима симуляции
-        /// </summary>
-        public Data.SimulationParams SimulationParams { get; set; }
 
         /// <summary>
-        ///     Конфиг размеров таблиц для симуляции
+        ///     Конфиг базы данных
         /// </summary>
-        public Data.SimulationSizes SimulationSizes { get; set; }
+        public Data.DataBase[] DataBase { get; set; }
 
         public void Save(string fileName)
         {
