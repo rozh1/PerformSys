@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -35,8 +36,11 @@ namespace server
         /// </summary>
         private bool _serverIsLife = true;
 
-        public Server()
+        private Dictionary<int, MySqlDb> _databases; 
+
+        public Server(Dictionary<int,MySqlDb> databases)
         {
+            _databases = databases;
             _tcpClient = new TcpClient();
             while (_serverIsLife)
             {
@@ -81,14 +85,18 @@ namespace server
         void SendDataBaseInfo()
         {
             DataTable dt = null;
-            var requestPacket = new DbRequestPacket("SELECT table_name AS table_name, data_length FROM information_schema.tables WHERE table_schema=DATABASE();", 0);
+            var requestPacket = new DbRequestPacket("SELECT table_name AS table_name, data_length FROM information_schema.tables WHERE table_schema=DATABASE();", 0)
+            {
+                GlobalId = 0,
+                RegionId = (uint)ServerConfig.Instance.Server.RBN.RegionId,
+            };
             switch (ServerConfig.Instance.Server.WorkMode)
             {
                 case WorkMode.Normal:
                     dt = ProcessQueryWithMySQL(requestPacket);
                     break;
                 case WorkMode.Simulation:
-                    dt = GenerateSimulatedSizesDataTable();
+                    dt = GenerateSimulatedSizesDataTable(requestPacket);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException("Нет такого режима работы");
@@ -109,18 +117,27 @@ namespace server
             }
         }
 
-        private DataTable GenerateSimulatedSizesDataTable()
+        private DataTable GenerateSimulatedSizesDataTable(DbRequestPacket requestPacket)
         {
             var dt = new DataTable() {TableName = "sizes"};
             dt.Columns.Add("table_name");
             dt.Columns.Add("data_length");
 
-            foreach (KeyValuePair<string,UInt64> pair in ServerConfig.Instance.SimulationSizes)
+            var currentDataBase = ServerConfig.Instance.DataBase.FirstOrDefault(
+                curDataBase => curDataBase.RegionId == requestPacket.RegionId);
+            if (currentDataBase != null)
             {
-                DataRow dr = dt.NewRow();
-                dr[0] = pair.Key;
-                dr[1] = pair.Value;
-                dt.Rows.Add(dr);
+                Dictionary<string, UInt64> sizes =
+                    currentDataBase.SimulationSizes;
+
+                if (sizes != null)
+                    foreach (KeyValuePair<string, UInt64> pair in sizes)
+                    {
+                        DataRow dr = dt.NewRow();
+                        dr[0] = pair.Key;
+                        dr[1] = pair.Value;
+                        dt.Rows.Add(dr);
+                    }
             }
             return dt;
         }
@@ -201,10 +218,11 @@ namespace server
         /// <returns></returns>
         private DataTable ProcessQueryWithMySQL(DbRequestPacket requestPacket)
         {
+            int region = (int)requestPacket.RegionId;
             DataTable dt = null;
             try
             {
-                dt = Database.CustomQuery(requestPacket.Query);
+                dt = _databases[region].Select(requestPacket.Query).Tables[0];
             }
             catch (Exception ex)
             {
@@ -221,16 +239,36 @@ namespace server
         private DataTable ProcessQuerySimulated(DbRequestPacket requestPacket)
         {
             var rand = new Random();
-            Thread.Sleep(ServerConfig.Instance.SimulationParams[requestPacket.QueryNumber][0]);
-            var data = new byte[ServerConfig.Instance.SimulationParams[requestPacket.QueryNumber][1]];
-
-            rand.NextBytes(data);
 
             var dt = new DataTable {TableName = "randomTable"};
             dt.Columns.Add("Data");
-            DataRow dr = dt.NewRow();
-            dr[0] = Encoding.ASCII.GetString(data);
-            dt.Rows.Add(dr);
+
+            var currentDataBase = ServerConfig.Instance.DataBase.FirstOrDefault(
+                simParam => simParam.RegionId == requestPacket.RegionId);
+
+            if (currentDataBase != null)
+            {
+                Dictionary<int, int[]> simuldationParams =
+                    currentDataBase.SimulationParams;
+            
+                if (simuldationParams != null)
+                {
+                    Thread.Sleep(simuldationParams[requestPacket.QueryNumber][0]);
+                    var data = new byte[simuldationParams[requestPacket.QueryNumber][1]];
+
+                    rand.NextBytes(data);
+
+                    DataRow dr = dt.NewRow();
+                    dr[0] = Encoding.ASCII.GetString(data);
+                    dt.Rows.Add(dr);
+                    return dt;
+                }
+            }
+
+            Logger.Write("Нет параметров симуляции. Длина пакета минимальная.");
+            DataRow dataRow = dt.NewRow();
+            dataRow[0] = "";
+            dt.Rows.Add(dataRow);
             return dt;
         }
 

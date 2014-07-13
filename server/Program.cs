@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -31,17 +32,30 @@ namespace server
 
             ThreadPool.SetMinThreads(1, 1);
 
+            var databases = new Dictionary<int, MySqlDb>();
+
             if (ServerConfig.Instance.Server.WorkMode == WorkMode.Normal)
             {
-                if (!Database.Init())
+                foreach (var dataBaseConfig in ServerConfig.Instance.DataBase)
                 {
-                    Logger.Write("Ошибка подключения к БД. Выход.");
-                    return;
+                    var database = new MySqlDb(
+                        dataBaseConfig.UserName,
+                        dataBaseConfig.Password,
+                        dataBaseConfig.DataBaseName,
+                        dataBaseConfig.Host,
+                        dataBaseConfig.Port);
+
+                    if (!database.MySqlConnectionOpen())
+                    {
+                        Logger.Write("Ошибка подключения к БД. Выход.");
+                        return;
+                    }
+                    databases.Add(dataBaseConfig.RegionId, database);
                 }
             }
 
             Logger.Write("Сервер конфигурирован");
-            new Server();
+            new Server(databases);
         }
     }
 }
