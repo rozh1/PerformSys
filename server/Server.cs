@@ -36,10 +36,13 @@ namespace server
         /// </summary>
         private bool _serverIsLife = true;
 
-        private readonly Dictionary<int, MySqlDb> _databases; 
+        private readonly Dictionary<int, MySqlDb> _databases;
+
+        private PacketTransmitHelper _transmitHelper;
 
         public Server(Dictionary<int,MySqlDb> databases)
         {
+            _transmitHelper = new PacketTransmitHelper();
             _databases = databases;
             _tcpClient = new TcpClient();
             while (_serverIsLife)
@@ -67,7 +70,7 @@ namespace server
                 while (_tcpClient.Connected)
                 {
                     SendStatus();
-                    Packet onePacketData = PacketTransmitHelper.Recive(_tcpClient.GetStream());
+                    Packet onePacketData = _transmitHelper.Recive(_tcpClient.GetStream());
 
                     if (onePacketData != null)
                     {
@@ -116,7 +119,7 @@ namespace server
             {
                 Logger.Write("Отправка информации о БД РБНу ");
                 var dataBaseInfoPacket = new DataBaseInfoPacket(tableSizes);
-                PacketTransmitHelper.Send(dataBaseInfoPacket.GetPacket(), _tcpClient.GetStream());
+                _transmitHelper.Send(dataBaseInfoPacket.GetPacket(), _tcpClient.GetStream());
             }
         }
 
@@ -154,7 +157,7 @@ namespace server
             var sp = new ServerStatusPacket(status);
             if (_tcpClient.Connected)
             {
-                PacketTransmitHelper.Send(sp.GetPacket(), _tcpClient.GetStream());
+                _transmitHelper.Send(sp.GetPacket(), _tcpClient.GetStream());
                 Logger.Write("Отослан статус " + status);
             }
         }
@@ -179,7 +182,7 @@ namespace server
                 Logger.Write("Отправка результата клиенту " + requestPacket.ClientId);
                 var dbAnswerPacket = new DbAnswerPacket(dt, requestPacket.QueryNumber,
                     new PacketBase {ClientId = requestPacket.ClientId, RegionId = requestPacket.RegionId});
-                PacketTransmitHelper.Send(dbAnswerPacket.GetPacket(), _tcpClient.GetStream());
+                _transmitHelper.Send(dbAnswerPacket.GetPacket(), _tcpClient.GetStream());
             }
             _queueLength--;
             SendStatus();
