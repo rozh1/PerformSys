@@ -58,7 +58,6 @@ namespace rbn
             servers.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
             servers.SendRequestFromQueueEvent += _rbnQueue.SendRequestToServer;
             servers.DataBaseInfoRecivedEvent += _rbnQueue.AddDataBaseInfo;
-            servers.DataBaseInfoRecivedEvent += globalBalancer.SendDataBaseInfo;
 
             globalBalancer.RequestRecivedEvent += _rbnQueue.AddClient;
             globalBalancer.AnswerRecivedEvent += _rbnQueue.ServerAnswer;

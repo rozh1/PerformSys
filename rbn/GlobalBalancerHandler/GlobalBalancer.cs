@@ -151,10 +151,6 @@ namespace rbn.GlobalBalancerHandler
                                 if (RequestRecivedEvent != null)
                                     RequestRecivedEvent(client);
                                 break;
-                            case PacketType.DataBaseInfo:
-                                var dataBaseInfoPacket = new DataBaseInfoPacket(packet.Data);
-                                if (DataBaseInfoRecivedEvent != null) DataBaseInfoRecivedEvent(dataBaseInfoPacket);
-                                break;
                         }
                     }
                 }
@@ -187,11 +183,6 @@ namespace rbn.GlobalBalancerHandler
         ~GlobalBalancer()
         {
             Dispose();
-        }
-
-        public void SendDataBaseInfo(DataBaseInfoPacket dataBaseInfoPacket)
-        {
-            PacketTransmitHelper.Send(dataBaseInfoPacket.GetPacket(), _globalBalancer.Connection.GetStream());
         }
     }
 }
