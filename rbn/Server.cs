@@ -22,6 +22,7 @@ using System.Net.Sockets;
 using System.Threading;
 using Balancer.Common;
 using Balancer.Common.Packet.Packets;
+using Balancer.Common.Utils;
 using rbn.GlobalBalancerHandler;
 using rbn.QueueHandler;
 using rbn.QueueHandler.Data;
@@ -63,7 +64,6 @@ namespace rbn
             globalBalancer.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
             globalBalancer.SendRequestFromQueueEvent += _rbnQueue.SendRequestToServer;
             globalBalancer.QueryWeightComputeEvent += _rbnQueue.ComputeQueueWeight;
-            globalBalancer.DataBaseInfoRecivedEvent += _rbnQueue.AddDataBaseInfo;
 
             _serverIsLife = true;
 
@@ -87,11 +87,12 @@ namespace rbn
         /// <param name="param"></param>
         private void ClientThread(object param)
         {
+            var transmitHelper = new PacketTransmitHelper();
             var tcpClient = (TcpClient) param;
             var client = new Client();
             while (tcpClient.Connected)
             {
-                var packet = Balancer.Common.Utils.PacketTransmitHelper.Recive(tcpClient.GetStream());
+                var packet = transmitHelper.Recive(tcpClient.GetStream());
                 if (packet != null)
                 {
                     var dbRequestPacket = new DbRequestPacket(packet.Data)

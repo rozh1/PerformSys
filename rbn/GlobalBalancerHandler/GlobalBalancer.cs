@@ -39,9 +39,11 @@ namespace rbn.GlobalBalancerHandler
     internal class GlobalBalancer : IServer, IDisposable
     {
         private readonly Data.GlobalBalancer _globalBalancer;
+        private readonly PacketTransmitHelper _transmitHelper;
 
         public GlobalBalancer()
         {
+            _transmitHelper = new PacketTransmitHelper();
             _globalBalancer = new Data.GlobalBalancer
             {
                 Connection = null,
@@ -70,7 +72,7 @@ namespace rbn.GlobalBalancerHandler
             {
                 if (!globalBalancer.Connection.Connected) return false;
                 if (
-                    !PacketTransmitHelper.Send(queueEntity.RequestPacket.GetPacket(),
+                    !_transmitHelper.Send(queueEntity.RequestPacket.GetPacket(),
                         globalBalancer.Connection.GetStream()))
                     return false;
                 Logger.Write("Отправлен запрос от клиента " + queueEntity.ClientId);
@@ -93,12 +95,7 @@ namespace rbn.GlobalBalancerHandler
         ///     Событие подсчета веса
         /// </summary>
         public event QueryWeightCompute QueryWeightComputeEvent;
-
-        /// <summary>
-        ///     Событие информации о БД
-        /// </summary>
-        public event Action<DataBaseInfoPacket> DataBaseInfoRecivedEvent;
-
+        
         private void GlobalBalancerListenThread(object param)
         {
             var globalBalancer = (Data.GlobalBalancer) param;
@@ -128,7 +125,7 @@ namespace rbn.GlobalBalancerHandler
 
                 while (connection.Connected)
                 {
-                    Packet packet = PacketTransmitHelper.Recive(connection.GetStream());
+                    Packet packet = _transmitHelper.Recive(connection.GetStream());
                     if (packet != null)
                     {
                         switch (packet.Type)
@@ -151,6 +148,8 @@ namespace rbn.GlobalBalancerHandler
                                 if (RequestRecivedEvent != null)
                                     RequestRecivedEvent(client);
                                 break;
+                            default:
+                                throw new ArgumentOutOfRangeException("GlobalBalancer. Получен пакет - " + packet.Type);
                         }
                     }
                 }
@@ -170,7 +169,7 @@ namespace rbn.GlobalBalancerHandler
                     {
                         RegionId = RBNConfig.Instance.RBN.RegionId
                     };
-                    PacketTransmitHelper.Send(packet.GetPacket(), globalBalancer.Connection.GetStream());
+                    _transmitHelper.Send(packet.GetPacket(), globalBalancer.Connection.GetStream());
                 }
                 else
                 {

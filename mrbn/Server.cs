@@ -77,9 +77,10 @@ namespace mrbn
         /// <param name="param"></param>
         private void ClientThread(object param)
         {
+            var transmitHelper = new PacketTransmitHelper();
             var rbnClient = (TcpClient) param;
 
-            Packet statusPacket = PacketTransmitHelper.Recive(rbnClient.GetStream());
+            Packet statusPacket = transmitHelper.Recive(rbnClient.GetStream());
             if (statusPacket == null) return;
             if (statusPacket.Type != PacketType.RBNStatus) return;
 
@@ -100,7 +101,7 @@ namespace mrbn
 
             while (rbnClient.Connected)
             {
-                Packet packet = PacketTransmitHelper.Recive(rbnClient.GetStream());
+                Packet packet = transmitHelper.Recive(rbnClient.GetStream());
                 if (packet != null)
                 {
                     switch (packet.Type)
@@ -110,7 +111,7 @@ namespace mrbn
                             break;
                         case PacketType.Request:
                             Debug.Assert(rbn.RelayRbn.RbnClient != null, "rbn.RelayRbn.RbnClient != null");
-                            if (PacketTransmitHelper.Send(packet, rbn.RelayRbn.RbnClient.GetStream()))
+                            if (transmitHelper.Send(packet, rbn.RelayRbn.RbnClient.GetStream()))
                             {
                                 rbn.RelayRbn = null;
                                 transmitRequestSended = false;
@@ -119,14 +120,14 @@ namespace mrbn
                         case PacketType.Answer:
                             var dbAnswerPacket = new DbAnswerPacket(packet.Data);
                             RBN remoteRbn = _balancer.GetRbnByRegionId((int) dbAnswerPacket.RegionId);
-                            PacketTransmitHelper.Send(packet, remoteRbn.RbnClient.GetStream());
+                            transmitHelper.Send(packet, remoteRbn.RbnClient.GetStream());
                             break;
                     }
                 }
                 _balancer.ConnectRbns();
                 if (rbn.RelayRbn != null && (rbn.RelayRbn.RbnClient != null && !transmitRequestSended))
                 {
-                    PacketTransmitHelper.Send((new TransmitRequestPacket()).GetPacket(), rbn.RbnClient.GetStream());
+                    transmitHelper.Send((new TransmitRequestPacket()).GetPacket(), rbn.RbnClient.GetStream());
                     transmitRequestSended = true;
                 }
             }
