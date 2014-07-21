@@ -10,6 +10,5 @@ namespace mrbn.GlobalBalancer.Data
         public int RegionId { get; set; }
         public double Weight { get; set; }
         public RBN RelayRbn { get; set; }
-        public Dictionary<string, UInt64> TableSizes { get; set; } 
     }
 }
