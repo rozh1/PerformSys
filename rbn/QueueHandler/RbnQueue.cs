@@ -64,8 +64,11 @@ namespace rbn.QueueHandler
         /// </summary>
         private readonly List<TableSizes> _tableSizes;
 
+        private readonly PacketTransmitHelper _transmitHelper;
+
         public RbnQueue()
         {
+            _transmitHelper = new PacketTransmitHelper();
             _sendMutex = new Mutex();
             _clientSyncObject = new object();
             _queue = new Queue<QueueEntity>();
@@ -143,7 +146,7 @@ namespace rbn.QueueHandler
                     {
                         if (_clients[i].Id == clientId)
                         {
-                            PacketTransmitHelper.Send(dbAnswerPacket.GetPacket(),
+                            _transmitHelper.Send(dbAnswerPacket.GetPacket(),
                                 _clients[i].Connection.GetStream());
                             Client client = GetClientById(clientId);
                             if (client.DisposeAfterTransmitAnswer)

@@ -23,12 +23,14 @@ using System.Text;
 
 namespace Balancer.Common.Utils
 {
-    public static class PacketTransmitHelper
+    public class PacketTransmitHelper
     {
-        public static bool Send(Packet.Packet packet, NetworkStream networkStream)
+        private string _nextPacketData = string.Empty;
+
+        public bool Send(Packet.Packet packet, NetworkStream networkStream)
         {
-            var result = false;
-            var packetBytes = packet.ToBytes();
+            bool result = false;
+            byte[] packetBytes = packet.ToBytes();
             if (networkStream.CanWrite)
             {
                 try
@@ -43,16 +45,30 @@ namespace Balancer.Common.Utils
                 }
                 return result;
             }
-            return result;
+            return false;
         }
 
-        private static string _nextPacketData = string.Empty;
-
-        public static Packet.Packet Recive(NetworkStream networkStream)
+        public Packet.Packet Recive(NetworkStream networkStream)
         {
-            var buffer = new byte[1400];
+            var buffer = new byte[64000];
             string packetData = "";
             Packet.Packet packet = null;
+
+            if (!string.IsNullOrEmpty(_nextPacketData))
+            {
+                if (_nextPacketData.Contains(Packet.Packet.PacketEnd))
+                {
+                    int index = _nextPacketData.IndexOf(Packet.Packet.PacketEnd, StringComparison.Ordinal);
+                    packetData =
+                        _nextPacketData.Remove(index);
+                    _nextPacketData =
+                        _nextPacketData.Substring(
+                            index +
+                            Packet.Packet.PacketEnd.Length);
+                    return new Packet.Packet(packetData);
+                }
+            }
+
             try
             {
                 int count;
@@ -81,7 +97,6 @@ namespace Balancer.Common.Utils
                     if (count == 0) Logger.Write("Произошло отключение");
                     if (count < 0) Logger.Write("Ошибка соедиения");
                 }
-
             }
             catch (Exception ex)
             {

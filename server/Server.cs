@@ -55,10 +55,13 @@ namespace server
         /// </summary>
         private bool _serverIsLife = true;
 
-        private Dictionary<int, MySqlDb> _databases; 
+        private readonly Dictionary<int, MySqlDb> _databases;
+
+        private PacketTransmitHelper _transmitHelper;
 
         public Server(Dictionary<int,MySqlDb> databases)
         {
+            _transmitHelper = new PacketTransmitHelper();
             _databases = databases;
             _tcpClient = new TcpClient();
             while (_serverIsLife)
@@ -78,12 +81,15 @@ namespace server
 
                 Logger.Write("Подключение установлено");
 
-                SendDataBaseInfo();
+                foreach (Config.Data.DataBase dataBase in ServerConfig.Instance.DataBase)
+                {
+                    SendDataBaseInfo(dataBase.RegionId);
+                }
 
                 while (_tcpClient.Connected)
                 {
                     SendStatus();
-                    Packet onePacketData = PacketTransmitHelper.Recive(_tcpClient.GetStream());
+                    Packet onePacketData = _transmitHelper.Recive(_tcpClient.GetStream());
 
                     if (onePacketData != null)
                     {
@@ -101,18 +107,18 @@ namespace server
             }
         }
 
-        void SendDataBaseInfo()
+        void SendDataBaseInfo(int regionId)
         {
             DataTable dt = null;
             var requestPacket = new DbRequestPacket("SELECT table_name AS table_name, data_length FROM information_schema.tables WHERE table_schema=DATABASE();", 0)
             {
                 GlobalId = 0,
-                RegionId = (uint)ServerConfig.Instance.Server.RBN.RegionId,
+                RegionId = (uint)regionId,
             };
             switch (ServerConfig.Instance.Server.WorkMode)
             {
                 case WorkMode.Normal:
-                    dt = ProcessQueryWithMySQL(requestPacket);
+                    dt = ProcessQueryWithMySql(requestPacket);
                     break;
                 case WorkMode.Simulation:
                     dt = GenerateSimulatedSizesDataTable(requestPacket);
@@ -132,13 +138,13 @@ namespace server
             {
                 Logger.Write("Отправка информации о БД РБНу ");
                 var dataBaseInfoPacket = new DataBaseInfoPacket(tableSizes);
-                PacketTransmitHelper.Send(dataBaseInfoPacket.GetPacket(), _tcpClient.GetStream());
+                _transmitHelper.Send(dataBaseInfoPacket.GetPacket(), _tcpClient.GetStream());
             }
         }
 
         private DataTable GenerateSimulatedSizesDataTable(DbRequestPacket requestPacket)
         {
-            var dt = new DataTable() {TableName = "sizes"};
+            var dt = new DataTable {TableName = "sizes"};
             dt.Columns.Add("table_name");
             dt.Columns.Add("data_length");
 
@@ -170,7 +176,7 @@ namespace server
             var sp = new ServerStatusPacket(status);
             if (_tcpClient.Connected)
             {
-                PacketTransmitHelper.Send(sp.GetPacket(), _tcpClient.GetStream());
+                _transmitHelper.Send(sp.GetPacket(), _tcpClient.GetStream());
                 Logger.Write("Отослан статус " + status);
             }
         }
@@ -195,7 +201,7 @@ namespace server
                 Logger.Write("Отправка результата клиенту " + requestPacket.ClientId);
                 var dbAnswerPacket = new DbAnswerPacket(dt, requestPacket.QueryNumber,
                     new PacketBase {ClientId = requestPacket.ClientId, RegionId = requestPacket.RegionId});
-                PacketTransmitHelper.Send(dbAnswerPacket.GetPacket(), _tcpClient.GetStream());
+                _transmitHelper.Send(dbAnswerPacket.GetPacket(), _tcpClient.GetStream());
             }
             _queueLength--;
             SendStatus();
@@ -216,7 +222,7 @@ namespace server
             switch (ServerConfig.Instance.Server.WorkMode)
             {
                 case WorkMode.Normal:
-                    dt = ProcessQueryWithMySQL(requestPacket);
+                    dt = ProcessQueryWithMySql(requestPacket);
                     break;
                 case WorkMode.Simulation:
                     dt = ProcessQuerySimulated(requestPacket);
@@ -235,7 +241,7 @@ namespace server
         /// </summary>
         /// <param name="requestPacket">пакет запроса</param>
         /// <returns></returns>
-        private DataTable ProcessQueryWithMySQL(DbRequestPacket requestPacket)
+        private DataTable ProcessQueryWithMySql(DbRequestPacket requestPacket)
         {
             int region = (int)requestPacket.RegionId;
             DataTable dt = null;

@@ -103,15 +103,5 @@ namespace mrbn.GlobalBalancer
 
             return rbns;
         }
-
-        public Dictionary<string, UInt64>[] GetAllTableSizes()
-        {
-            var tableSizes = new Dictionary<string, ulong>[_rbns.Count];
-            for (int i = 0; i < _rbns.Count; i++)
-            {
-                tableSizes[i] = _rbns[i].TableSizes;
-            }
-            return tableSizes;
-        }
     }
 }
