@@ -8,7 +8,6 @@ using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
 using rbn.Interfaces;
-using rbn.QueueHandler;
 using rbn.QueueHandler.Data;
 
 namespace rbn.ServersHandler
@@ -48,8 +47,11 @@ namespace rbn.ServersHandler
         /// </summary>
         private readonly TcpListener _listener;
 
+        private readonly PacketTransmitHelper _transmitHelper;
+
         public Servers(int port)
         {
+            _transmitHelper = new PacketTransmitHelper();
             _serversList = new List<Server>();
             _serversThreads = new List<Thread>();
 
@@ -185,7 +187,7 @@ namespace rbn.ServersHandler
             TcpClient connection = server.Connection;
             while (connection.Connected)
             {
-                Packet packet = PacketTransmitHelper.Recive(connection.GetStream());
+                Packet packet = _transmitHelper.Recive(connection.GetStream());
 
                 if (packet != null)
                 {
@@ -207,6 +209,8 @@ namespace rbn.ServersHandler
                             dataBaseInfoPacket.GlobalId = Config.RBNConfig.Instance.RBN.GlobalId;
                             if (DataBaseInfoRecivedEvent != null) DataBaseInfoRecivedEvent(dataBaseInfoPacket);
                             break;
+                        default:
+                            throw new ArgumentOutOfRangeException("Servers. Получен пакет - " + packet.Type);
                     }
                 }
                 else
@@ -221,11 +225,10 @@ namespace rbn.ServersHandler
         /// </summary>
         /// <param name="server"></param>
         /// <param name="dbRequestPacket"></param>
-        /// <param name="clientId"></param>
         private void SendRequest(Server server, DbRequestPacket dbRequestPacket)
         {
             if (!server.Connection.Connected) return;
-            if (PacketTransmitHelper.Send(dbRequestPacket.GetPacket(), server.Connection.GetStream()))
+            if (_transmitHelper.Send(dbRequestPacket.GetPacket(), server.Connection.GetStream()))
                 server.StatusRecived = false;
         }
 
