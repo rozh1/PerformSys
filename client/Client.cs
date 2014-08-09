@@ -97,9 +97,10 @@ namespace client
                     //    for (int i = 0; i < dt.Columns.Count; i++) answer += dt.Rows[j][i] + "\t";
                     //}
 
-                    ClientStatsData.WaitTime = DateTime.Now - startTime;
+                    var queryTime = DateTime.Now - startTime;
+                    ClientStatsData.WaitTime += queryTime;
                     ClientStatsData.Answer = null; //answer;
-                    Console.WriteLine("Клиент: " +_number + "\tЗапрос: " + i + "\tВремя выполнения: " + ClientStatsData.WaitTime);
+                    Console.WriteLine("Клиент: " + _number + "\tЗапрос: " + i + "\tВремя выполнения: " + queryTime);
                 }
             }
             tcpClient.Close();
