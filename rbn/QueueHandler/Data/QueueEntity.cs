@@ -38,6 +38,6 @@ namespace rbn.QueueHandler.Data
         /// <summary>
         /// Объем отношений для обработки запроса
         /// </summary>
-        public double relationVolume { get; set; }
+        public double RelationVolume { get; set; }
     }
 }

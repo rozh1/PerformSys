@@ -31,6 +31,7 @@ namespace rbn
         private static void Main()
         {
             Logger.SetLogFile("rbnLog.txt");
+            Logger.SetCsvLogFile("statsRBN.csv");
             Logger.Write("Сервер запущен");
 
             const string configFilePath = "rbnConfig.xml";

@@ -21,10 +21,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Balancer.Common;
 using Balancer.Common.Logger;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
+using rbn.Config.Data;
 using rbn.Interfaces;
 using rbn.QueueHandler.Data;
 
@@ -110,8 +110,17 @@ namespace rbn.QueueHandler
                     new QueueEntity
                     {
                         RequestPacket = requestPacket,
-                        relationVolume = CalculateRelationsVolume(requestPacket)
+                        RelationVolume = CalculateRelationsVolume(requestPacket)
                     });
+
+                client.LogStats = new LogStats
+                {
+                    GlobalId = requestPacket.GlobalId,
+                    RegionId = requestPacket.RegionId,
+                    QueryNumber = requestPacket.QueryNumber,
+                    QueueLength = _queue.Count,
+                };
+                client.AddedTime = DateTime.Now;
             }
         }
 
@@ -150,6 +159,10 @@ namespace rbn.QueueHandler
                             _transmitHelper.Send(dbAnswerPacket.GetPacket(),
                                 _clients[i].Connection.GetStream());
                             Client client = GetClientById(clientId);
+
+                            client.LogStats.QueryExecutionTime = DateTime.Now - client.SendedTime;
+                            Logger.WriteCsv(client.LogStats);
+
                             if (client.DisposeAfterTransmitAnswer)
                                 RemoveClient(client);
                             break;
@@ -195,7 +208,12 @@ namespace rbn.QueueHandler
                 if (server.SendRequest(queueEntity))
                 {
                     Client client = GetClientById(queueEntity.ClientId);
-                    if (client != null) client.RequestSended = true;
+                    if (client != null)
+                    {
+                        client.RequestSended = true;
+                        client.SendedTime = DateTime.Now;
+                        client.LogStats.QueueWaitTime = DateTime.Now - client.AddedTime;
+                    }
                     _queue.Dequeue();
                 }
             }
@@ -229,7 +247,7 @@ namespace rbn.QueueHandler
 
             foreach (QueueEntity queueEntity in _queue)
             {
-                queueEntity.relationVolume = CalculateRelationsVolume(queueEntity.RequestPacket);
+                queueEntity.RelationVolume = CalculateRelationsVolume(queueEntity.RequestPacket);
             }
         }
 
@@ -277,10 +295,13 @@ namespace rbn.QueueHandler
                 if (tableSize.RegionId == Config.RBNConfig.Instance.RBN.RegionId && tableSize.GlobalId == Config.RBNConfig.Instance.RBN.GlobalId)
                     tableSizes = tableSize;
             }
-            double requestVolume = _queue.Sum(queueEntity => queueEntity.relationVolume);
-            double normalize = Config.RBNConfig.Instance.RBN.ServersCount/
-                               (double) Config.RBNConfig.Instance.RBN.MaxServersCount;
-            if (tableSizes != null) return (requestVolume/(_queue.Count*tableSizes.DataBaseSize))*normalize;
+            lock (_queue)
+            {
+                double requestVolume = _queue.Sum(queueEntity => queueEntity.RelationVolume);
+                double normalize = Config.RBNConfig.Instance.RBN.ServersCount/
+                                   (double) Config.RBNConfig.Instance.RBN.MaxServersCount;
+                if (tableSizes != null) return (requestVolume/(_queue.Count*tableSizes.DataBaseSize))*normalize;
+            }
             return 0;
         }
     }
