@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\ConfigInit.cs" />
+    <Compile Include="Config\Data\LogStats.cs" />
     <Compile Include="Config\Data\SimulatedTimes.cs" />
     <Compile Include="Config\Data\Server.cs" />
     <Compile Include="Config\Data\RBN.cs" />

@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
-using Balancer.Common;
+using Balancer.Common.Logger;
 using server.Config;
 using server.Config.Data;
 using server.DataBase;
@@ -35,6 +35,7 @@ namespace server
         private static void Main()
         {
             Logger.SetLogFile("serverLog.txt");
+            Logger.SetCsvLogFile("statsServer.csv");
             Logger.Write("Сервер запущен");
 
             const string configFilePath = "serverConfig.xml";

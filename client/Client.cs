@@ -24,6 +24,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using Balancer.Common;
+using Balancer.Common.Logger;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using client.Properties;
@@ -103,11 +104,13 @@ namespace client
                     _clientStatsData.WaitTime += queryTime;
                     _clientStatsData.Answer = null; //answer;
                     Console.WriteLine(@"Клиент: {0}	Запрос: {1}	Время выполнения: {2}", _number, i, queryTime);
-                    Logger.WriteCsv(
-                        _queryNumber.ToString(CultureInfo.InvariantCulture),
-                        _number.ToString(CultureInfo.InvariantCulture),
-                        i.ToString(CultureInfo.InvariantCulture),
-                        queryTime.TotalMilliseconds.ToString(CultureInfo.InvariantCulture));
+
+                    _config.LogStats.ClientNumber = _number;
+                    _config.LogStats.ClientQueryNumber = i;
+                    _config.LogStats.QueryNumber = _queryNumber;
+                    _config.LogStats.QueryTime = queryTime;
+
+                    Logger.WriteCsv(_config.LogStats);
                 }
             }
             tcpClient.Close();

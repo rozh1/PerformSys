@@ -21,6 +21,7 @@
 using System.Net.Sockets;
 using System.Threading;
 using Balancer.Common;
+using Balancer.Common.Logger;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;

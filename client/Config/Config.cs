@@ -17,7 +17,9 @@
  */
 #endregion
 
-﻿namespace client.Config
+﻿using client.Config.Data;
+
+namespace client.Config
 {
     public class Config
     {
@@ -40,5 +42,10 @@
         ///     Порт балансировщика
         /// </summary>
         public int? BalancerPort { get; set; }
+
+        /// <summary>
+        /// Данные статистики для записи в лог
+        /// </summary>
+        public LogStats LogStats { get; set; }
     }
 }

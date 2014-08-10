@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Balancer.Common;
+using Balancer.Common.Logger;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
 using rbn.Interfaces;

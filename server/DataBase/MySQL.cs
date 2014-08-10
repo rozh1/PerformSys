@@ -19,7 +19,7 @@
 
 ﻿using System;
 using System.Data;
-using Balancer.Common;
+using Balancer.Common.Logger;
 using MySql.Data.MySqlClient;
 
 namespace server.DataBase

@@ -19,9 +19,8 @@
 
 ﻿using System.IO;
 using System.Text;
-using Balancer.Common;
+using Balancer.Common.Logger;
 using mrbn.Config;
-using mrbn.Config.Data;
 using mrbn.Properties;
 
 namespace mrbn

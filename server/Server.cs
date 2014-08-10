@@ -21,11 +21,12 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using Balancer.Common;
+using Balancer.Common.Logger;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
@@ -190,11 +191,12 @@ namespace server
             DataTable dt = null;
             var packet = (Packet) packetObj;
             var requestPacket = new DbRequestPacket(packet.Data);
+            var elapsedTime = new TimeSpan();
 
             Logger.Write("Принят запрос от клиента: " + requestPacket.ClientId);
             if (packet.Type == PacketType.Request)
             {
-                dt = ProcessQuery(requestPacket);
+                dt = ProcessQuery(requestPacket, out elapsedTime);
             }
             if (dt != null)
             {
@@ -203,6 +205,16 @@ namespace server
                     new PacketBase {ClientId = requestPacket.ClientId, RegionId = requestPacket.RegionId});
                 _transmitHelper.Send(dbAnswerPacket.GetPacket(), _tcpClient.GetStream());
             }
+
+            Logger.WriteCsv(new LogStats()
+            {
+                GlobalId = requestPacket.GlobalId,
+                RegionId = requestPacket.RegionId,
+                QueryNumber = requestPacket.QueryNumber,
+                QueueLength = _queueLength,
+                QueryExecutionTime = elapsedTime,
+            });
+
             _queueLength--;
             SendStatus();
         }
@@ -211,13 +223,13 @@ namespace server
         ///     Обработчик запросов
         /// </summary>
         /// <param name="requestPacket">пакет запроса</param>
+        /// <param name="elapsedTime">Время работы</param>
         /// <returns></returns>
-        private DataTable ProcessQuery(DbRequestPacket requestPacket)
+        private DataTable ProcessQuery(DbRequestPacket requestPacket, out TimeSpan elapsedTime)
         {
             DataTable dt;
             Logger.Write("Запрос начал выполнение");
-            var sw = new Stopwatch();
-            sw.Start();
+            var startTime = DateTime.Now;
 
             switch (ServerConfig.Instance.Server.WorkMode)
             {
@@ -231,8 +243,8 @@ namespace server
                     throw new ArgumentOutOfRangeException("ServerConfig.Instance.Server.WorkMode Нет такого режима работы");
             }
 
-            sw.Stop();
-            Logger.Write("Запрос " + requestPacket.QueryNumber + " выполнен за " + sw.ElapsedMilliseconds + " мс");
+            elapsedTime = DateTime.Now - startTime;
+            Logger.Write("Запрос " + requestPacket.QueryNumber + " выполнен за " + elapsedTime.Milliseconds.ToString(CultureInfo.InvariantCulture) + " мс");
             return dt;
         }
 

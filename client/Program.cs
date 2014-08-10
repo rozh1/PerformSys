@@ -19,8 +19,9 @@
 
 ﻿using System;
 using System.Diagnostics;
-using Balancer.Common;
+using Balancer.Common.Logger;
 using client.ComandLineParamsParser;
+using client.Config.Data;
 
 namespace client
 {
@@ -48,6 +49,7 @@ namespace client
             }
 
             Config.Config config = parser.GetConfig();
+            config.LogStats = new LogStats();
             Logger.SetCsvLogFile("statsClients.csv");
 
             Debug.Assert(config.ClientCount != null, "config.ClientCount != null");

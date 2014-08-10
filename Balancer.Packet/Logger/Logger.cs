@@ -20,8 +20,9 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using Balancer.Common.Logger.Data;
 
-namespace Balancer.Common
+namespace Balancer.Common.Logger
 {
     /// <summary>
     ///     Класс логгера
@@ -55,7 +56,7 @@ namespace Balancer.Common
         }
 
         /// <summary>
-        ///     Записыват строку в CSV файл отметкой времени
+        ///     Записыват строку в CSV файл
         /// </summary>
         /// <param name="messages">сообщения</param>
         public static void WriteCsv(params string[] messages)
@@ -64,6 +65,14 @@ namespace Balancer.Common
             string csvLine = string.Join(";", messages);
             File.AppendAllText(_csvFileName, csvLine + Environment.NewLine);
             Mut.ReleaseMutex();
+        }
+
+        /// <summary>
+        ///     Записыват строку в CSV файл
+        /// </summary>
+        public static void WriteCsv(ILogStats logStats)
+        {
+            WriteCsv(logStats.GetCsvParams());
         }
 
         /// <summary>

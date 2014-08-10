@@ -39,7 +39,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Logger.cs" />
+    <Compile Include="Logger\Data\ILogStats.cs" />
+    <Compile Include="Logger\Logger.cs" />
     <Compile Include="Packet\Packets\IPacket.cs" />
     <Compile Include="Packet\Packets\PacketBase.cs" />
     <Compile Include="Packet\Packets\ServerStatusPacket.cs" />

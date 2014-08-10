@@ -19,6 +19,7 @@
 
 ﻿using System;
 using Balancer.Common;
+using Balancer.Common.Logger;
 
 namespace client.ComandLineParamsParser
 {
