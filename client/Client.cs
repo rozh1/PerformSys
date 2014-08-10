@@ -19,9 +19,11 @@
 
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using Balancer.Common;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using client.Properties;
@@ -37,8 +39,8 @@ namespace client
         private readonly int _number;
         private readonly int _port;
         private readonly int _queryNumber;
-        public ClientStatsData ClientStatsData;
-        private Config.Config _config;
+        private ClientStatsData _clientStatsData;
+        private readonly Config.Config _config;
 
         public Client(Config.Config config, int number, int queryNumber)
         {
@@ -57,7 +59,7 @@ namespace client
         /// </summary>
         private void ClientThread()
         {
-            ClientStatsData = new ClientStatsData();
+            _clientStatsData = new ClientStatsData();
 
             var tcpClient = new TcpClient();
             tcpClient.Connect(_address, _port);
@@ -98,13 +100,18 @@ namespace client
                     //}
 
                     var queryTime = DateTime.Now - startTime;
-                    ClientStatsData.WaitTime += queryTime;
-                    ClientStatsData.Answer = null; //answer;
-                    Console.WriteLine("Клиент: " + _number + "\tЗапрос: " + i + "\tВремя выполнения: " + queryTime);
+                    _clientStatsData.WaitTime += queryTime;
+                    _clientStatsData.Answer = null; //answer;
+                    Console.WriteLine(@"Клиент: {0}	Запрос: {1}	Время выполнения: {2}", _number, i, queryTime);
+                    Logger.WriteCsv(
+                        _queryNumber.ToString(CultureInfo.InvariantCulture),
+                        _number.ToString(CultureInfo.InvariantCulture),
+                        i.ToString(CultureInfo.InvariantCulture),
+                        queryTime.TotalMilliseconds.ToString(CultureInfo.InvariantCulture));
                 }
             }
             tcpClient.Close();
-            Console.WriteLine("Клиент: " +_number + "\tОбщее время работы: " + ClientStatsData.WaitTime);
+            Console.WriteLine(@"Клиент: {0}	Общее время работы: {1}", _number, _clientStatsData.WaitTime);
         }
     }
 }

@@ -29,6 +29,7 @@ namespace Balancer.Common
     public class Logger
     {
         private static string _fileName = "log.txt";
+        private static string _csvFileName = "log.csv";
         private static int _logLevel = 7;
         private static readonly Mutex Mut = new Mutex();
 
@@ -54,6 +55,18 @@ namespace Balancer.Common
         }
 
         /// <summary>
+        ///     Записыват строку в CSV файл отметкой времени
+        /// </summary>
+        /// <param name="messages">сообщения</param>
+        public static void WriteCsv(params string[] messages)
+        {
+            Mut.WaitOne();
+            string csvLine = string.Join(";", messages);
+            File.AppendAllText(_csvFileName, csvLine + Environment.NewLine);
+            Mut.ReleaseMutex();
+        }
+
+        /// <summary>
         ///     Записыват сообщение в файл с отметкой времени и уровнем 0
         /// </summary>
         /// <param name="message">сообщение</param>
@@ -69,6 +82,15 @@ namespace Balancer.Common
         public static void SetLogFile(string path)
         {
             _fileName = path;
+        }
+
+        /// <summary>
+        ///     Устанавливает CSV файл для записи
+        /// </summary>
+        /// <param name="path">путь к файлу</param>
+        public static void SetCsvLogFile(string path)
+        {
+            _csvFileName = path;
         }
 
         /// <summary>
