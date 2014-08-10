@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using Balancer.Common;
+using Balancer.Common.Logger;
 using rbn.Config;
 using rbn.Properties;
 

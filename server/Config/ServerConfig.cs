@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Xml.Serialization;
-using Balancer.Common;
+using Balancer.Common.Logger;
 
 namespace server.Config
 {
