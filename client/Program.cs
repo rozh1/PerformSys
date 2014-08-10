@@ -11,16 +11,16 @@ namespace client
         {
             if (args.Length < 5)
             {
-                Console.WriteLine(string.Format("Использование эмулятора клиентов {0}:", AppDomain.CurrentDomain.FriendlyName));
-                Console.WriteLine(string.Format("{0} --clients 10 --queries 5 --host localhost --port 3409", AppDomain.CurrentDomain.FriendlyName));
-                Console.WriteLine(string.Format("\t--clients, -c\t- количество эмулируемых клиентов"));
-                Console.WriteLine(string.Format("\t--queries, -q\t- количество запросов от одного клиента"));
-                Console.WriteLine(string.Format("\t--host, -h\t- адрес балансировщика"));
-                Console.WriteLine(string.Format("\t--port, -p\t- порт балансировщика"));
+                Console.WriteLine(@"Использование эмулятора клиентов {0}:", AppDomain.CurrentDomain.FriendlyName);
+                Console.WriteLine(@"{0} --clients 10 --queries 5 --host localhost --port 3409", AppDomain.CurrentDomain.FriendlyName);
+                Console.WriteLine(@"    --clients, -c   - количество эмулируемых клиентов");
+                Console.WriteLine(@"    --queries, -q   - количество запросов от одного клиента");
+                Console.WriteLine(@"    --host, -h      - адрес балансировщика");
+                Console.WriteLine(@"    --port, -p      - порт балансировщика");
                 Environment.Exit(-1);
             }
 
-            Parser parser = new Parser(args);
+            var parser = new Parser(args);
 
             if (!string.IsNullOrEmpty(parser.ErrorText))
             {
@@ -29,6 +29,7 @@ namespace client
             }
 
             Config.Config config = parser.GetConfig();
+            Logger.SetCsvLogFile("statsClients.csv");
 
             Debug.Assert(config.ClientCount != null, "config.ClientCount != null");
             var clients = new Client[(int)config.ClientCount];
