@@ -27,7 +27,7 @@ namespace Balancer.Common.Packet.Packets
     {
         public DbAnswerPacket(string answerPacketData)
         {
-            var packetData = (PacketData) SerializeMapper.Deserialize(answerPacketData);
+            var packetData = SerializeMapper.Deserialize<PacketData>(answerPacketData);
             AnswerDataTable = packetData.DataTable;
             QueryNumber = packetData.QueryNumber;
             RegionId = packetData.RegionId;
@@ -35,7 +35,7 @@ namespace Balancer.Common.Packet.Packets
             GlobalId = packetData.GlobalId;
         }
 
-        public DbAnswerPacket(DataTable answer, int queryNumber, PacketBase packetBase)
+        public DbAnswerPacket(byte[] answer, int queryNumber, PacketBase packetBase)
         {
             AnswerDataTable = answer;
             QueryNumber = queryNumber;
@@ -44,7 +44,7 @@ namespace Balancer.Common.Packet.Packets
             GlobalId = packetBase.GlobalId;
         }
 
-        public DataTable AnswerDataTable { get; set; }
+        public byte[] AnswerDataTable { get; set; }
         public int QueryNumber { get; set; }
         
         public Packet GetPacket()
@@ -68,7 +68,7 @@ namespace Balancer.Common.Packet.Packets
         internal class PacketData : PacketBase
         {
             [DataMember]
-            public DataTable DataTable { get; set; }
+            public byte[] DataTable { get; set; }
 
             [DataMember]
             public int QueryNumber { get; set; }

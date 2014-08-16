@@ -20,6 +20,7 @@
 ﻿using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace Balancer.Common.Utils
 {
@@ -37,13 +38,13 @@ namespace Balancer.Common.Utils
             }
         }
 
-        public static object Deserialize(string xml)
+        public static T Deserialize<T>(string xml)
         {
             var serializer = new NetDataContractSerializer();
             byte[] bytes = Encoding.UTF8.GetBytes(xml);
             using (var stream = new MemoryStream(bytes))
             {
-                object obj = serializer.Deserialize(stream);
+                var obj = (T)serializer.Deserialize(stream);
                 return obj;
             }
         }

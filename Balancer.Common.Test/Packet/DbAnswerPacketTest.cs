@@ -18,8 +18,10 @@
 #endregion
 
 ﻿using System.Data;
+using System.Text;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Test.Util;
+using Balancer.Common.Utils;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Balancer.Common.Test.Packet
@@ -43,7 +45,7 @@ namespace Balancer.Common.Test.Packet
                 RegionId = 3
             };
 
-            var dbAnswerPacket = new DbAnswerPacket(dt, 1, packetBase);
+            var dbAnswerPacket = new DbAnswerPacket(Encoding.UTF8.GetBytes(SerializeMapper.Serialize(dt)), 1, packetBase);
 
             Common.Packet.Packet packet = dbAnswerPacket.GetPacket();
 
@@ -53,9 +55,8 @@ namespace Balancer.Common.Test.Packet
             Assert.AreEqual(dbAnswerPacketDeserialized.ClientId, dbAnswerPacket.ClientId, "Разные номера клиентов");
             Assert.AreEqual(dbAnswerPacketDeserialized.RegionId, dbAnswerPacket.RegionId, "Разные номера регионов");
             Assert.AreEqual(dbAnswerPacketDeserialized.GlobalId, dbAnswerPacket.GlobalId, "Разные глобальные номера");
-            Assert.IsTrue(
-                CustomComparators.AreTablesEqual(dbAnswerPacketDeserialized.AnswerDataTable,
-                    dbAnswerPacket.AnswerDataTable), "Разные данные в ответе");
+            Assert.AreEqual(Encoding.UTF8.GetString(dbAnswerPacketDeserialized.AnswerDataTable),
+                            Encoding.UTF8.GetString(dbAnswerPacket.AnswerDataTable));
         }
     }
 }
