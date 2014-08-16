@@ -240,7 +240,7 @@
       </SimulationSizes>
     </DataBase>
     <DataBase>
-      <RegionId>1</RegionId>
+      <RegionId>2</RegionId>
       <Host>localhost</Host>
       <Port>3306</Port>
       <UserName>root</UserName>
