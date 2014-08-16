@@ -12,7 +12,7 @@ namespace server.Config
                 {
                     new Data.DataBase
                     {
-                        DataBaseName = "tpch",
+                        DataBaseName = "tpch1",
                         Host = "localhost",
                         Password = "0000",
                         UserName = "root",
@@ -47,6 +47,45 @@ namespace server.Config
                                 {"partsupp", 141213696},
                                 {"region", 16384},
                                 {"supplier", 2637824},
+                            },
+                    }, 
+                    new Data.DataBase
+                    {
+                        DataBaseName = "tpch3",
+                        Host = "localhost",
+                        Password = "0000",
+                        UserName = "root",
+                        Port = 3306,
+                        RegionId = 1,
+                        SimulationParams =
+                            new SimulationParams
+                            {
+                                {1, new[] {38412, 4622 }},
+                                {2, new[] {14538, 740066}},
+                                {3, new[] {4757, 9605286}},
+                                {4, new[] {5217, 2630 }},
+                                {5, new[] {2485, 2498}},
+                                {6, new[] {5853, 1778}},
+                                {7, new[] {17878, 2846}},
+                                {8, new[] {10194, 2042}},
+                                {9, new[] {60784, 35154}},
+                                {10, new[] {16068, 59003658}},
+                                {11, new[] {400, 1666}},
+                                {12, new[] {29774, 2278}},
+                                {13, new[] {8382, 7702}},
+                                {14, new[] {41704, 1814}},
+                            },
+                        SimulationSizes =
+                            new SimulationSizes
+                            {
+                                {"customer", 86605824},
+                                {"lineitem", 2445279232},
+                                {"nation",  16384},
+                                {"orders", 565166080},
+                                {"part", 97107968},
+                                {"partsupp", 421494784},
+                                {"region", 16384},
+                                {"supplier", 5783552},
                             },
                     }
                 },
