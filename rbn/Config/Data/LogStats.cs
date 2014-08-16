@@ -37,13 +37,13 @@ namespace rbn.Config.Data
         {
             return new[]
             {
-                GlobalId.ToString(CultureInfo.InvariantCulture),
-                RegionId.ToString(CultureInfo.InvariantCulture),
-                ClientNumber.ToString(CultureInfo.InvariantCulture),
-                QueryNumber.ToString(CultureInfo.InvariantCulture),
-                QueryExecutionTime.TotalMilliseconds.ToString(CultureInfo.InvariantCulture),
-                QueueWaitTime.TotalMilliseconds.ToString(CultureInfo.InvariantCulture),
-                QueueLength.ToString(CultureInfo.InvariantCulture),
+                GlobalId.ToString(CultureInfo.CurrentCulture),
+                RegionId.ToString(CultureInfo.CurrentCulture),
+                ClientNumber.ToString(CultureInfo.CurrentCulture),
+                QueryNumber.ToString(CultureInfo.CurrentCulture),
+                QueryExecutionTime.TotalMilliseconds.ToString(CultureInfo.CurrentCulture),
+                QueueWaitTime.TotalMilliseconds.ToString(CultureInfo.CurrentCulture),
+                QueueLength.ToString(CultureInfo.CurrentCulture),
             };
         }
 
