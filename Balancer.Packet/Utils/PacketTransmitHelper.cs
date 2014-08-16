@@ -31,7 +31,7 @@ namespace Balancer.Common.Utils
 
         public Packet.Packet Recive(NetworkStream networkStream)
         {
-            var buffer = new byte[64000];
+            var buffer = new byte[1024*1024*2];
             string packetData = "";
             Packet.Packet packet = null;
 
