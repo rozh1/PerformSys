@@ -12,7 +12,7 @@ namespace Balancer.Common.Packet.Packets
 
         public RBNStatusPacket(string serializedPacketData)
         {
-            var packetData = (PacketData)SerializeMapper.Deserialize(serializedPacketData);
+            var packetData = SerializeMapper.Deserialize<PacketData>(serializedPacketData);
             RegionId = packetData.RegionId;
             ClientId = packetData.ClientId;
             GlobalId = packetData.GlobalId;

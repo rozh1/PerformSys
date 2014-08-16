@@ -22,7 +22,7 @@ namespace Balancer.Common.Packet.Packets
 
         public DbRequestPacket(string serializedQuery)
         {
-            var packetData = (PacketData)SerializeMapper.Deserialize(serializedQuery);
+            var packetData = SerializeMapper.Deserialize<PacketData>(serializedQuery);
             Query = packetData.Query;
             QueryNumber = packetData.QueryNumber;
             RegionId = packetData.RegionId;

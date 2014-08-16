@@ -182,7 +182,9 @@ namespace server
             if (dt != null)
             {
                 Logger.Write("Отправка результата клиенту " + requestPacket.ClientId);
-                var dbAnswerPacket = new DbAnswerPacket(dt, requestPacket.QueryNumber,
+                var dbAnswerPacket = new DbAnswerPacket(
+                    Encoding.UTF8.GetBytes(SerializeMapper.Serialize(dt)), 
+                    requestPacket.QueryNumber,
                     new PacketBase {ClientId = requestPacket.ClientId, RegionId = requestPacket.RegionId});
                 Logger.Write(string.Format("Размер посылки ответа запроса {0}: {1} ", requestPacket.QueryNumber, dbAnswerPacket.GetPacket().ToBase64String().Length));
                 _transmitHelper.Send(dbAnswerPacket.GetPacket(), _tcpClient.GetStream());
@@ -273,7 +275,7 @@ namespace server
                 if (simuldationParams != null)
                 {
                     Thread.Sleep(simuldationParams[requestPacket.QueryNumber][0]);
-                    var data = new byte[simuldationParams[requestPacket.QueryNumber][1]];
+                    var data = new byte[simuldationParams[requestPacket.QueryNumber][1]/2];
 
                     rand.NextBytes(data);
 

@@ -35,11 +35,12 @@ namespace client
 
             Debug.Assert(config.ClientCount != null, "config.ClientCount != null");
             var clients = new Client[(int)config.ClientCount];
-            
-            for (int i = 0; i < (int)config.ClientCount; i++)
-            {
-                clients[i] = new Client(config, i, (i%14) + 1);
-            }
+
+            clients[0] = new Client(config, 0, 10);
+            //for (int i = 0; i < (int)config.ClientCount; i++)
+            //{
+            //    clients[i] = new Client(config, i, (i%14) + 1);
+            //}
         }
     }
 }
