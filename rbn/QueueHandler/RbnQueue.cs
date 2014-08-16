@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Balancer.Common.Logger;
@@ -138,9 +137,12 @@ namespace rbn.QueueHandler
                     {
                         if (_clients[i].Id == clientId)
                         {
+                            Client client = _clients[i];
+
+                            if (client.OldId != 0) dbAnswerPacket.ClientId = (uint)client.OldId;
+
                             _transmitHelper.Send(dbAnswerPacket.GetPacket(),
-                                _clients[i].Connection.GetStream());
-                            Client client = GetClientById(clientId);
+                               client.Connection.GetStream());
 
                             client.LogStats.QueryExecutionTime = DateTime.UtcNow - client.SendedTime;
                             Logger.WriteCsv(client.LogStats);

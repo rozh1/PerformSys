@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Threading;
-using Balancer.Common;
 using Balancer.Common.Logger;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
@@ -121,11 +120,13 @@ namespace rbn.GlobalBalancerHandler
                                     AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
                                 break;
                             case PacketType.Request:
+                                var request = new DbRequestPacket(packet.Data);
                                 var client = new Client
                                 {
                                     Connection = connection,
                                     RequestPacketData = packet.Data,
-                                    DisposeAfterTransmitAnswer = true
+                                    DisposeAfterTransmitAnswer = true,
+                                    OldId = (int)request.ClientId
                                 };
                                 if (RequestRecivedEvent != null)
                                     RequestRecivedEvent(client);
