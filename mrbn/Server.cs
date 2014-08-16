@@ -67,7 +67,8 @@ namespace mrbn
             var rbn = new RBN
             {
                 RbnClient = rbnClient,
-                RegionId = (int) rbnStatusPacket.RegionId
+                RegionId = (int) rbnStatusPacket.RegionId,
+                Weight = 0
             };
 
             if (!_balancer.AddRbn(rbn))
@@ -87,18 +88,21 @@ namespace mrbn
                     {
                         case PacketType.RBNStatus:
                             rbn.Weight = (new RBNStatusPacket(packet.Data)).Weight;
+                            //Logger.Write(string.Format("Получен вес очереди {0} РБН {1}", rbn.RegionId, rbn.Weight));
                             break;
                         case PacketType.Request:
                             Debug.Assert(rbn.RelayRbn.RbnClient != null, "rbn.RelayRbn.RbnClient != null");
+                            Logger.Write(string.Format("Предача запроса из {0} в {1} РБН", rbn.RegionId, rbn.RelayRbn.RegionId));
                             if (transmitHelper.Send(packet, rbn.RelayRbn.RbnClient.GetStream()))
                             {
                                 rbn.RelayRbn = null;
                                 transmitRequestSended = false;
                             }
                             break;
-                        case PacketType.Answer:
+                        case PacketType.Answer: 
                             var dbAnswerPacket = new DbAnswerPacket(packet.Data);
                             RBN remoteRbn = _balancer.GetRbnByRegionId((int) dbAnswerPacket.RegionId);
+                            Logger.Write(string.Format("Получен ответ для {1} из {0} РБН", rbn.RegionId, remoteRbn.RegionId));
                             transmitHelper.Send(packet, remoteRbn.RbnClient.GetStream());
                             break;
                     }
