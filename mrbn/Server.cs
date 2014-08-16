@@ -95,9 +95,7 @@ namespace mrbn
                 rbnClient.Close();
                 return;
             }
-
-            bool transmitRequestSended = false;
-
+            
             while (rbnClient.Connected)
             {
                 Packet packet = transmitHelper.Recive(rbnClient.GetStream());
@@ -115,7 +113,6 @@ namespace mrbn
                             if (transmitHelper.Send(packet, rbn.RelayRbn.RbnClient.GetStream()))
                             {
                                 rbn.RelayRbn = null;
-                                transmitRequestSended = false;
                             }
                             break;
                         case PacketType.Answer: 
@@ -127,10 +124,9 @@ namespace mrbn
                     }
                 }
                 _balancer.ConnectRbns();
-                if (rbn.RelayRbn != null && (rbn.RelayRbn.RbnClient != null && !transmitRequestSended))
+                if (rbn.RelayRbn != null && rbn.RelayRbn.RbnClient != null)
                 {
                     transmitHelper.Send((new TransmitRequestPacket()).GetPacket(), rbn.RbnClient.GetStream());
-                    transmitRequestSended = true;
                 }
             }
 

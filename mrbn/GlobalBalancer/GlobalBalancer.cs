@@ -78,7 +78,7 @@ namespace mrbn.GlobalBalancer
 
                 if (highLoadRbn != lowLoadRbn)
                 {
-                    if (highLoadRbn.RegionId > 0)
+                    if (highLoadRbn.RegionId > 0 && lowLoadRbn.RegionId > 0)
                     {
                         highLoadRbn.RelayRbn = lowLoadRbn;
                     }
