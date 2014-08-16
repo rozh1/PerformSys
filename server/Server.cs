@@ -299,7 +299,7 @@ namespace server
                     rand.NextBytes(data);
 
                     DataRow dr = dt.NewRow();
-                    dr[0] = Encoding.ASCII.GetString(data);
+                    dr[0] = Convert.ToBase64String(data);
                     dt.Rows.Add(dr);
                     return dt;
                 }
