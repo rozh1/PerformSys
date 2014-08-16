@@ -2,7 +2,7 @@
 <ServerConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <Server>
     <RBN>
-      <Port>3310</Port>
+      <Port>3410</Port>
       <Host>localhost</Host>
       <RegionId>1</RegionId>
     </RBN>
