@@ -301,7 +301,8 @@ namespace rbn.QueueHandler
                 double requestVolume = _queue.Sum(queueEntity => queueEntity.RelationVolume);
                 double normalize = Config.RBNConfig.Instance.RBN.ServersCount/
                                    (double) Config.RBNConfig.Instance.RBN.MaxServersCount;
-                if (tableSizes != null) return (requestVolume/(_queue.Count*tableSizes.DataBaseSize))*normalize;
+                if (tableSizes != null && _queue.Count > 0)
+                    return (requestVolume/(_queue.Count*tableSizes.DataBaseSize))*normalize;
             }
             return 0;
         }
