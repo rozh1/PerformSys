@@ -225,7 +225,7 @@ namespace server
             }
 
             elapsedTime = DateTime.UtcNow - startTime;
-            Logger.Write("Запрос " + requestPacket.QueryNumber + " выполнен за " + elapsedTime.Milliseconds.ToString(CultureInfo.InvariantCulture) + " мс");
+            Logger.Write("Запрос " + requestPacket.QueryNumber + " выполнен за " + elapsedTime.TotalMilliseconds.ToString(CultureInfo.CurrentCulture) + " мс");
             return dt;
         }
 

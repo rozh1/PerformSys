@@ -15,10 +15,10 @@ namespace client.Config.Data
         {
             return new[]
             {
-                QueryNumber.ToString(CultureInfo.InvariantCulture),
-                ClientNumber.ToString(CultureInfo.InvariantCulture),
-                ClientQueryNumber.ToString(CultureInfo.InvariantCulture),
-                QueryTime.TotalMilliseconds.ToString(CultureInfo.InvariantCulture)
+                QueryNumber.ToString(CultureInfo.CurrentCulture),
+                ClientNumber.ToString(CultureInfo.CurrentCulture),
+                ClientQueryNumber.ToString(CultureInfo.CurrentCulture),
+                QueryTime.TotalMilliseconds.ToString(CultureInfo.CurrentCulture)
             };
         }
 
