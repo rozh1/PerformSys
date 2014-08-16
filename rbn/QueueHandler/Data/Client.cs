@@ -30,6 +30,7 @@ namespace rbn.QueueHandler.Data
         public string AnswerPacketData { get; set; }
         public bool RequestSended { get; set; }
         public int Id { get; set; }
+        public int OldId { get; set; }
         public bool DisposeAfterTransmitAnswer { get; set; }
         public LogStats LogStats { get; set; }
         public DateTime AddedTime { get; set; }
