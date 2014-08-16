@@ -94,7 +94,7 @@ namespace server.Config
                     RBN = new RBN
                     {
                         Host = "localhost",
-                        Port = 3310,
+                        Port = 3410,
                         RegionId = 1,
                     },
                     WorkMode = WorkMode.Simulation
