@@ -105,7 +105,7 @@ namespace rbn.ServersHandler
             while (_sendThreadLife)
             {
                 if (SendRequestFromQueueEvent != null) SendRequestFromQueueEvent(this);
-                Thread.Sleep(100);
+                Thread.Sleep(30);
             }
         }
 

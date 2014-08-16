@@ -28,5 +28,18 @@ namespace server.Config.Data
                 QueueLength.ToString(CultureInfo.InvariantCulture),
             };
         }
+
+        public string[] GetCsvColumnNames()
+        {
+            return new[]
+            {
+                @"Глобальный идентификатор",
+                @"Номер региона",
+                @"Номер клиента",
+                @"Номер запроса",
+                @"Время выполнения",
+                @"Длина очереди",
+            };
+        }
     }
 }

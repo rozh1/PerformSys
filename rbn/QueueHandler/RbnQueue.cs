@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Balancer.Common.Logger;
@@ -101,7 +102,7 @@ namespace rbn.QueueHandler
                     QueryNumber = requestPacket.QueryNumber,
                     QueueLength = _queue.Count,
                 };
-                client.AddedTime = DateTime.Now;
+                client.AddedTime = DateTime.UtcNow;
             }
         }
 
@@ -141,7 +142,7 @@ namespace rbn.QueueHandler
                                 _clients[i].Connection.GetStream());
                             Client client = GetClientById(clientId);
 
-                            client.LogStats.QueryExecutionTime = DateTime.Now - client.SendedTime;
+                            client.LogStats.QueryExecutionTime = DateTime.UtcNow - client.SendedTime;
                             Logger.WriteCsv(client.LogStats);
 
                             if (client.DisposeAfterTransmitAnswer)
@@ -192,8 +193,8 @@ namespace rbn.QueueHandler
                     if (client != null)
                     {
                         client.RequestSended = true;
-                        client.SendedTime = DateTime.Now;
-                        client.LogStats.QueueWaitTime = DateTime.Now - client.AddedTime;
+                        client.SendedTime = DateTime.UtcNow;
+                        client.LogStats.QueueWaitTime = DateTime.UtcNow - client.AddedTime;
                     }
                     _queue.Dequeue();
                 }

@@ -21,5 +21,16 @@ namespace client.Config.Data
                 QueryTime.TotalMilliseconds.ToString(CultureInfo.InvariantCulture)
             };
         }
+
+        public string[] GetCsvColumnNames()
+        {
+            return new[]
+            {
+                @"Номер запроса",
+                @"Номер клиента",
+                @"Номер запроса клиента",
+                @"Время работы",
+            };
+        }
     }
 }

@@ -54,7 +54,7 @@ namespace client
                     Byte[] requestPacket = dbRequestPacket.GetPacket().ToBytes();
                     tcpClient.GetStream().Write(requestPacket, 0, requestPacket.Length);
 
-                    DateTime startTime = DateTime.Now;
+                    DateTime startTime = DateTime.UtcNow;
 
                     var buffer = new byte[1400];
                     Packet packet;
@@ -81,7 +81,7 @@ namespace client
                     //    for (int i = 0; i < dt.Columns.Count; i++) answer += dt.Rows[j][i] + "\t";
                     //}
 
-                    var queryTime = DateTime.Now - startTime;
+                    var queryTime = DateTime.UtcNow - startTime;
                     _clientStatsData.WaitTime += queryTime;
                     _clientStatsData.Answer = null; //answer;
                     Console.WriteLine(@"Клиент: {0}	Запрос: {1}	Время выполнения: {2}", _number, i, queryTime);

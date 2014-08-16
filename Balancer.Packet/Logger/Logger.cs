@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using System.Threading;
 using Balancer.Common.Logger.Data;
 
@@ -44,7 +45,7 @@ namespace Balancer.Common.Logger
         {
             Mut.WaitOne();
             string csvLine = string.Join(";", messages);
-            File.AppendAllText(_csvFileName, csvLine + Environment.NewLine);
+            File.AppendAllText(_csvFileName, csvLine + Environment.NewLine, Encoding.UTF8);
             Mut.ReleaseMutex();
         }
 
@@ -53,6 +54,10 @@ namespace Balancer.Common.Logger
         /// </summary>
         public static void WriteCsv(ILogStats logStats)
         {
+            if (!File.Exists(_csvFileName))
+            {
+                WriteCsv(logStats.GetCsvColumnNames());
+            }
             WriteCsv(logStats.GetCsvParams());
         }
 
