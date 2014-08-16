@@ -22,5 +22,6 @@
     public interface ILogStats
     {
         string[] GetCsvParams();
+        string[] GetCsvColumnNames();
     }
 }

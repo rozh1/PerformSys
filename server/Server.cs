@@ -229,7 +229,7 @@ namespace server
         {
             DataTable dt;
             Logger.Write("Запрос начал выполнение");
-            var startTime = DateTime.Now;
+            var startTime = DateTime.UtcNow;
 
             switch (ServerConfig.Instance.Server.WorkMode)
             {
@@ -243,7 +243,7 @@ namespace server
                     throw new ArgumentOutOfRangeException("ServerConfig.Instance.Server.WorkMode Нет такого режима работы");
             }
 
-            elapsedTime = DateTime.Now - startTime;
+            elapsedTime = DateTime.UtcNow - startTime;
             Logger.Write("Запрос " + requestPacket.QueryNumber + " выполнен за " + elapsedTime.Milliseconds.ToString(CultureInfo.InvariantCulture) + " мс");
             return dt;
         }
