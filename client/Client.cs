@@ -8,6 +8,7 @@ using Balancer.Common;
 using Balancer.Common.Logger;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
+using Balancer.Common.Utils;
 using client.Properties;
 
 namespace client
@@ -23,6 +24,7 @@ namespace client
         private readonly int _queryNumber;
         private ClientStatsData _clientStatsData;
         private readonly Config.Config _config;
+        private Balancer.Common.Utils.PacketTransmitHelper packetTransmitHelper;
 
         public Client(Config.Config config, int number, int queryNumber)
         {
@@ -32,6 +34,7 @@ namespace client
             _number = number;
             _queryNumber = queryNumber;
             _config = config;
+            packetTransmitHelper = new PacketTransmitHelper();
             var t = new Thread(ClientThread);
             t.Start();
         }
@@ -50,27 +53,14 @@ namespace client
                 if (tcpClient.Connected)
                 {
                     string query = Resources.ResourceManager.GetString("q" + _queryNumber);
+
                     var dbRequestPacket = new DbRequestPacket(query, _queryNumber);
-                    Byte[] requestPacket = dbRequestPacket.GetPacket().ToBytes();
-                    tcpClient.GetStream().Write(requestPacket, 0, requestPacket.Length);
+                    packetTransmitHelper.Send(dbRequestPacket.GetPacket(), tcpClient.GetStream());
 
                     DateTime startTime = DateTime.UtcNow;
 
-                    var buffer = new byte[1400];
-                    Packet packet;
-                    do
-                    {
-                        string packetData = "";
-
-                        int count;
-                        while ((count = tcpClient.GetStream().Read(buffer, 0, buffer.Length)) > 0)
-                        {
-                            packetData += Encoding.ASCII.GetString(buffer, 0, count);
-                            if (packetData.IndexOf(Packet.PacketEnd, StringComparison.Ordinal) >= 0) break;
-                        }
-                        packet = new Packet(packetData);
-                    } while (packet.Type != PacketType.Answer);
-
+                    Packet packet = packetTransmitHelper.Recive(tcpClient.GetStream());
+                    
                     //var dt = (DataTable)SerializeMapper.Deserialize(packet.Data);
                     //
                     //string answer = "";
