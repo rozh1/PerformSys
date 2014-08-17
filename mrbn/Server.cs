@@ -119,6 +119,7 @@ namespace mrbn
                             var dbAnswerPacket = new DbAnswerPacket(packet.Data);
                             RBN remoteRbn = _balancer.GetRbnByRegionId((int) dbAnswerPacket.RegionId);
                             Logger.Write(string.Format("Получен ответ для {1} из {0} РБН", rbn.RegionId, remoteRbn.RegionId));
+                            Debug.Assert(rbn.RegionId != remoteRbn.RegionId, "rbn.RegionId == remoteRbn.RegionId");
                             transmitHelper.Send(packet, remoteRbn.RbnClient.GetStream());
                             break;
                     }

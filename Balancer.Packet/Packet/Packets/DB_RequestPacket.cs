@@ -22,7 +22,7 @@ using Balancer.Common.Utils;
 
 namespace Balancer.Common.Packet.Packets
 {
-    public class DbRequestPacket : PacketBase, IPacket
+    public class DbRequestPacket : PacketBase, IPacket, IClonable<DbRequestPacket>
     {
         public DbRequestPacket(string query, int queryNumber)
         {
@@ -51,7 +51,7 @@ namespace Balancer.Common.Packet.Packets
 
         string SerializePacketData()
         {
-            return SerializeMapper.Serialize(new PacketData()
+            return SerializeMapper.Serialize(new PacketData
             {
                 Query = Query,
                 QueryNumber = QueryNumber,
@@ -76,6 +76,17 @@ namespace Balancer.Common.Packet.Packets
             public string Query { get; set; }
             [DataMember]
             public int QueryNumber { get; set; }
+        }
+
+        public DbRequestPacket Clone()
+        {
+            return new DbRequestPacket(Query, QueryNumber,
+                new PacketBase
+                {
+                    ClientId = ClientId, 
+                    GlobalId = GlobalId, 
+                    RegionId = RegionId
+                });
         }
     }
 }

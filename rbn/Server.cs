@@ -63,7 +63,7 @@ namespace rbn
 
             globalBalancer.RequestRecivedEvent += _rbnQueue.AddClient;
             globalBalancer.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
-            globalBalancer.SendRequestFromQueueEvent += _rbnQueue.SendRequestToServer;
+            globalBalancer.SendRequestFromQueueEvent += _rbnQueue.SendRequestToAnotherRegion;
             globalBalancer.QueryWeightComputeEvent += _rbnQueue.ComputeQueueWeight;
 
             _serverIsLife = true;

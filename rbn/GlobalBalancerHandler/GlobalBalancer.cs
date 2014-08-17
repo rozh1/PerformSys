@@ -68,11 +68,12 @@ namespace rbn.GlobalBalancerHandler
         public bool SendRequest(QueueEntity queueEntity)
         {
             Data.GlobalBalancer globalBalancer = _globalBalancer;
+            var requestPacket = queueEntity.RequestPacket;
             if (globalBalancer != null)
             {
                 if (!globalBalancer.Connection.Connected) return false;
                 if (
-                    !_transmitHelper.Send(queueEntity.RequestPacket.GetPacket(),
+                    !_transmitHelper.Send(requestPacket.GetPacket(),
                         globalBalancer.Connection.GetStream()))
                     return false;
                 Logger.Write("Отправлен запрос от клиента " + queueEntity.ClientId);
