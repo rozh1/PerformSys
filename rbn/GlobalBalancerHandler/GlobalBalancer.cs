@@ -135,6 +135,7 @@ namespace rbn.GlobalBalancerHandler
                                 break;
                             case PacketType.Answer:
                                 var answer = new DbAnswerPacket(packet.Data);
+                                Logger.Write("Получен ответ для " + answer.ClientId);
                                 if (AnswerRecivedEvent != null)
                                     AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
                                 break;
@@ -147,6 +148,7 @@ namespace rbn.GlobalBalancerHandler
                                     DisposeAfterTransmitAnswer = true,
                                     OldId = (int)request.ClientId
                                 };
+                                Logger.Write("Получен запрос из РБН " + request.RegionId);
                                 if (RequestRecivedEvent != null)
                                     RequestRecivedEvent(client);
                                 break;
