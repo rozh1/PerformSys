@@ -4,7 +4,7 @@ using Balancer.Common.Utils;
 
 namespace Balancer.Common.Packet.Packets
 {
-    public class DbAnswerPacket : PacketBase, IPacket
+    public class DbAnswerPacket : PacketBase, IPacket, IClonable<DbAnswerPacket>
     {
         public DbAnswerPacket(string answerPacketData)
         {
@@ -53,6 +53,17 @@ namespace Balancer.Common.Packet.Packets
 
             [DataMember]
             public int QueryNumber { get; set; }
+        }
+
+        public DbAnswerPacket Clone()
+        {
+            return new DbAnswerPacket(AnswerDataTable, QueryNumber,
+               new PacketBase
+               {
+                   ClientId = ClientId,
+                   GlobalId = GlobalId,
+                   RegionId = RegionId
+               });
         }
     }
 }

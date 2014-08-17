@@ -5,6 +5,7 @@ using System.Threading;
 using Balancer.Common.Logger;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
+using rbn.Config;
 using rbn.Config.Data;
 using rbn.Interfaces;
 using rbn.QueueHandler.Data;
@@ -199,6 +200,34 @@ namespace rbn.QueueHandler
                         client.LogStats.QueueWaitTime = DateTime.UtcNow - client.AddedTime;
                     }
                     _queue.Dequeue();
+                }
+            }
+            _sendMutex.ReleaseMutex();
+        }
+
+        /// <summary>
+        ///     Выбор клиента и отправка его запроса в МРБН
+        /// </summary>
+        public void SendRequestToAnotherRegion(IServer server)
+        {
+            _sendMutex.WaitOne(1000);
+            if (_queue.Count > 0)
+            {
+                QueueEntity queueEntity = _queue.Peek();
+                //Debug.Assert(queueEntity.RequestPacket.RegionId == RBNConfig.Instance.RBN.RegionId, "queueEntity.RequestPacket.RegionId == RBNConfig.Instance.RBN.RegionId");
+                if (queueEntity.RequestPacket.RegionId == RBNConfig.Instance.RBN.RegionId)
+                {
+                    if (server.SendRequest(queueEntity))
+                    {
+                        Client client = GetClientById(queueEntity.ClientId);
+                        if (client != null)
+                        {
+                            client.RequestSended = true;
+                            client.SendedTime = DateTime.UtcNow;
+                            client.LogStats.QueueWaitTime = DateTime.UtcNow - client.AddedTime;
+                        }
+                        _queue.Dequeue();
+                    }
                 }
             }
             _sendMutex.ReleaseMutex();
