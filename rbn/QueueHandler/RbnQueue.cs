@@ -214,20 +214,23 @@ namespace rbn.QueueHandler
             if (_queue.Count > 0)
             {
                 QueueEntity queueEntity = _queue.Peek();
-                //Debug.Assert(queueEntity.RequestPacket.RegionId == RBNConfig.Instance.RBN.RegionId, "queueEntity.RequestPacket.RegionId == RBNConfig.Instance.RBN.RegionId");
-                if (queueEntity.RequestPacket.RegionId == RBNConfig.Instance.RBN.RegionId)
+                Client client = GetClientById(queueEntity.ClientId);
+
+                if (queueEntity.RequestPacket.RegionId != RBNConfig.Instance.RBN.RegionId)
                 {
-                    if (server.SendRequest(queueEntity))
+                    queueEntity.RequestPacket.ClientId = (uint)client.OldId;
+                    _clients.Remove(client);
+                }
+
+                if (server.SendRequest(queueEntity))
+                {
+                    if (client != null)
                     {
-                        Client client = GetClientById(queueEntity.ClientId);
-                        if (client != null)
-                        {
-                            client.RequestSended = true;
-                            client.SendedTime = DateTime.UtcNow;
-                            client.LogStats.QueueWaitTime = DateTime.UtcNow - client.AddedTime;
-                        }
-                        _queue.Dequeue();
+                        client.RequestSended = true;
+                        client.SendedTime = DateTime.UtcNow;
+                        client.LogStats.QueueWaitTime = DateTime.UtcNow - client.AddedTime;
                     }
+                    _queue.Dequeue();
                 }
             }
             _sendMutex.ReleaseMutex();
