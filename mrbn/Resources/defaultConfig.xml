@@ -5,4 +5,5 @@
     <RegionId>1</RegionId>
     <Port>3401</Port>
   </MRBN>
+  <LogFile>mrbnLog.txt</LogFile>
 </MRBNConfig>

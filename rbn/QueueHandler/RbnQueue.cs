@@ -22,6 +22,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Balancer.Common.Logger;
+using Balancer.Common.Logger.Data;
+using Balancer.Common.Logger.Enums;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
 using rbn.Config;
@@ -70,7 +72,7 @@ namespace rbn.QueueHandler
 
         public RbnQueue()
         {
-            _transmitHelper = new PacketTransmitHelper();
+            _transmitHelper = new PacketTransmitHelper(Config.RBNConfig.Instance.Log.LogFile);
             _sendMutex = new Mutex();
             _clientSyncObject = new object();
             _queue = new Queue<QueueEntity>();
@@ -147,7 +149,9 @@ namespace rbn.QueueHandler
         /// <param name="dbAnswerPacket">пакет ответа</param>
         public void ServerAnswer(int clientId, DbAnswerPacket dbAnswerPacket)
         {
-            Logger.Write("Получен ответ для клиента " + clientId);
+            Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
+                new StringLogData("Получен ответ для клиента " + clientId), 
+                LogLevel.INFO);
             try
             {
                 lock (_clientSyncObject)
@@ -165,7 +169,9 @@ namespace rbn.QueueHandler
                                client.Connection.GetStream());
 
                             client.LogStats.QueryExecutionTime = DateTime.UtcNow - client.SendedTime;
-                            Logger.WriteCsv(client.LogStats);
+                            Logger.Write(Config.RBNConfig.Instance.Log.StatsFile,
+                                client.LogStats, 
+                                LogLevel.INFO);
 
                             if (client.DisposeAfterTransmitAnswer)
                                 RemoveClient(client);
@@ -176,7 +182,9 @@ namespace rbn.QueueHandler
             }
             catch (Exception ex)
             {
-                Logger.Write("Исключение при передаче ответа клиенту" + ex.Message);
+                Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
+                    new StringLogData("Исключение при передаче ответа клиенту" + ex.Message), 
+                    LogLevel.ERROR);
             }
         }
 

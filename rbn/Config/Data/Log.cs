@@ -17,27 +17,12 @@
  */
 #endregion
 
-﻿using BalancerLogger.Interfaces;
-
-namespace BalancerLogger.LogData
+﻿namespace rbn.Config.Data
 {
-    /// <summary>
-    /// Класс csv-данных.
-    /// </summary>
-    public class CsvData : ILogData
+    public class Log
     {
-        /// <summary>
-        /// Данные.
-        /// </summary>
-        public string[] DataParams { get; set; }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="Data"></param>
-        public CsvData(string[] Data)
-        {
-            DataParams = Data;
-        }
+        public string LogFile { get; set; }
+        public string StatsFile { get; set; }
+        public string QueueStatsFile { get; set; }
     }
 }

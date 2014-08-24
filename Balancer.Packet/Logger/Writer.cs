@@ -17,32 +17,25 @@
  */
 #endregion
 
-﻿using BalancerLogger.Enums;
-using BalancerLogger.Helpers;
-using BalancerLogger.Helpers.WriterHelpers;
-using BalancerLogger.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-namespace BalancerLogger.Writers
+﻿using Balancer.Common.Logger.Enums;
+using Balancer.Common.Logger.Helpers;
+using Balancer.Common.Logger.Helpers.WriterHelpers;
+using Balancer.Common.Logger.Interfaces;
+
+namespace Balancer.Common.Logger
 {
     /// <summary>
-    /// Базовый класс писателя.
+    ///     Базовый класс писателя.
     /// </summary>
     public class Writer : IWriter
     {
         /// <summary>
-        /// Тип файла.
+        ///     Тип файла.
         /// </summary>
         private FileType _fileType;
 
-        public Writer()
-        {
-        }
-
         /// <summary>
-        /// Метод записи лога.
+        ///     Метод записи лога.
         /// </summary>
         /// <param name="filePath">Путь к файлу.</param>
         /// <param name="data">Данные.</param>
@@ -53,20 +46,20 @@ namespace BalancerLogger.Writers
             switch (_fileType)
             {
                 case FileType.TXT:
-                    {
-                        WriteTxt(filePath, data);
-                        break;
-                    }
+                {
+                    WriteTxt(filePath, data);
+                    break;
+                }
                 case FileType.CSV:
-                    {
-                        WriteCsv(filePath, data);
-                        break;
-                    }
+                {
+                    WriteCsv(filePath, data);
+                    break;
+                }
             }
         }
 
         /// <summary>
-        /// Метод записи лога в txt-файл.
+        ///     Метод записи лога в txt-файл.
         /// </summary>
         /// <param name="filePath">Путь к файлу.</param>
         /// <param name="data">Данные.</param>
@@ -76,7 +69,7 @@ namespace BalancerLogger.Writers
         }
 
         /// <summary>
-        /// Метод записи лога в csv-файл.
+        ///     Метод записи лога в csv-файл.
         /// </summary>
         /// <param name="filePath">Путь к файлу.</param>
         /// <param name="data">Данные.</param>

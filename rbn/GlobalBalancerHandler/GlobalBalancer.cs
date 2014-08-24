@@ -21,6 +21,8 @@
 using System.Net.Sockets;
 using System.Threading;
 using Balancer.Common.Logger;
+using Balancer.Common.Logger.Data;
+using Balancer.Common.Logger.Enums;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
@@ -43,7 +45,7 @@ namespace rbn.GlobalBalancerHandler
 
         public GlobalBalancer()
         {
-            _transmitHelper = new PacketTransmitHelper();
+            _transmitHelper = new PacketTransmitHelper(Config.RBNConfig.Instance.Log.LogFile);
             _globalBalancer = new Data.GlobalBalancer
             {
                 Connection = null,
@@ -76,7 +78,9 @@ namespace rbn.GlobalBalancerHandler
                     !_transmitHelper.Send(requestPacket.GetPacket(),
                         globalBalancer.Connection.GetStream()))
                     return false;
-                Logger.Write("Отправлен запрос от клиента " + queueEntity.ClientId);
+                Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
+                    new StringLogData("Отправлен запрос от клиента " + queueEntity.ClientId), 
+                    LogLevel.INFO);
             }
             else return false;
             return true;
@@ -112,12 +116,16 @@ namespace rbn.GlobalBalancerHandler
                 }
                 catch (Exception)
                 {
-                    Logger.Write("Не удалось подключиться к межрегиональному балансировщику. Переподключение");
+                    Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
+                        new StringLogData("Не удалось подключиться к межрегиональному балансировщику. Переподключение"), 
+                        LogLevel.ERROR);
                     Thread.Sleep(1000);
                     continue;
                 }
 
-                Logger.Write("Подключение установлено");
+                Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
+                    new StringLogData("Подключение установлено"), 
+                    LogLevel.INFO);
 
                 globalBalancer.Connection = connection;
 
@@ -136,7 +144,9 @@ namespace rbn.GlobalBalancerHandler
                                 break;
                             case PacketType.Answer:
                                 var answer = new DbAnswerPacket(packet.Data);
-                                Logger.Write("Получен ответ для " + answer.ClientId);
+                                Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
+                                    new StringLogData("Получен ответ для " + answer.ClientId), 
+                                    LogLevel.INFO);
                                 if (AnswerRecivedEvent != null)
                                     AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
                                 break;
@@ -149,7 +159,9 @@ namespace rbn.GlobalBalancerHandler
                                     DisposeAfterTransmitAnswer = true,
                                     OldId = (int)request.ClientId
                                 };
-                                Logger.Write("Получен запрос из РБН " + request.RegionId);
+                                Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
+                                    new StringLogData("Получен запрос из РБН " + request.RegionId), 
+                                    LogLevel.INFO);
                                 if (RequestRecivedEvent != null)
                                     RequestRecivedEvent(client);
                                 break;

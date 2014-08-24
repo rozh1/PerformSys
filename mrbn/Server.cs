@@ -22,6 +22,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Balancer.Common.Logger;
+using Balancer.Common.Logger.Data;
+using Balancer.Common.Logger.Enums;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
@@ -53,7 +55,7 @@ namespace mrbn
         {
             _listener = new TcpListener(IPAddress.Any, port);
             _listener.Start();
-            Logger.Write("Начато прослушивание " + IPAddress.Any + ":" + port);
+            Logger.Write(Config.MRBNConfig.Instance.LogFile, new StringLogData("Начато прослушивание " + IPAddress.Any + ":" + port), LogLevel.INFO);
 
             _balancer = new GlobalBalancer.GlobalBalancer();
 
@@ -62,7 +64,7 @@ namespace mrbn
             while (_serverIsLife)
             {
                 TcpClient tcpClient = _listener.AcceptTcpClient();
-                Logger.Write("Принято соединие");
+                Logger.Write(Config.MRBNConfig.Instance.LogFile, new StringLogData("Принято соединие"), LogLevel.INFO);
 
                 var t = new Thread(ClientThread);
                 t.Start(tcpClient);
@@ -75,7 +77,7 @@ namespace mrbn
         /// <param name="param"></param>
         private void ClientThread(object param)
         {
-            var transmitHelper = new PacketTransmitHelper();
+            var transmitHelper = new PacketTransmitHelper(Config.MRBNConfig.Instance.LogFile);
             var rbnClient = (TcpClient) param;
 
             Packet statusPacket = transmitHelper.Recive(rbnClient.GetStream());
@@ -109,7 +111,7 @@ namespace mrbn
                             break;
                         case PacketType.Request:
                             Debug.Assert(rbn.RelayRbn.RbnClient != null, "rbn.RelayRbn.RbnClient != null");
-                            Logger.Write(string.Format("Предача запроса из {0} в {1} РБН", rbn.RegionId, rbn.RelayRbn.RegionId));
+                            Logger.Write(Config.MRBNConfig.Instance.LogFile, new StringLogData(string.Format("Предача запроса из {0} в {1} РБН", rbn.RegionId, rbn.RelayRbn.RegionId)), LogLevel.INFO);
                             if (transmitHelper.Send(packet, rbn.RelayRbn.RbnClient.GetStream()))
                             {
                                 rbn.RelayRbn = null;
@@ -118,7 +120,7 @@ namespace mrbn
                         case PacketType.Answer: 
                             var dbAnswerPacket = new DbAnswerPacket(packet.Data);
                             RBN remoteRbn = _balancer.GetRbnByRegionId((int) dbAnswerPacket.RegionId);
-                            Logger.Write(string.Format("Получен ответ для {1} из {0} РБН", rbn.RegionId, remoteRbn.RegionId));
+                            Logger.Write(Config.MRBNConfig.Instance.LogFile, new StringLogData(string.Format("Получен ответ для {1} из {0} РБН", rbn.RegionId, remoteRbn.RegionId)), LogLevel.INFO);
                             Debug.Assert(rbn.RegionId != remoteRbn.RegionId, "rbn.RegionId == remoteRbn.RegionId");
                             transmitHelper.Send(packet, remoteRbn.RbnClient.GetStream());
                             break;

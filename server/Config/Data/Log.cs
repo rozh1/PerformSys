@@ -17,27 +17,12 @@
  */
 #endregion
 
-﻿using BalancerLogger.Interfaces;
-
-namespace BalancerLogger.LogData
+﻿namespace server.Config.Data
 {
-    /// <summary>
-    /// Класс txt-данных.
-    /// </summary>
-    public class TxtData : ILogData
+    public class Log
     {
-        /// <summary>
-        /// Данные.
-        /// </summary>
-        public string[] DataParams { get; set; }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="Data"></param>
-        public TxtData(string Line)
-        {
-            DataParams = new[] { Line };
-        }
+        public string LogFile { get; set; }
+        public string StatsFile { get; set; }
+        public string QueueStatsFile { get; set; }
     }
 }

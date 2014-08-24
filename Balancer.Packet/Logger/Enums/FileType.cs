@@ -17,10 +17,10 @@
  */
 #endregion
 
-﻿namespace BalancerLogger.Enums
+﻿namespace Balancer.Common.Logger.Enums
 {
     /// <summary>
-    /// Расширение файла.
+    ///     Расширение файла.
     /// </summary>
     public enum FileType
     {

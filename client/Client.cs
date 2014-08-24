@@ -19,12 +19,10 @@
 
 ﻿using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
-using Balancer.Common;
 using Balancer.Common.Logger;
+using Balancer.Common.Logger.Enums;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
@@ -38,22 +36,22 @@ namespace client
     internal class Client
     {
         private readonly string _address;
+        private readonly Config.Config _config;
         private readonly int _number;
         private readonly int _port;
         private readonly int _queryNumber;
+        private readonly PacketTransmitHelper _packetTransmitHelper;
         private ClientStatsData _clientStatsData;
-        private readonly Config.Config _config;
-        private Balancer.Common.Utils.PacketTransmitHelper packetTransmitHelper;
 
         public Client(Config.Config config, int number, int queryNumber)
         {
             _address = config.BalancerHost;
             Debug.Assert(config.BalancerPort != null, "config.BalancerPort != null");
-            _port = (int)config.BalancerPort;
+            _port = (int) config.BalancerPort;
             _number = number;
             _queryNumber = queryNumber;
             _config = config;
-            packetTransmitHelper = new PacketTransmitHelper();
+            _packetTransmitHelper = new PacketTransmitHelper("clentLog.txt");
             var t = new Thread(ClientThread);
             t.Start();
         }
@@ -74,12 +72,12 @@ namespace client
                     string query = Resources.ResourceManager.GetString("q" + _queryNumber);
 
                     var dbRequestPacket = new DbRequestPacket(query, _queryNumber);
-                    packetTransmitHelper.Send(dbRequestPacket.GetPacket(), tcpClient.GetStream());
+                    _packetTransmitHelper.Send(dbRequestPacket.GetPacket(), tcpClient.GetStream());
 
                     DateTime startTime = DateTime.UtcNow;
 
-                    Packet packet = packetTransmitHelper.Recive(tcpClient.GetStream());
-                    
+                    Packet packet = _packetTransmitHelper.Recive(tcpClient.GetStream());
+
                     //var dt = (DataTable)SerializeMapper.Deserialize(packet.Data);
                     //
                     //string answer = "";
@@ -90,7 +88,7 @@ namespace client
                     //    for (int i = 0; i < dt.Columns.Count; i++) answer += dt.Rows[j][i] + "\t";
                     //}
 
-                    var queryTime = DateTime.UtcNow - startTime;
+                    TimeSpan queryTime = DateTime.UtcNow - startTime;
                     _clientStatsData.WaitTime += queryTime;
                     _clientStatsData.Answer = null; //answer;
                     Console.WriteLine(@"Клиент: {0}	Запрос: {1}	Время выполнения: {2}", _number, i, queryTime);
@@ -100,7 +98,7 @@ namespace client
                     _config.LogStats.QueryNumber = _queryNumber;
                     _config.LogStats.QueryTime = queryTime;
 
-                    Logger.WriteCsv(_config.LogStats);
+                    Logger.Write("statsClient.csv", _config.LogStats, LogLevel.INFO);
                 }
             }
             tcpClient.Close();

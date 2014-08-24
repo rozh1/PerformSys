@@ -17,13 +17,17 @@
  */
 #endregion
 
-﻿namespace Balancer.Common.Logger.Interfaces
+﻿using Balancer.Common.Logger.Interfaces;
+
+namespace Balancer.Common.Logger.Data
 {
-    /// <summary>
-    ///     Интерфейс формата данных для логировщика.
-    /// </summary>
-    public interface ILogData
+    public class StringLogData : ILogData
     {
-        string[] DataParams { get; }
+        public StringLogData(string text)
+        {
+            DataParams = new[] {text};
+        }
+
+        public string[] DataParams { get; set; }
     }
 }

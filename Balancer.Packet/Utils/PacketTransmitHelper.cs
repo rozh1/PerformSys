@@ -20,11 +20,19 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Text;
+using Balancer.Common.Logger.Data;
+using Balancer.Common.Logger.Enums;
 
 namespace Balancer.Common.Utils
 {
     public class PacketTransmitHelper
     {
+        private readonly string _logFilePath;
+        public PacketTransmitHelper(string logFilePath)
+        {
+            _logFilePath = logFilePath;
+        }
+
         private string _nextPacketData = string.Empty;
 
         public bool Send(Packet.Packet packet, NetworkStream networkStream)
@@ -41,7 +49,10 @@ namespace Balancer.Common.Utils
                 }
                 catch (Exception ex)
                 {
-                    //Logger.Logger.Write("Исключение при попытке отправки: " + ex.Message);
+                    Logger.Logger.Write(_logFilePath, 
+                        new StringLogData(string.Format(
+                            @"Исключение при попытке отправки: {0} ", ex.Message
+                            )), LogLevel.ERROR);
                 }
                 return result;
             }
@@ -94,13 +105,20 @@ namespace Balancer.Common.Utils
                 }
                 else
                 {
-                    //if (count == 0) Logger.Logger.Write("Произошло отключение");
-                    //if (count < 0) Logger.Logger.Write("Ошибка соедиения");
+                    if (count == 0)
+                        Logger.Logger.Write(_logFilePath, new StringLogData(
+                            @"Произошло отключение"), LogLevel.ERROR);
+                    if (count < 0)
+                        Logger.Logger.Write(_logFilePath, new StringLogData(
+                            @"Ошибка приема"), LogLevel.ERROR);
                 }
             }
             catch (Exception ex)
             {
-                //Logger.Logger.Write("Исключение при чтении ответа: " + ex.Message);
+                Logger.Logger.Write(_logFilePath,
+                    new StringLogData(string.Format(
+                        @"Исключение при чтении ответа: {0} ", ex.Message
+                        )), LogLevel.ERROR);
             }
             return packet;
         }

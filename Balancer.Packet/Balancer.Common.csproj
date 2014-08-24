@@ -39,7 +39,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Logger\BalancerLogger.cs" />
+    <Compile Include="Logger\Logger.cs" />
+    <Compile Include="Logger\Data\StringLogData.cs" />
     <Compile Include="Logger\Enums\FileType.cs" />
     <Compile Include="Logger\Enums\LoggerLevel.cs" />
     <Compile Include="Logger\Enums\LogMode.cs" />
@@ -49,8 +50,6 @@
     <Compile Include="Logger\Interfaces\ICsvLogData.cs" />
     <Compile Include="Logger\Interfaces\ILogData.cs" />
     <Compile Include="Logger\Interfaces\IWriter.cs" />
-    <Compile Include="Logger\LogData\CsvData.cs" />
-    <Compile Include="Logger\LogData\TxtData.cs" />
     <Compile Include="Logger\Writer.cs" />
     <Compile Include="Packet\Packets\IPacket.cs" />
     <Compile Include="Packet\Packets\PacketBase.cs" />

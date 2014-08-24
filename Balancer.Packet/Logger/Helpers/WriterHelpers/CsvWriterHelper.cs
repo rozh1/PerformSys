@@ -18,29 +18,27 @@
 #endregion
 
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace BalancerLogger.Helpers.WriterHelpers
+namespace Balancer.Common.Logger.Helpers.WriterHelpers
 {
     /// <summary>
-    /// 
     /// </summary>
-    public class CsvWriterHelper
+    public static class CsvWriterHelper
     {
         /// <summary>
-        /// Мьютекс для синхронизации записи лога в файл.
+        ///     Мьютекс для синхронизации записи лога в файл.
         /// </summary>
         private static readonly Mutex Mut = new Mutex();
 
         /// <summary>
-        /// Метод записи лога в .csv файл
+        ///     Метод записи лога в .csv файл
         /// </summary>
-        /// <param name="filePath">Путь к .csv файлу.param>
-        /// <param name="data">Данные лога.</param>
+        /// <param name="filePath">
+        ///     Путь к .csv файлу.param>
+        ///     <param name="data">Данные лога.</param>
         public static void CsvWrite(string filePath, string[] data)
         {
             Mut.WaitOne();

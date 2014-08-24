@@ -17,16 +17,16 @@
  */
 #endregion
 
-﻿namespace BalancerLogger.Enums
+﻿namespace Balancer.Common.Logger.Enums
 {
     /// <summary>
-    /// Уровень логирования.
+    ///     Уровень логирования.
     /// </summary>
     public enum LogLevel
     {
         DEBUG = 0,
-        INFO =  1,
-        WARN =  2,
+        INFO = 1,
+        WARN = 2,
         ERROR = 3,
         FATAL = 4
     }

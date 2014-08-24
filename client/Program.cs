@@ -20,6 +20,8 @@
 ﻿using System;
 using System.Diagnostics;
 using Balancer.Common.Logger;
+using Balancer.Common.Logger.Data;
+using Balancer.Common.Logger.Enums;
 using client.ComandLineParamsParser;
 using client.Config.Data;
 
@@ -29,9 +31,6 @@ namespace client
     {
         private static void Main(string[] args)
         {
-
-            BalancerLogger.BalancerLogger.Log("test.txt", new Balancer.Common.Logger.Interfaces.ICsvLogData() { DataColumnNames = { "column1", "column2" }, DataParams = { "1","2"} }, BalancerLogger.Enums.LogLevel.DEBUG);
-
             if (args.Length < 5)
             {
                 Console.WriteLine(@"Использование эмулятора клиентов {0}:", AppDomain.CurrentDomain.FriendlyName);
@@ -47,13 +46,12 @@ namespace client
 
             if (!string.IsNullOrEmpty(parser.ErrorText))
             {
-                Logger.Write(parser.ErrorText);
+                Logger.Write("clientLog.txt", new StringLogData(parser.ErrorText), LogLevel.FATAL);
                 Environment.Exit(-1);
             }
 
             Config.Config config = parser.GetConfig();
             config.LogStats = new LogStats();
-            Logger.SetCsvLogFile("statsClients.csv");
 
             Debug.Assert(config.ClientCount != null, "config.ClientCount != null");
             var clients = new Client[(int)config.ClientCount];

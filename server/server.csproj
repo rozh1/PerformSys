@@ -65,6 +65,7 @@
     <Compile Include="Config\Data\Server.cs" />
     <Compile Include="Config\Data\RBN.cs" />
     <Compile Include="Config\Data\SimulationSizes.cs" />
+    <Compile Include="Config\Data\Log.cs" />
     <Compile Include="Config\ServerConfig.cs" />
     <Compile Include="Config\Data\DataBase.cs" />
     <Compile Include="DataBase\MySQL.cs" />

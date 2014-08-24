@@ -118,6 +118,12 @@ namespace server.Config
                     },
                     WorkMode = WorkMode.Simulation
                 },
+                Log = new Log()
+                {
+                    LogFile = "serverLog.txt",
+                    QueueStatsFile = "serverQueue.csv",
+                    StatsFile = "serverStats.csv"
+                }
             };
         }
 
