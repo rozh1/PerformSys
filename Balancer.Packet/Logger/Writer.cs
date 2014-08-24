@@ -25,21 +25,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-
 namespace BalancerLogger.Writers
 {
     /// <summary>
     /// Базовый класс писателя.
     /// </summary>
-    public class BaseWriter : IWriter
+    public class Writer : IWriter
     {
         /// <summary>
         /// Тип файла.
         /// </summary>
         private FileType _fileType;
 
-        public BaseWriter()
+        public Writer()
         {
         }
 

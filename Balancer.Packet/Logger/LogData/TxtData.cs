@@ -17,20 +17,27 @@
  */
 #endregion
 
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BalancerLogger.Interfaces;
 
-namespace BalancerLogger.Enums
+namespace BalancerLogger.LogData
 {
     /// <summary>
-    /// Расширение файла.
+    /// Класс txt-данных.
     /// </summary>
-    public enum FileType
+    public class TxtData : ILogData
     {
-        TXT = 0,
-        CSV = 1
+        /// <summary>
+        /// Данные.
+        /// </summary>
+        public string[] DataParams { get; set; }
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="Data"></param>
+        public TxtData(string Line)
+        {
+            DataParams = new[] { Line };
+        }
     }
 }

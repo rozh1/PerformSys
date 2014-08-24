@@ -17,19 +17,14 @@
  */
 #endregion
 
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BalancerLogger.Interfaces
+﻿namespace BalancerLogger.Enums
 {
     /// <summary>
-    /// Интерфейс писателя логов.
+    /// Расширение файла.
     /// </summary>
-    public interface IWriter
+    public enum FileType
     {
-        void Write(string filePath, string[] data);
+        TXT = 0,
+        CSV = 1
     }
 }

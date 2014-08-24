@@ -41,7 +41,7 @@ namespace Balancer.Common.Utils
                 }
                 catch (Exception ex)
                 {
-                    Logger.Logger.Write("Исключение при попытке отправки: " + ex.Message);
+                    //Logger.Logger.Write("Исключение при попытке отправки: " + ex.Message);
                 }
                 return result;
             }
@@ -94,13 +94,13 @@ namespace Balancer.Common.Utils
                 }
                 else
                 {
-                    if (count == 0) Logger.Logger.Write("Произошло отключение");
-                    if (count < 0) Logger.Logger.Write("Ошибка соедиения");
+                    //if (count == 0) Logger.Logger.Write("Произошло отключение");
+                    //if (count < 0) Logger.Logger.Write("Ошибка соедиения");
                 }
             }
             catch (Exception ex)
             {
-                Logger.Logger.Write("Исключение при чтении ответа: " + ex.Message);
+                //Logger.Logger.Write("Исключение при чтении ответа: " + ex.Message);
             }
             return packet;
         }

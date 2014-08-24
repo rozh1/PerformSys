@@ -23,14 +23,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace BalancerLogger.Helpers.WriterHelpers
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class CsvWriterHelper
+    public class TxtWriterHelper
     {
         /// <summary>
         /// Мьютекс для синхронизации записи лога в файл.
@@ -38,17 +34,20 @@ namespace BalancerLogger.Helpers.WriterHelpers
         private static readonly Mutex Mut = new Mutex();
 
         /// <summary>
-        /// Метод записи лога в .csv файл
+        /// Метод записи лога в .txt файл
         /// </summary>
-        /// <param name="filePath">Путь к .csv файлу.param>
+        /// <param name="filePath">Путь к .txt файлу.param>
         /// <param name="data">Данные лога.</param>
-        public static void CsvWrite(string filePath, string[] data)
+        public static void TxtWrite(string filePath, string[] data)
         {
             Mut.WaitOne();
 
-            string csvLine = string.Join(";", data);
-            File.AppendAllText(filePath, csvLine + Environment.NewLine, Encoding.UTF8);
-
+            foreach (string item in data)
+            {
+                File.AppendAllText(filePath,
+                @"[" + DateTime.Now.ToLongDateString() + @" " + DateTime.Now.ToLongTimeString() + @"] " + item + @"");
+            }
+            
             Mut.ReleaseMutex();
         }
     }

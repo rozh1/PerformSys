@@ -17,23 +17,13 @@
  */
 #endregion
 
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BalancerLogger.Enums
+﻿namespace BalancerLogger.Interfaces
 {
     /// <summary>
-    /// Уровень логирования.
+    /// Интерфейс писателя логов.
     /// </summary>
-    public enum LogLevel
+    public interface IWriter
     {
-        DEBUG = 0,
-        INFO =  1,
-        WARN =  2,
-        ERROR = 3,
-        FATAL = 4
+        void Write(string filePath, string[] data);
     }
 }

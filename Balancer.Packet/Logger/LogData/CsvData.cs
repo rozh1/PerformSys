@@ -18,32 +18,26 @@
 #endregion
 
 ﻿using BalancerLogger.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace BalancerLogger.Writers
+namespace BalancerLogger.LogData
 {
     /// <summary>
-    /// Класс писателя события Event3.
+    /// Класс csv-данных.
     /// </summary>
-    class EventWriter3 : BaseWriter, IWriter
+    public class CsvData : ILogData
     {
-        public EventWriter3()
-            : base()
-        {
-        }
+        /// <summary>
+        /// Данные.
+        /// </summary>
+        public string[] DataParams { get; set; }
 
         /// <summary>
-        /// Метод записи лога.
+        /// Конструктор.
         /// </summary>
-        /// <param name="filePath">Путь к файлу.</param>
-        /// <param name="data">Данные.</param>
-        public void Write(string filePath, string[] data)
+        /// <param name="Data"></param>
+        public CsvData(string[] Data)
         {
-            base.Write(filePath, data);
+            DataParams = Data;
         }
     }
 }

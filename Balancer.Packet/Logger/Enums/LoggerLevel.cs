@@ -17,11 +17,17 @@
  */
 #endregion
 
-﻿namespace Balancer.Common.Logger.Data
+﻿namespace BalancerLogger.Enums
 {
-    public interface ILogStats
+    /// <summary>
+    /// Уровень логирования.
+    /// </summary>
+    public enum LogLevel
     {
-        string[] GetCsvParams();
-        string[] GetCsvColumnNames();
+        DEBUG = 0,
+        INFO =  1,
+        WARN =  2,
+        ERROR = 3,
+        FATAL = 4
     }
 }

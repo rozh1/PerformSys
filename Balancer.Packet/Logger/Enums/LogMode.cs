@@ -17,32 +17,14 @@
  */
 #endregion
 
-﻿using BalancerLogger.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BalancerLogger.LogData
+﻿namespace BalancerLogger.Enums
 {
     /// <summary>
-    /// Класс csv-данных.
+    /// Мод логирования.
     /// </summary>
-    public class CsvData : ILogData
+    public enum LogMode
     {
-        /// <summary>
-        /// Данные.
-        /// </summary>
-        public string[] DataParams { get; set; }
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        /// <param name="Data"></param>
-        public CsvData(string[] Data)
-        {
-            DataParams = Data;
-        }
+        SINGLE = 0,
+        MULTIPLE = 1
     }
 }

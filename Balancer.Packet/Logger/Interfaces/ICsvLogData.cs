@@ -22,28 +22,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace BalancerLogger.Writers
-{
+namespace Balancer.Common.Logger.Interfaces
+{       
     /// <summary>
-    /// Класс писателя события Event2.
+    /// Интерфейс формата данных логировщика .
     /// </summary>
-    public class EventWriter2 : BaseWriter, IWriter
+    public interface ICsvLogData : ILogData
     {
-        public EventWriter2()
-            : base()
-        {
-        }
-
-        /// <summary>
-        /// Метод записи лога.
-        /// </summary>
-        /// <param name="filePath">Путь к файлу.</param>
-        /// <param name="data">Данные.</param>
-        public void Write(string filePath, string[] data)
-        {
-            base.Write(filePath,data);
-        }
+        string[] DataColumnNames { get; set; }
+        string[] DataParams { get; set; }
     }
 }

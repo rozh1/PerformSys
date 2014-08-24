@@ -29,6 +29,9 @@ namespace client
     {
         private static void Main(string[] args)
         {
+
+            BalancerLogger.BalancerLogger.Log("test.txt", new Balancer.Common.Logger.Interfaces.ICsvLogData() { DataColumnNames = { "column1", "column2" }, DataParams = { "1","2"} }, BalancerLogger.Enums.LogLevel.DEBUG);
+
             if (args.Length < 5)
             {
                 Console.WriteLine(@"Использование эмулятора клиентов {0}:", AppDomain.CurrentDomain.FriendlyName);
