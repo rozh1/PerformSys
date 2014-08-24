@@ -470,4 +470,9 @@
       </SimulationSizes>
     </DataBase>
   </DataBase>
+  <Log>
+    <LogFile>serverLog.txt</LogFile>
+    <StatsFile>serverStats.csv</StatsFile>
+    <QueueStatsFile>serverQueue.csv</QueueStatsFile>
+  </Log>
 </ServerConfig>

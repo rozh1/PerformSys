@@ -51,7 +51,7 @@ namespace client.ComandLineParamsParser
             int output;
             if (int.TryParse(str, out output))
                 return output;
-            Logger.Write("После ключа " + key + " должно следовать число!");
+            //Logger.Write("После ключа " + key + " должно следовать число!");
             Environment.Exit(-1);
             return 0;
         }

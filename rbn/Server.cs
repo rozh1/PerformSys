@@ -1,8 +1,9 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using Balancer.Common;
 using Balancer.Common.Logger;
+using Balancer.Common.Logger.Data;
+using Balancer.Common.Logger.Enums;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
 using rbn.GlobalBalancerHandler;
@@ -51,12 +52,16 @@ namespace rbn
 
             _listener = new TcpListener(IPAddress.Any, port);
             _listener.Start();
-            Logger.Write("Начато прослушивание клиентов " + IPAddress.Any + ":" + port);
+            Logger.Write(Config.RBNConfig.Instance.Log.LogFile, 
+                new StringLogData("Начато прослушивание клиентов " + IPAddress.Any + ":" + port), 
+                LogLevel.INFO);
 
             while (_serverIsLife)
             {
                 TcpClient tcpClient = _listener.AcceptTcpClient();
-                Logger.Write("Принято соединие");
+                Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
+                    new StringLogData("Принято соединие"), 
+                    LogLevel.INFO);
 
                 var t = new Thread(ClientThread);
                 t.Start(tcpClient);
@@ -69,7 +74,7 @@ namespace rbn
         /// <param name="param"></param>
         private void ClientThread(object param)
         {
-            var transmitHelper = new PacketTransmitHelper();
+            var transmitHelper = new PacketTransmitHelper(Config.RBNConfig.Instance.Log.LogFile);
             var tcpClient = (TcpClient) param;
             var client = new Client();
             while (tcpClient.Connected)
@@ -93,7 +98,7 @@ namespace rbn
                     tcpClient.Close();
                 }
             }
-            Logger.Write("Клиент отключен:");
+            Logger.Write(Config.RBNConfig.Instance.Log.LogFile, new StringLogData("Клиент отключен"), LogLevel.INFO);
             _rbnQueue.RemoveClient(client);
         }
 

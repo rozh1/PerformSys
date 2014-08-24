@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Xml.Serialization;
-using Balancer.Common.Logger;
 using mrbn.Config.Data;
 
 namespace mrbn.Config
@@ -12,7 +11,9 @@ namespace mrbn.Config
         public static MRBNConfig Instance;
 
         public MRBN MRBN { get; set; }
-        
+
+        public string LogFile { get; set; }
+
         public void Save(string fileName)
         {
             using (var writer = new StreamWriter(fileName))
@@ -40,7 +41,7 @@ namespace mrbn.Config
             }
             catch (Exception e)
             {
-                Logger.Write(e.Message);
+                Console.WriteLine(e.Message);
             }
             return Instance;
         }

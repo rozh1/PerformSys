@@ -1,7 +1,7 @@
-﻿namespace BalancerLogger.Enums
+﻿namespace Balancer.Common.Logger.Enums
 {
     /// <summary>
-    /// Мод логирования.
+    ///     Мод логирования.
     /// </summary>
     public enum LogMode
     {

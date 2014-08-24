@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Xml.Serialization;
-using Balancer.Common;
-using Balancer.Common.Logger;
+using rbn.Config.Data;
 
 namespace rbn.Config
 {
@@ -14,6 +13,8 @@ namespace rbn.Config
         public Data.RBN RBN { get; set; }
 
         public Data.MRBN MRBN { get; set; }
+
+        public Log Log { get; set; }
 
         /// <summary>
         ///     Конфиг серверов
@@ -47,7 +48,7 @@ namespace rbn.Config
             }
             catch (Exception e)
             {
-                Logger.Write(e.Message);
+                Console.WriteLine(e.Message);
             }
             return Instance;
         }

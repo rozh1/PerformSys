@@ -14,4 +14,9 @@
   <Server>
     <Port>3410</Port>
   </Server>
+  <Log>
+    <LogFile>rbnLog.txt</LogFile>
+    <StatsFile>rbnStats.csv</StatsFile>
+    <QueueStatsFile>rbnQueue.csv</QueueStatsFile>
+  </Log>
 </RBNConfig>

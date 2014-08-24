@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using Balancer.Common;
 using Balancer.Common.Logger;
+using Balancer.Common.Logger.Data;
+using Balancer.Common.Logger.Enums;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
@@ -52,13 +53,15 @@ namespace rbn.ServersHandler
 
         public Servers(int port)
         {
-            _transmitHelper = new PacketTransmitHelper();
+            _transmitHelper = new PacketTransmitHelper(Config.RBNConfig.Instance.Log.LogFile);
             _serversList = new List<Server>();
             _serversThreads = new List<Thread>();
 
             _listener = new TcpListener(IPAddress.Any, port);
             _listener.Start();
-            Logger.Write("Начато прослушивание серверов " + IPAddress.Any + ":" + port);
+            Logger.Write(Config.RBNConfig.Instance.Log.LogFile, 
+                new StringLogData("Начато прослушивание серверов " + IPAddress.Any + ":" + port), 
+                LogLevel.INFO);
 
             var thread = new Thread(SendThread);
             thread.Start();
@@ -81,7 +84,9 @@ namespace rbn.ServersHandler
             if (server != null)
             {
                 SendRequest(server, queueEntity.RequestPacket);
-                Logger.Write("Отправлен запрос от клиента " + queueEntity.ClientId);
+                Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
+                    new StringLogData("Отправлен запрос от клиента " + queueEntity.ClientId), 
+                    LogLevel.INFO);
             }
             else return false;
             return true;
@@ -119,7 +124,7 @@ namespace rbn.ServersHandler
                 while (_serverIsLife)
                 {
                     TcpClient tcpClient = _listener.AcceptTcpClient();
-                    Logger.Write("Подключен сервер");
+                    Logger.Write(Config.RBNConfig.Instance.Log.LogFile,new StringLogData("Подключен сервер"), LogLevel.INFO);
                     var server = new Server { Connection = tcpClient };
                     AddServer(server);
                     var serverThread = new Thread(ServerListenThread);
@@ -205,9 +210,11 @@ namespace rbn.ServersHandler
                                 AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
                             break;
                         case PacketType.DataBaseInfo:
-                            var dataBaseInfoPacket = new DataBaseInfoPacket(packet.Data);
-                            dataBaseInfoPacket.RegionId = Config.RBNConfig.Instance.RBN.RegionId;
-                            dataBaseInfoPacket.GlobalId = Config.RBNConfig.Instance.RBN.GlobalId;
+                            var dataBaseInfoPacket = new DataBaseInfoPacket(packet.Data)
+                            {
+                                RegionId = Config.RBNConfig.Instance.RBN.RegionId,
+                                GlobalId = Config.RBNConfig.Instance.RBN.GlobalId
+                            };
                             if (DataBaseInfoRecivedEvent != null) DataBaseInfoRecivedEvent(dataBaseInfoPacket);
                             break;
                         default:

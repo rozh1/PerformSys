@@ -1,7 +1,7 @@
-﻿namespace BalancerLogger.Interfaces
+﻿namespace Balancer.Common.Logger.Interfaces
 {
     /// <summary>
-    /// Интерфейс писателя логов.
+    ///     Интерфейс писателя логов.
     /// </summary>
     public interface IWriter
     {

@@ -11,26 +11,33 @@ namespace client.Config.Data
         public int ClientQueryNumber { get; set; }
         public TimeSpan QueryTime { get; set; }
 
-        public string[] GetCsvParams()
+        public string[] DataColumnNames
         {
-            return new[]
+            get
             {
-                QueryNumber.ToString(CultureInfo.CurrentCulture),
-                ClientNumber.ToString(CultureInfo.CurrentCulture),
-                ClientQueryNumber.ToString(CultureInfo.CurrentCulture),
-                QueryTime.TotalMilliseconds.ToString(CultureInfo.CurrentCulture)
-            };
+                return new[]
+                {
+                    @"Номер запроса",
+                    @"Номер клиента",
+                    @"Номер запроса клиента",
+                    @"Время работы",
+                };
+                
+            }
         }
 
-        public string[] GetCsvColumnNames()
+        public string[] DataParams
         {
-            return new[]
+            get
             {
-                @"Номер запроса",
-                @"Номер клиента",
-                @"Номер запроса клиента",
-                @"Время работы",
-            };
+                return new[]
+                {
+                    QueryNumber.ToString(CultureInfo.CurrentCulture),
+                    ClientNumber.ToString(CultureInfo.CurrentCulture),
+                    ClientQueryNumber.ToString(CultureInfo.CurrentCulture),
+                    QueryTime.TotalMilliseconds.ToString(CultureInfo.CurrentCulture)
+                };
+            }
         }
     }
 }

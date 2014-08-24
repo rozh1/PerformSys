@@ -1,16 +1,13 @@
-﻿using BalancerLogger.Enums;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
+using Balancer.Common.Logger.Enums;
 
-namespace BalancerLogger.Helpers
+namespace Balancer.Common.Logger.Helpers
 {
-    public class CommonHelpers
+    public static class CommonHelpers
     {
         /// <summary>
-        /// Метод, определяющий FileType по filePath.
+        ///     Метод, определяющий FileType по filePath.
         /// </summary>
         /// <param name="filePath">Путь к файлу.</param>
         /// <returns>FileType файла.</returns>
@@ -24,26 +21,26 @@ namespace BalancerLogger.Helpers
             switch (exe.ToUpper())
             {
                 case "TXT":
-                    {
-                        type = FileType.TXT;
-                        break;
-                    }
+                {
+                    type = FileType.TXT;
+                    break;
+                }
                 case "CSV":
-                    {
-                        type = FileType.CSV;
-                        break;
-                    }
+                {
+                    type = FileType.CSV;
+                    break;
+                }
                 default:
-                    {
-                        type = FileType.TXT;
-                        break;
-                    }
+                {
+                    type = FileType.TXT;
+                    break;
+                }
             }
             return type;
         }
 
         /// <summary>
-        /// Метод создания директории файла, если директории не суәествует
+        ///     Метод создания директории файла, если директории не суәествует
         /// </summary>
         /// <param name="filePath">Абсолютный путь к файлу.</param>
         public static void CreateIfNotExistDirectory(string filePath)
@@ -55,7 +52,7 @@ namespace BalancerLogger.Helpers
         }
 
         /// <summary>
-        /// Метод получения абсолютного пути к файлу.
+        ///     Метод получения абсолютного пути к файлу.
         /// </summary>
         /// <param name="dir">Директория.</param>
         /// <param name="fileName">Имя файла.</param>

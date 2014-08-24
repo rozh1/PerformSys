@@ -1,7 +1,8 @@
 ﻿using System.IO;
 using System.Text;
-using Balancer.Common;
 using Balancer.Common.Logger;
+using Balancer.Common.Logger.Data;
+using Balancer.Common.Logger.Enums;
 using rbn.Config;
 using rbn.Properties;
 
@@ -11,10 +12,6 @@ namespace rbn
     {
         private static void Main()
         {
-            Logger.SetLogFile("rbnLog.txt");
-            Logger.SetCsvLogFile("statsRBN.csv");
-            Logger.Write("Сервер запущен");
-
             const string configFilePath = "rbnConfig.xml";
             if (!File.Exists(configFilePath))
             {
@@ -22,6 +19,9 @@ namespace rbn
                     new MemoryStream(Encoding.UTF8.GetBytes(Resources.defaultConfig))).Save(configFilePath);
             }
             RBNConfig.Load(configFilePath);
+            Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
+                new StringLogData("Сервер запущен"), 
+                LogLevel.INFO);
             
             new Server((int)RBNConfig.Instance.RBN.Port);
         }

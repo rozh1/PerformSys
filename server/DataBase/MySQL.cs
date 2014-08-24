@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Data;
 using Balancer.Common.Logger;
+using Balancer.Common.Logger.Data;
+using Balancer.Common.Logger.Enums;
 using MySql.Data.MySqlClient;
+using server.Config;
 
 namespace server.DataBase
 {
@@ -43,12 +46,16 @@ namespace server.DataBase
                 var conn = new MySqlConnection(_connectionString.GetConnectionString(true));
                 conn.Open();
                 Insert("SET NAMES utf8", conn);
-                Logger.Write("Выполненно подключение к БД " + _database, 7);
+                Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                    new StringLogData("Выполненно подключение к БД " + _database), 
+                    LogLevel.INFO);
                 conn.Close();
             }
             catch (MySqlException e)
             {
-                Logger.Write("При подключении к серверу MySQL возникло исколючение: " + e.Message);
+                Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                    new StringLogData("При подключении к серверу MySQL возникло исколючение: " + e.Message), 
+                    LogLevel.INFO);
                 result = false;
             }
             return result;
@@ -61,11 +68,15 @@ namespace server.DataBase
             {
                 conn.Open();
                 Insert("SET NAMES utf8", conn);
-                Logger.Write("Выполненно подключение к БД", 7);
+                Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                    new StringLogData("Выполненно подключение к БД"), 
+                    LogLevel.INFO);
             }
             catch (MySqlException e)
             {
-                Logger.Write("При подключении к серверу MySQL возникло исколючение: " + e.Message);
+                Logger.Write(ServerConfig.Instance.Log.LogFile,
+                    new StringLogData("При подключении к серверу MySQL возникло исколючение: " + e.Message),
+                    LogLevel.ERROR);
                 if (ConnectionError != null) ConnectionError();
             }
             return conn;
@@ -93,7 +104,9 @@ namespace server.DataBase
                 }
                 catch (Exception e)
                 {
-                    Logger.Write("При записи в БД произошло исключение: " + e.Message);
+                    Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                        new StringLogData("При записи в БД произошло исключение: " + e.Message), 
+                        LogLevel.ERROR);
                 }
                 ConnectionClose(conn);
             }
@@ -109,7 +122,9 @@ namespace server.DataBase
             }
             catch (Exception e)
             {
-                Logger.Write("При записи в БД произошло исключение: " + e.Message);
+                Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                    new StringLogData("При записи в БД произошло исключение: " + e.Message), 
+                    LogLevel.ERROR);
             }
         }
 
@@ -134,7 +149,9 @@ namespace server.DataBase
                 }
                 catch (Exception e)
                 {
-                    Logger.Write("При чтении из БД произошло исключение: " + e.Message);
+                    Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                        new StringLogData("При чтении из БД произошло исключение: " + e.Message), 
+                        LogLevel.ERROR);
                 }
                 ConnectionClose(conn);
             }
@@ -160,7 +177,9 @@ namespace server.DataBase
                 }
                 catch (Exception e)
                 {
-                    Logger.Write("При обновлении записи в БД произошло исключение: " + e.Message);
+                    Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                        new StringLogData("При обновлении записи в БД произошло исключение: " + e.Message), 
+                        LogLevel.ERROR);
                 }
                 ConnectionClose(conn);
             }
@@ -186,7 +205,9 @@ namespace server.DataBase
                 }
                 catch (Exception e)
                 {
-                    Logger.Write("При удалении записи из БД произошло исключение: " + e.Message);
+                    Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                        new StringLogData("При удалении записи из БД произошло исключение: " + e.Message), 
+                        LogLevel.ERROR);
                 }
                 ConnectionClose(conn);
             }

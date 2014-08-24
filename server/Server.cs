@@ -8,6 +8,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using Balancer.Common.Logger;
+using Balancer.Common.Logger.Data;
+using Balancer.Common.Logger.Enums;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
@@ -43,7 +45,7 @@ namespace server
 
         public Server(Dictionary<int,MySqlDb> databases)
         {
-            _transmitHelper = new PacketTransmitHelper();
+            _transmitHelper = new PacketTransmitHelper(ServerConfig.Instance.Log.LogFile);
             _databases = databases;
             _tcpClient = new TcpClient();
             while (_serverIsLife)
@@ -56,12 +58,16 @@ namespace server
                 }
                 catch (Exception)
                 {
-                    Logger.Write("Не удалось подключиться. Переподключение");
+                    Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                        new StringLogData("Не удалось подключиться. Переподключение"), 
+                        LogLevel.ERROR);
                     Thread.Sleep(1000);
                     continue;
                 }
 
-                Logger.Write("Подключение установлено");
+                Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                    new StringLogData("Подключение установлено"), 
+                    LogLevel.INFO);
 
                 foreach (Config.Data.DataBase dataBase in ServerConfig.Instance.DataBase)
                 {
@@ -81,7 +87,9 @@ namespace server
                     }
                     else
                     {
-                        Logger.Write("Получен пустой пакет или разорвано соединение");
+                        Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                            new StringLogData("Получен пустой пакет или разорвано соединение"), 
+                            LogLevel.ERROR);
                     }
                 }
                 _tcpClient.Close();
@@ -118,7 +126,9 @@ namespace server
 
             if (dt != null)
             {
-                Logger.Write("Отправка информации о БД РБНу ");
+                Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                    new StringLogData("Отправка информации о БД РБНу"), 
+                    LogLevel.INFO);
                 var dataBaseInfoPacket = new DataBaseInfoPacket(tableSizes);
                 _transmitHelper.Send(dataBaseInfoPacket.GetPacket(), _tcpClient.GetStream());
             }
@@ -159,7 +169,9 @@ namespace server
             if (_tcpClient.Connected)
             {
                 _transmitHelper.Send(sp.GetPacket(), _tcpClient.GetStream());
-                Logger.Write("Отослан статус " + status);
+                Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                    new StringLogData("Отослан статус " + status), 
+                    LogLevel.INFO);
             }
         }
 
@@ -174,30 +186,37 @@ namespace server
             var requestPacket = new DbRequestPacket(packet.Data);
             var elapsedTime = new TimeSpan();
 
-            Logger.Write("Принят запрос от клиента: " + requestPacket.ClientId);
+            Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                new StringLogData("Принят запрос от клиента: " + requestPacket.ClientId), 
+                LogLevel.INFO);
             if (packet.Type == PacketType.Request)
             {
                 dt = ProcessQuery(requestPacket, out elapsedTime);
             }
             if (dt != null)
             {
-                Logger.Write("Отправка результата клиенту " + requestPacket.ClientId);
+                Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                    new StringLogData("Отправка результата клиенту " + requestPacket.ClientId), 
+                    LogLevel.INFO);
                 var dbAnswerPacket = new DbAnswerPacket(
                     Encoding.UTF8.GetBytes(SerializeMapper.Serialize(dt)), 
                     requestPacket.QueryNumber,
                     new PacketBase {ClientId = requestPacket.ClientId, RegionId = requestPacket.RegionId});
-                Logger.Write(string.Format("Размер посылки ответа запроса {0}: {1} ", requestPacket.QueryNumber, dbAnswerPacket.GetPacket().ToBase64String().Length));
+                Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                    new StringLogData(string.Format("Размер посылки ответа запроса {0}: {1} ", requestPacket.QueryNumber, dbAnswerPacket.GetPacket().ToBase64String().Length)), 
+                    LogLevel.INFO);
                 _transmitHelper.Send(dbAnswerPacket.GetPacket(), _tcpClient.GetStream());
             }
 
-            Logger.WriteCsv(new LogStats()
-            {
-                GlobalId = requestPacket.GlobalId,
-                RegionId = requestPacket.RegionId,
-                QueryNumber = requestPacket.QueryNumber,
-                QueueLength = _queueLength,
-                QueryExecutionTime = elapsedTime,
-            });
+            Logger.Write(ServerConfig.Instance.Log.StatsFile,
+                new LogStats()
+                {
+                    GlobalId = requestPacket.GlobalId,
+                    RegionId = requestPacket.RegionId,
+                    QueryNumber = requestPacket.QueryNumber,
+                    QueueLength = _queueLength,
+                    QueryExecutionTime = elapsedTime,
+                }, LogLevel.INFO);
 
             _queueLength--;
             SendStatus();
@@ -212,7 +231,9 @@ namespace server
         private DataTable ProcessQuery(DbRequestPacket requestPacket, out TimeSpan elapsedTime)
         {
             DataTable dt;
-            Logger.Write("Запрос начал выполнение");
+            Logger.Write(ServerConfig.Instance.Log.LogFile,
+                new StringLogData("Запрос начал выполнение"), 
+                LogLevel.INFO);
             var startTime = DateTime.UtcNow;
 
             switch (ServerConfig.Instance.Server.WorkMode)
@@ -228,7 +249,9 @@ namespace server
             }
 
             elapsedTime = DateTime.UtcNow - startTime;
-            Logger.Write("Запрос " + requestPacket.QueryNumber + " выполнен за " + elapsedTime.TotalMilliseconds.ToString(CultureInfo.CurrentCulture) + " мс");
+            Logger.Write(ServerConfig.Instance.Log.LogFile,
+                new StringLogData("Запрос " + requestPacket.QueryNumber + " выполнен за " + elapsedTime.TotalMilliseconds.ToString(CultureInfo.CurrentCulture) + " мс"), 
+                LogLevel.INFO);
             return dt;
         }
 
@@ -247,7 +270,9 @@ namespace server
             }
             catch (Exception ex)
             {
-                Logger.Write(ex.Message);
+                Logger.Write(ServerConfig.Instance.Log.LogFile,
+                    new StringLogData(ex.Message), 
+                    LogLevel.ERROR);
             }
             return dt;
         }
@@ -286,7 +311,9 @@ namespace server
                 }
             }
 
-            Logger.Write("Нет параметров симуляции. Длина пакета минимальная.");
+            Logger.Write(ServerConfig.Instance.Log.LogFile,
+                new StringLogData("Нет параметров симуляции. Длина пакета минимальная."), 
+                LogLevel.INFO);
             DataRow dataRow = dt.NewRow();
             dataRow[0] = "";
             dt.Rows.Add(dataRow);

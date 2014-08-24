@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Xml.Serialization;
-using Balancer.Common.Logger;
+using server.Config.Data;
 
 namespace server.Config
 {
@@ -18,6 +18,8 @@ namespace server.Config
         ///     Конфиг базы данных
         /// </summary>
         public Data.DataBase[] DataBase { get; set; }
+
+        public Log Log { get; set; }
 
         public void Save(string fileName)
         {
@@ -46,7 +48,7 @@ namespace server.Config
             }
             catch (Exception e)
             {
-                Logger.Write(e.Message);
+                Console.WriteLine(e.Message);
             }
             return Instance;
         }
