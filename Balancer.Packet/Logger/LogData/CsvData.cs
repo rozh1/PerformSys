@@ -1,16 +1,11 @@
 ﻿using BalancerLogger.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BalancerLogger.LogData
 {
     /// <summary>
-    /// Класс txt-данных.
+    /// Класс csv-данных.
     /// </summary>
-    public class TxtData : ILogData
+    public class CsvData : ILogData
     {
         /// <summary>
         /// Данные.
@@ -21,9 +16,9 @@ namespace BalancerLogger.LogData
         /// Конструктор.
         /// </summary>
         /// <param name="Data"></param>
-        public TxtData(string Line)
+        public CsvData(string[] Data)
         {
-            DataParams = new[] { Line };
+            DataParams = Data;
         }
     }
 }

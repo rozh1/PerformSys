@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Globalization;
-using Balancer.Common.Logger.Data;
+using Balancer.Common.Logger.Interfaces;
 
 namespace client.Config.Data
 {
-    public class LogStats : ILogStats
+    public class LogStats : ICsvLogData
     {
         public int QueryNumber { get; set; }
         public int ClientNumber { get; set; }
