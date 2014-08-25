@@ -95,7 +95,7 @@ namespace rbn.ServersHandler
         /// <summary>
         ///     Событие получения ответа
         /// </summary>
-        public event Action<int, DbAnswerPacket> AnswerRecivedEvent;
+        public event Action<DbAnswerPacket> AnswerRecivedEvent;
 
         /// <summary>
         ///     Событие информации о БД
@@ -207,7 +207,7 @@ namespace rbn.ServersHandler
                         case PacketType.Answer:
                             var answer = new DbAnswerPacket(packet.Data);
                             if (AnswerRecivedEvent != null)
-                                AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
+                                AnswerRecivedEvent(answer);
                             break;
                         case PacketType.DataBaseInfo:
                             var dataBaseInfoPacket = new DataBaseInfoPacket(packet.Data)

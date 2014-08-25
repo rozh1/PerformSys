@@ -39,7 +39,7 @@ namespace client
 
             for (int i = 0; i < (int)config.ClientCount; i++)
             {
-                clients[i] = new Client(config, i, (i%14) + 1);
+                clients[i] = new Client(config, (i+1), (i%14) + 1);
             }
         }
     }

@@ -7,9 +7,7 @@ namespace rbn.QueueHandler.Data
         /// <summary>
         /// Идентификатор клиента
         /// </summary>
-        public int ClientId {
-            get { return (int)RequestPacket.ClientId; } 
-        }
+        public int ClientId { get; set; }
 
         /// <summary>
         /// Пакет запроса к БД

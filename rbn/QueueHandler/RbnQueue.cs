@@ -45,12 +45,7 @@ namespace rbn.QueueHandler
         private readonly List<TableSizes> _tableSizes;
 
         private readonly PacketTransmitHelper _transmitHelper;
-
-        /// <summary>
-        ///     Уникальный идентификатор пользователя
-        /// </summary>
-        private int _id = 1;
-
+        
         public RbnQueue()
         {
             _transmitHelper = new PacketTransmitHelper(RBNConfig.Instance.Log.LogFile);
@@ -75,24 +70,19 @@ namespace rbn.QueueHandler
                     Client tmpClient = _clients[_clients.IndexOf(client)];
                     tmpClient.RequestPacketData = client.RequestPacketData;
                     tmpClient.AnswerPacketData = "";
-                    requestPacket = new DbRequestPacket(tmpClient.RequestPacketData)
-                    {
-                        ClientId = (uint) tmpClient.Id
-                    };
+                    requestPacket = new DbRequestPacket(tmpClient.RequestPacketData);
                 }
                 else
                 {
-                    client.Id = _id++;
+                    requestPacket = new DbRequestPacket(client.RequestPacketData);
+                    client.Id = ComputeClientId(requestPacket);
                     _clients.Add(client);
-                    requestPacket = new DbRequestPacket(client.RequestPacketData)
-                    {
-                        ClientId = (uint) client.Id
-                    };
                 }
 
                 _queue.Enqueue(
                     new QueueEntity
                     {
+                        ClientId = client.Id,
                         RequestPacket = requestPacket,
                         RelationVolume = CalculateRelationsVolume(requestPacket)
                     });
@@ -126,12 +116,12 @@ namespace rbn.QueueHandler
         /// <summary>
         ///     Ответ сервера
         /// </summary>
-        /// <param name="clientId">номер клиента</param>
         /// <param name="dbAnswerPacket">пакет ответа</param>
-        public void ServerAnswer(int clientId, DbAnswerPacket dbAnswerPacket)
+        public void ServerAnswer(DbAnswerPacket dbAnswerPacket)
         {
+            int id = ComputeClientId(dbAnswerPacket);
             Logger.Write(RBNConfig.Instance.Log.LogFile,
-                new StringLogData("Получен ответ для клиента " + clientId),
+                new StringLogData("Получен ответ для клиента " + id),
                 LogLevel.INFO);
             try
             {
@@ -140,11 +130,9 @@ namespace rbn.QueueHandler
                     int count = _clients.Count;
                     for (int i = 0; i < count; i++)
                     {
-                        if (_clients[i].Id == clientId)
+                        if (_clients[i].Id == id)
                         {
                             Client client = _clients[i];
-
-                            if (client.OldId != 0) dbAnswerPacket.ClientId = (uint) client.OldId;
 
                             _transmitHelper.Send(dbAnswerPacket.GetPacket(),
                                 client.Connection.GetStream());
@@ -230,7 +218,6 @@ namespace rbn.QueueHandler
 
                 if (queueEntity.RequestPacket.RegionId != RBNConfig.Instance.RBN.RegionId)
                 {
-                    queueEntity.RequestPacket.ClientId = (uint) client.OldId;
                     _clients.Remove(client);
                 }
 
@@ -334,6 +321,11 @@ namespace rbn.QueueHandler
                     return (requestVolume/(_queue.Count*tableSizes.DataBaseSize))*normalize;
             }
             return 0;
+        }
+
+        public int ComputeClientId(PacketBase packet)
+        {
+            return (int) (packet.GlobalId*100000000 + packet.RegionId*1000000 + packet.ClientId);
         }
     }
 }
