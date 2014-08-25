@@ -17,24 +17,19 @@
  */
 #endregion
 
-﻿using System;
-using System.Net.Sockets;
-using rbn.Config.Data;
-using rbn.Config.Data.LogData;
+﻿using Balancer.Common.Logger.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace rbn.QueueHandler.Data
+namespace Balancer.Common.Logger.Interfaces
 {
-    public class Client
+    public interface ILogConfig
     {
-        public TcpClient Connection { get; set; }
-        public string RequestPacketData { get; set; }
-        public string AnswerPacketData { get; set; }
-        public bool RequestSended { get; set; }
-        public int Id { get; set; }
-        public int OldId { get; set; }
-        public bool DisposeAfterTransmitAnswer { get; set; }
-        public Stats LogStats { get; set; }
-        public DateTime AddedTime { get; set; }
-        public DateTime SendedTime { get; set; }
+        LogLevel LogLevel { get; set; }
+        LogMode LogMode { get; set; }
+        string LogDir { get; set; }
+        bool WriteToConsole { get; set; }
     }
 }

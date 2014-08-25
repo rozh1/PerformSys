@@ -41,7 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\Data\Log.cs" />
-    <Compile Include="Config\Data\LogStats.cs" />
+    <Compile Include="Config\Data\LogData\Stats.cs" />
+    <Compile Include="Config\Data\LogData\QueueStats.cs" />
     <Compile Include="Config\Data\RBN.cs" />
     <Compile Include="Config\Data\Server.cs" />
     <Compile Include="Config\Data\MRBN.cs" />

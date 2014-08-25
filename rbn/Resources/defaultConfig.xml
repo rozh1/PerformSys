@@ -18,5 +18,9 @@
     <LogFile>rbnLog.txt</LogFile>
     <StatsFile>rbnStats.csv</StatsFile>
     <QueueStatsFile>rbnQueue.csv</QueueStatsFile>
+    <LogLevel>DEBUG</LogLevel>
+    <LogMode>MULTIPLE</LogMode>
+    <LogDir />
+    <WriteToConsole>true</WriteToConsole>
   </Log>
 </RBNConfig>

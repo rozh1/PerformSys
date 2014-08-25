@@ -44,6 +44,7 @@ namespace server
             }
             ServerConfig.Load(configFilePath);
 
+            Logger.Configure(ServerConfig.Instance.Log);
             Logger.Write(ServerConfig.Instance.Log.LogFile, 
                 new StringLogData("Сервер запущен"), 
                 LogLevel.INFO);

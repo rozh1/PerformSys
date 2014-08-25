@@ -38,7 +38,9 @@ namespace rbn
                     new MemoryStream(Encoding.UTF8.GetBytes(Resources.defaultConfig))).Save(configFilePath);
             }
             RBNConfig.Load(configFilePath);
-            Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
+
+            Logger.Configure(RBNConfig.Instance.Log);
+            Logger.Write(RBNConfig.Instance.Log.LogFile,
                 new StringLogData("Сервер запущен"), 
                 LogLevel.INFO);
             

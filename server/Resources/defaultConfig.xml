@@ -474,5 +474,9 @@
     <LogFile>serverLog.txt</LogFile>
     <StatsFile>serverStats.csv</StatsFile>
     <QueueStatsFile>serverQueue.csv</QueueStatsFile>
+    <LogLevel>DEBUG</LogLevel>
+    <LogMode>MULTIPLE</LogMode>
+    <LogDir />
+    <WriteToConsole>true</WriteToConsole>
   </Log>
 </ServerConfig>
