@@ -8,29 +8,44 @@ using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
 using client.Properties;
+using client.QuerySequence;
 
 namespace client
 {
     /// <summary>
-    ///     эмулятор клиента
+    /// Эмулятор клиента.
     /// </summary>
     internal class Client
     {
         private readonly string _address;
         private readonly Config.Config _config;
-        private readonly int _number;
+        private readonly int _clientID;
         private readonly int _port;
-        private readonly int _queryNumber;
+        private int _queryNumber;
         private readonly PacketTransmitHelper _packetTransmitHelper;
         private ClientStatsData _clientStatsData;
-
-        public Client(Config.Config config, int number, int queryNumber)
+        private readonly QuerySequence.QuerySequence _querySequence;
+        private int _querySeqIndex;
+        private readonly int _querySeqLen;
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="config">Конфигурация клиента.</param>
+        /// <param name="clientID">Идентификатор клиента.</param>
+        /// <param name="queryStartIndex">Индекс стартового запроса в последовательности запросов.</param>
+        /// <param name="querySequence">Последовательность запросов.</param>
+        public Client(Config.Config config, int clientID, int queryStartIndex, QuerySequence.QuerySequence querySequence)
         {
             _address = config.BalancerHost;
             Debug.Assert(config.BalancerPort != null, "config.BalancerPort != null");
             _port = (int) config.BalancerPort;
-            _number = number;
-            _queryNumber = queryNumber;
+            _clientID = clientID;
+
+            _querySeqIndex = queryStartIndex;
+            _querySequence = querySequence;
+            _queryNumber = querySequence.array[_querySeqIndex];
+            _querySeqLen = querySequence.array.Length;
+
             _config = config;
             _packetTransmitHelper = new PacketTransmitHelper("clentLog.txt");
             var t = new Thread(ClientThread);
@@ -49,12 +64,12 @@ namespace client
             for (int i = 0; i < _config.QueryCount; i++)
             {
                 if (tcpClient.Connected)
-                {
+                {                  
                     string query = Resources.ResourceManager.GetString("q" + _queryNumber);
 
                     var dbRequestPacket = new DbRequestPacket(query, _queryNumber)
                     {
-                        ClientId = (uint)_number
+                        ClientId = (uint)_clientID
                     };
                     _packetTransmitHelper.Send(dbRequestPacket.GetPacket(), tcpClient.GetStream());
 
@@ -75,18 +90,21 @@ namespace client
                     TimeSpan queryTime = DateTime.UtcNow - startTime;
                     _clientStatsData.WaitTime += queryTime;
                     _clientStatsData.Answer = null; //answer;
-                    Console.WriteLine(@"Клиент: {0}	Запрос: {1}	Время выполнения: {2}", _number, i, queryTime);
+                    Console.WriteLine(@"Клиент: {0}	Запрос: {1}	Время выполнения: {2}", _clientID, i, queryTime);
 
-                    _config.LogStats.ClientNumber = _number;
+                    _config.LogStats.ClientNumber = _clientID;
                     _config.LogStats.ClientQueryNumber = i;
                     _config.LogStats.QueryNumber = _queryNumber;
                     _config.LogStats.QueryTime = queryTime;
+
+                    _querySeqIndex = (_querySeqIndex + 1) % _querySeqLen;
+                    _queryNumber = _querySequence.array[_querySeqIndex];
 
                     Logger.Write("clientStats.csv", _config.LogStats, LogLevel.INFO);
                 }
             }
             tcpClient.Close();
-            Console.WriteLine(@"Клиент: {0}	Общее время работы: {1}", _number, _clientStatsData.WaitTime);
+            Console.WriteLine(@"Клиент: {0}	Общее время работы: {1}", _clientID, _clientStatsData.WaitTime);
         }
     }
 }
