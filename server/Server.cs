@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net.Sockets;
@@ -15,6 +14,7 @@ using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
 using server.Config;
 using server.Config.Data;
+using server.Config.Data.LogData;
 using server.DataBase;
 
 namespace server
@@ -82,6 +82,14 @@ namespace server
                     if (onePacketData != null)
                     {
                         _queueLength++;
+
+                        PacketBase packetBase = new PacketBase();
+                        packetBase.Deserialize(onePacketData.Data);
+                        Logger.Write(ServerConfig.Instance.Log.QueueStatsFile,
+                            new QueueStats(packetBase.GlobalId, packetBase.RegionId, (int) packetBase.ClientId,
+                                _queueLength),
+                            LogLevel.INFO);
+
                         SendStatus();
                         ThreadPool.QueueUserWorkItem(MySqlWorker, onePacketData);
                     }
@@ -209,17 +217,22 @@ namespace server
             }
 
             Logger.Write(ServerConfig.Instance.Log.StatsFile,
-                new LogStats()
-                {
-                    GlobalId = requestPacket.GlobalId,
-                    RegionId = requestPacket.RegionId,
-                    QueryNumber = requestPacket.QueryNumber,
-                    QueueLength = _queueLength,
-                    QueryExecutionTime = elapsedTime,
-                }, LogLevel.INFO);
+                new Stats(
+                    requestPacket.GlobalId,
+                    requestPacket.RegionId,
+                    (int) requestPacket.ClientId,
+                    requestPacket.QueryNumber,
+                    elapsedTime,
+                    _queueLength
+                    ), LogLevel.INFO);
 
             _queueLength--;
             SendStatus();
+
+            Logger.Write(ServerConfig.Instance.Log.QueueStatsFile,
+                            new QueueStats(requestPacket.GlobalId, requestPacket.RegionId, (int)requestPacket.ClientId,
+                                _queueLength),
+                            LogLevel.INFO);
         }
 
         /// <summary>

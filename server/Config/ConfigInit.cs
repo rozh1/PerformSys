@@ -1,4 +1,5 @@
-﻿using server.Config.Data;
+﻿using Balancer.Common.Logger.Enums;
+using server.Config.Data;
 
 namespace server.Config
 {
@@ -103,7 +104,11 @@ namespace server.Config
                 {
                     LogFile = "serverLog.txt",
                     QueueStatsFile = "serverQueue.csv",
-                    StatsFile = "serverStats.csv"
+                    StatsFile = "serverStats.csv",
+                    LogDir = "",
+                    WriteToConsole = true,
+                    LogLevel = LogLevel.DEBUG,
+                    LogMode = LogMode.MULTIPLE
                 }
             };
         }

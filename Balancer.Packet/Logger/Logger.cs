@@ -49,6 +49,14 @@ namespace Balancer.Common.Logger
         /// </summary>
         public static bool WriteToConsole { get; set; }
 
+        public static void Configure(ILogConfig config)
+        {
+            LogLevel = config.LogLevel;
+            LogMode = config.LogMode;
+            LogDir = string.IsNullOrEmpty(config.LogDir) ? Environment.CurrentDirectory : config.LogDir;
+            WriteToConsole = config.WriteToConsole;
+        }
+
         /// <summary>
         ///     Метод записи лога.
         /// </summary>

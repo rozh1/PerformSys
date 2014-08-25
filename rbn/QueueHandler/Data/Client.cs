@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using rbn.Config.Data;
+using rbn.Config.Data.LogData;
 
 namespace rbn.QueueHandler.Data
 {
@@ -13,7 +14,7 @@ namespace rbn.QueueHandler.Data
         public int Id { get; set; }
         public int OldId { get; set; }
         public bool DisposeAfterTransmitAnswer { get; set; }
-        public LogStats LogStats { get; set; }
+        public Stats LogStats { get; set; }
         public DateTime AddedTime { get; set; }
         public DateTime SendedTime { get; set; }
     }

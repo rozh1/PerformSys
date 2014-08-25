@@ -8,7 +8,7 @@ using Balancer.Common.Logger.Enums;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
 using rbn.Config;
-using rbn.Config.Data;
+using rbn.Config.Data.LogData;
 using rbn.Interfaces;
 using rbn.QueueHandler.Data;
 
@@ -40,20 +40,20 @@ namespace rbn.QueueHandler
         private readonly Mutex _sendMutex;
 
         /// <summary>
-        ///     Уникальный идентификатор пользователя
-        /// </summary>
-        private int _id = 1;
-
-        /// <summary>
-        /// Размеры таблиц БД регионов
+        ///     Размеры таблиц БД регионов
         /// </summary>
         private readonly List<TableSizes> _tableSizes;
 
         private readonly PacketTransmitHelper _transmitHelper;
 
+        /// <summary>
+        ///     Уникальный идентификатор пользователя
+        /// </summary>
+        private int _id = 1;
+
         public RbnQueue()
         {
-            _transmitHelper = new PacketTransmitHelper(Config.RBNConfig.Instance.Log.LogFile);
+            _transmitHelper = new PacketTransmitHelper(RBNConfig.Instance.Log.LogFile);
             _sendMutex = new Mutex();
             _clientSyncObject = new object();
             _queue = new Queue<QueueEntity>();
@@ -97,13 +97,13 @@ namespace rbn.QueueHandler
                         RelationVolume = CalculateRelationsVolume(requestPacket)
                     });
 
-                client.LogStats = new LogStats
-                {
-                    GlobalId = requestPacket.GlobalId,
-                    RegionId = requestPacket.RegionId,
-                    QueryNumber = requestPacket.QueryNumber,
-                    QueueLength = _queue.Count,
-                };
+                client.LogStats = new Stats(requestPacket.GlobalId, requestPacket.RegionId,
+                    (int) requestPacket.ClientId, requestPacket.QueryNumber, _queue.Count);
+
+                Logger.Write(RBNConfig.Instance.Log.QueueStatsFile,
+                    new QueueStats(requestPacket.GlobalId, requestPacket.RegionId, (int) requestPacket.ClientId, _queue.Count), 
+                    LogLevel.INFO);
+
                 client.AddedTime = DateTime.UtcNow;
             }
         }
@@ -130,8 +130,8 @@ namespace rbn.QueueHandler
         /// <param name="dbAnswerPacket">пакет ответа</param>
         public void ServerAnswer(int clientId, DbAnswerPacket dbAnswerPacket)
         {
-            Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
-                new StringLogData("Получен ответ для клиента " + clientId), 
+            Logger.Write(RBNConfig.Instance.Log.LogFile,
+                new StringLogData("Получен ответ для клиента " + clientId),
                 LogLevel.INFO);
             try
             {
@@ -144,14 +144,14 @@ namespace rbn.QueueHandler
                         {
                             Client client = _clients[i];
 
-                            if (client.OldId != 0) dbAnswerPacket.ClientId = (uint)client.OldId;
+                            if (client.OldId != 0) dbAnswerPacket.ClientId = (uint) client.OldId;
 
                             _transmitHelper.Send(dbAnswerPacket.GetPacket(),
-                               client.Connection.GetStream());
+                                client.Connection.GetStream());
 
                             client.LogStats.QueryExecutionTime = DateTime.UtcNow - client.SendedTime;
-                            Logger.Write(Config.RBNConfig.Instance.Log.StatsFile,
-                                client.LogStats, 
+                            Logger.Write(RBNConfig.Instance.Log.StatsFile,
+                                client.LogStats,
                                 LogLevel.INFO);
 
                             if (client.DisposeAfterTransmitAnswer)
@@ -163,8 +163,8 @@ namespace rbn.QueueHandler
             }
             catch (Exception ex)
             {
-                Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
-                    new StringLogData("Исключение при передаче ответа клиенту" + ex.Message), 
+                Logger.Write(RBNConfig.Instance.Log.LogFile,
+                    new StringLogData("Исключение при передаче ответа клиенту" + ex.Message),
                     LogLevel.ERROR);
             }
         }
@@ -208,6 +208,10 @@ namespace rbn.QueueHandler
                         client.LogStats.QueueWaitTime = DateTime.UtcNow - client.AddedTime;
                     }
                     _queue.Dequeue();
+
+                    Logger.Write(RBNConfig.Instance.Log.QueueStatsFile,
+                    new QueueStats(queueEntity.RequestPacket.GlobalId, queueEntity.RequestPacket.RegionId, (int)queueEntity.RequestPacket.ClientId, _queue.Count),
+                    LogLevel.INFO);
                 }
             }
             _sendMutex.ReleaseMutex();
@@ -226,7 +230,7 @@ namespace rbn.QueueHandler
 
                 if (queueEntity.RequestPacket.RegionId != RBNConfig.Instance.RBN.RegionId)
                 {
-                    queueEntity.RequestPacket.ClientId = (uint)client.OldId;
+                    queueEntity.RequestPacket.ClientId = (uint) client.OldId;
                     _clients.Remove(client);
                 }
 
@@ -245,26 +249,27 @@ namespace rbn.QueueHandler
         }
 
         /// <summary>
-        /// Добавление информации о БД
+        ///     Добавление информации о БД
         /// </summary>
         /// <param name="packet"></param>
         public void AddDataBaseInfo(DataBaseInfoPacket packet)
         {
             List<TableSizes> tableSizeToRemove = _tableSizes.Where(
-                tableSizes => 
+                tableSizes =>
                     tableSizes.RegionId == packet.RegionId && tableSizes.GlobalId == packet.GlobalId
-                    ).ToList();
+                ).ToList();
             foreach (TableSizes tableSizes in tableSizeToRemove)
             {
                 _tableSizes.Remove(tableSizes);
             }
 
-            double dataBaseSize = packet.TableSizes.Aggregate<KeyValuePair<string, ulong>, double>(0, (current, pair) => current + pair.Value);
+            double dataBaseSize = packet.TableSizes.Aggregate<KeyValuePair<string, ulong>, double>(0,
+                (current, pair) => current + pair.Value);
 
             _tableSizes.Add(new TableSizes
             {
-                RegionId = (int)packet.RegionId, 
-                GlobalId = (int)packet.GlobalId, 
+                RegionId = (int) packet.RegionId,
+                GlobalId = (int) packet.GlobalId,
                 Sizes = packet.TableSizes,
                 DataBaseSize = dataBaseSize/1024.0/1024.0
             });
@@ -276,7 +281,7 @@ namespace rbn.QueueHandler
         }
 
         /// <summary>
-        /// Подсчитывает объем отношений в МБ
+        ///     Подсчитывает объем отношений в МБ
         /// </summary>
         /// <param name="packet"></param>
         /// <returns></returns>
@@ -294,19 +299,19 @@ namespace rbn.QueueHandler
             {
                 string query = packet.Query.ToLower();
                 var relationsList = new List<string>();
-                string[] words = query.Split(new[] {' ', ',', '\t', '\n', '\r', ';'}, StringSplitOptions.RemoveEmptyEntries);
+                string[] words = query.Split(new[] {' ', ',', '\t', '\n', '\r', ';'},
+                    StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (string word in words)
                 {
                     if (tableSizes.Sizes.ContainsKey(word))
                         relationsList.Add(word);
                 }
-                foreach (KeyValuePair<string, UInt64> pair in tableSizes.Sizes)
+                foreach (var pair in tableSizes.Sizes)
                 {
                     if (relationsList.Contains(pair.Key))
                         relationsVolume += pair.Value;
                 }
-
             }
             return relationsVolume/1024.0/1024.0;
         }
@@ -316,14 +321,15 @@ namespace rbn.QueueHandler
             TableSizes tableSizes = null;
             foreach (TableSizes tableSize in _tableSizes)
             {
-                if (tableSize.RegionId == Config.RBNConfig.Instance.RBN.RegionId && tableSize.GlobalId == Config.RBNConfig.Instance.RBN.GlobalId)
+                if (tableSize.RegionId == RBNConfig.Instance.RBN.RegionId &&
+                    tableSize.GlobalId == RBNConfig.Instance.RBN.GlobalId)
                     tableSizes = tableSize;
             }
             lock (_queue)
             {
                 double requestVolume = _queue.Sum(queueEntity => queueEntity.RelationVolume);
-                double normalize = Config.RBNConfig.Instance.RBN.ServersCount/
-                                   (double) Config.RBNConfig.Instance.RBN.MaxServersCount;
+                double normalize = RBNConfig.Instance.RBN.ServersCount/
+                                   (double) RBNConfig.Instance.RBN.MaxServersCount;
                 if (tableSizes != null && _queue.Count > 0)
                     return (requestVolume/(_queue.Count*tableSizes.DataBaseSize))*normalize;
             }
