@@ -89,7 +89,7 @@ namespace rbn.GlobalBalancerHandler
         /// <summary>
         ///     Событие получения ответа
         /// </summary>
-        public event Action<int, DbAnswerPacket> AnswerRecivedEvent;
+        public event Action<DbAnswerPacket> AnswerRecivedEvent;
 
         /// <summary>
         ///     Событие получения запоса
@@ -148,7 +148,7 @@ namespace rbn.GlobalBalancerHandler
                                     new StringLogData("Получен ответ для " + answer.ClientId), 
                                     LogLevel.INFO);
                                 if (AnswerRecivedEvent != null)
-                                    AnswerRecivedEvent((int) answer.ClientId, new DbAnswerPacket(packet.Data));
+                                    AnswerRecivedEvent(answer);
                                 break;
                             case PacketType.Request:
                                 var request = new DbRequestPacket(packet.Data);
@@ -157,7 +157,6 @@ namespace rbn.GlobalBalancerHandler
                                     Connection = connection,
                                     RequestPacketData = packet.Data,
                                     DisposeAfterTransmitAnswer = true,
-                                    OldId = (int)request.ClientId
                                 };
                                 Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
                                     new StringLogData("Получен запрос из РБН " + request.RegionId), 

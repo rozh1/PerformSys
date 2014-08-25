@@ -228,7 +228,7 @@ namespace server
                 var dbAnswerPacket = new DbAnswerPacket(
                     Encoding.UTF8.GetBytes(SerializeMapper.Serialize(dt)), 
                     requestPacket.QueryNumber,
-                    new PacketBase {ClientId = requestPacket.ClientId, RegionId = requestPacket.RegionId});
+                    new PacketBase {ClientId = requestPacket.ClientId, RegionId = requestPacket.RegionId, GlobalId = requestPacket.GlobalId});
                 Logger.Write(ServerConfig.Instance.Log.LogFile, 
                     new StringLogData(string.Format("Размер посылки ответа запроса {0}: {1} ", requestPacket.QueryNumber, dbAnswerPacket.GetPacket().ToBase64String().Length)), 
                     LogLevel.INFO);

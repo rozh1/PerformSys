@@ -71,7 +71,10 @@ namespace client
                 {
                     string query = Resources.ResourceManager.GetString("q" + _queryNumber);
 
-                    var dbRequestPacket = new DbRequestPacket(query, _queryNumber);
+                    var dbRequestPacket = new DbRequestPacket(query, _queryNumber)
+                    {
+                        ClientId = (uint)_number
+                    };
                     _packetTransmitHelper.Send(dbRequestPacket.GetPacket(), tcpClient.GetStream());
 
                     DateTime startTime = DateTime.UtcNow;
