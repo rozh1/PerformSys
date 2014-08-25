@@ -101,7 +101,7 @@ namespace client
                     _config.LogStats.QueryNumber = _queryNumber;
                     _config.LogStats.QueryTime = queryTime;
 
-                    Logger.Write("statsClient.csv", _config.LogStats, LogLevel.INFO);
+                    Logger.Write("clientStats.csv", _config.LogStats, LogLevel.INFO);
                 }
             }
             tcpClient.Close();
