@@ -48,7 +48,6 @@
     <Compile Include="Config\Config.cs" />
     <Compile Include="Config\Data\LogStats.cs" />
     <Compile Include="QuerySequence\QuerySequence.cs" />
-    <Compile Include="QuerySequence\QuerySequenceManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
