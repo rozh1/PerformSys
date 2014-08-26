@@ -37,11 +37,11 @@ namespace client
             Debug.Assert(config.ClientCount != null, "config.ClientCount != null");
             var clients = new Client[(int)config.ClientCount];
 
-            QuerySequence.QuerySequence qSeq = client.QuerySequence.QuerySequenceManager.Generate((int)config.QueryCount);
 
             for (int i = 0; i < (int)config.ClientCount; i++)
             {
-                clients[i] = new Client(config, (i + 1), i, qSeq);
+                var qSeq = new QuerySequence.QuerySequence(14,(i%14)+1);
+                clients[i] = new Client(config, (i + 1), qSeq);
             }
         }
     }
