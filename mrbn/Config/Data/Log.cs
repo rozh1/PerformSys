@@ -17,18 +17,18 @@
  */
 #endregion
 
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
+﻿using Balancer.Common.Logger.Enums;
+using Balancer.Common.Logger.Interfaces;
 
-namespace mrbn.GlobalBalancer.Data
+namespace mrbn.Config.Data
 {
-    class RBN
+    public class Log : ILogConfig
     {
-        public TcpClient RbnClient { get; set; }
-        public uint RegionId { get; set; }
-        public uint GlobalId { get; set; }
-        public double Weight { get; set; }
-        public RBN RelayRbn { get; set; }
+        public string LogFile { get; set; }
+        public string StatsFile { get; set; }
+        public LogLevel LogLevel { get; set; }
+        public LogMode LogMode { get; set; }
+        public string LogDir { get; set; }
+        public bool WriteToConsole { get; set; }
     }
 }

@@ -5,5 +5,12 @@
     <RegionId>1</RegionId>
     <Port>3401</Port>
   </MRBN>
-  <LogFile>mrbnLog.txt</LogFile>
+  <Log>
+    <LogFile>mrbnLog.txt</LogFile>
+    <StatsFile>mrbnStats.csv</StatsFile>
+    <LogLevel>DEBUG</LogLevel>
+    <LogMode>MULTIPLE</LogMode>
+    <LogDir />
+    <WriteToConsole>true</WriteToConsole>
+  </Log>
 </MRBNConfig>

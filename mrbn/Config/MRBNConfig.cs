@@ -31,7 +31,7 @@ namespace mrbn.Config
 
         public MRBN MRBN { get; set; }
 
-        public string LogFile { get; set; }
+        public Log Log { get; set; }
 
         public void Save(string fileName)
         {
