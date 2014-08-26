@@ -22,12 +22,12 @@ using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
 using Balancer.Common.Logger;
+using Balancer.Common.Logger.Data;
 using Balancer.Common.Logger.Enums;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
 using client.Properties;
-using client.QuerySequence;
 
 namespace client
 {
@@ -44,7 +44,6 @@ namespace client
         private readonly PacketTransmitHelper _packetTransmitHelper;
         private ClientStatsData _clientStatsData;
         private readonly QuerySequence.QuerySequence _querySequence;
-        private int _querySeqIndex;
 
         /// <summary>
         /// Конструктор.
@@ -62,7 +61,7 @@ namespace client
             _querySequence = querySequence;
 
             _config = config;
-            _packetTransmitHelper = new PacketTransmitHelper("clentLog.txt");
+            _packetTransmitHelper = new PacketTransmitHelper(_config.Log.LogFile);
             var t = new Thread(ClientThread);
             t.Start();
         }
@@ -87,6 +86,7 @@ namespace client
                     {
                         ClientId = (uint)_clientId
                     };
+
                     _packetTransmitHelper.Send(dbRequestPacket.GetPacket(), tcpClient.GetStream());
 
                     DateTime startTime = DateTime.UtcNow;
@@ -106,18 +106,24 @@ namespace client
                     TimeSpan queryTime = DateTime.UtcNow - startTime;
                     _clientStatsData.WaitTime += queryTime;
                     _clientStatsData.Answer = null; //answer;
-                    Console.WriteLine(@"Клиент: {0}	Запрос: {1}	Время выполнения: {2}", _clientId, i, queryTime);
+
+                    Logger.Write(_config.Log.LogFile, 
+                        new StringLogData(string.Format(@"Клиент: {0}	Запрос: {1}	Время выполнения: {2}", _clientId, i, queryTime)), 
+                        LogLevel.INFO);
 
                     _config.LogStats.ClientNumber = _clientId;
                     _config.LogStats.ClientQueryNumber = i;
                     _config.LogStats.QueryNumber = _queryNumber;
                     _config.LogStats.QueryTime = queryTime;
                     
-                    Logger.Write("clientStats.csv", _config.LogStats, LogLevel.INFO);
+                    Logger.Write(_config.Log.StatsFile, _config.LogStats, LogLevel.INFO);
                 }
             }
             tcpClient.Close();
-            Console.WriteLine(@"Клиент: {0}	Общее время работы: {1}", _clientId, _clientStatsData.WaitTime);
+
+            Logger.Write(_config.Log.LogFile,
+                new StringLogData(string.Format(@"Клиент: {0}	Общее время работы: {1}", _clientId, _clientStatsData.WaitTime)),
+                LogLevel.INFO);
         }
     }
 }

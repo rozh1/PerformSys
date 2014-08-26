@@ -47,5 +47,10 @@ namespace client.Config
         /// Данные статистики для записи в лог
         /// </summary>
         public LogStats LogStats { get; set; }
+
+        /// <summary>
+        ///     Конфиг лога
+        /// </summary>
+        public Log Log { get; set; }
     }
 }
