@@ -9,7 +9,11 @@
         ClientCount,
         QueryPerClient,
         BalancerHost,
-        BalancerPort
+        BalancerPort,
+        LogName,
+        CsvLogName,
+        LogDir,
+        WriteLogToConsole
     }
 
     /// <summary>
@@ -33,6 +37,14 @@
                 case "-p":
                 case "--port":
                     return ComandSwitch.BalancerPort;
+                case "--log":
+                    return ComandSwitch.LogName;
+                case "--csv":
+                    return ComandSwitch.CsvLogName;
+                case "--logdir":
+                    return ComandSwitch.LogDir;
+                case "--log-to-console":
+                    return ComandSwitch.WriteLogToConsole;
                 default:
                     return ComandSwitch.None;
             }

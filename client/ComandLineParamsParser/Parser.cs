@@ -1,6 +1,6 @@
 ﻿using System;
-using Balancer.Common;
-using Balancer.Common.Logger;
+using Balancer.Common.Logger.Enums;
+using client.Config.Data;
 
 namespace client.ComandLineParamsParser
 {
@@ -16,7 +16,17 @@ namespace client.ComandLineParamsParser
 
         public Parser(string[] args)
         {
-            _config = new Config.Config();
+            _config = new Config.Config
+            {
+                Log = new Log
+                {
+                    LogFile = "clientLog.txt",
+                    LogLevel = LogLevel.DEBUG,
+                    LogMode = LogMode.MULTIPLE,
+                    WriteToConsole = false,
+                    StatsFile = "clientStats.csv"
+                }
+            };
             _args = args;
         }
 
@@ -25,33 +35,44 @@ namespace client.ComandLineParamsParser
         /// </summary>
         private void Parse()
         {
-            for (int i = 0; i < _args.Length - 1; i++)
+            for (int i = 0; i < _args.Length; i++)
             {
                 ComandSwitch comandSwitch = Switchs.Parse(_args[i]);
                 switch (comandSwitch)
                 {
                     case ComandSwitch.ClientCount:
-                        _config.ClientCount = TryParseInt(_args[i + 1], _args[i]);
+                        _config.ClientCount = TryParseInt(_args[i + 1]);
                         break;
                     case ComandSwitch.QueryPerClient:
-                        _config.QueryCount = TryParseInt(_args[i + 1], _args[i]);
+                        _config.QueryCount = TryParseInt(_args[i + 1]);
                         break;
                     case ComandSwitch.BalancerHost:
                         _config.BalancerHost = _args[i + 1];
                         break;
                     case ComandSwitch.BalancerPort:
-                        _config.BalancerPort = TryParseInt(_args[i + 1], _args[i]);
+                        _config.BalancerPort = TryParseInt(_args[i + 1]);
+                        break;
+                    case ComandSwitch.LogName:
+                        _config.Log.LogFile = _args[i + 1];
+                        break;
+                    case ComandSwitch.LogDir:
+                        _config.Log.LogDir = _args[i + 1];
+                        break;
+                    case ComandSwitch.CsvLogName:
+                        _config.Log.StatsFile = _args[i + 1];
+                        break;
+                    case ComandSwitch.WriteLogToConsole:
+                        _config.Log.WriteToConsole = true;
                         break;
                 }
             }
         }
 
-        private int TryParseInt(string str, string key)
+        private int TryParseInt(string str)
         {
             int output;
             if (int.TryParse(str, out output))
                 return output;
-            //Logger.Write("После ключа " + key + " должно следовать число!");
             Environment.Exit(-1);
             return 0;
         }
