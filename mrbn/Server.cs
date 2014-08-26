@@ -8,6 +8,7 @@ using Balancer.Common.Logger.Enums;
 using Balancer.Common.Packet;
 using Balancer.Common.Packet.Packets;
 using Balancer.Common.Utils;
+using mrbn.Config.Data.LogData;
 using mrbn.GlobalBalancer.Data;
 
 namespace mrbn
@@ -36,7 +37,7 @@ namespace mrbn
         {
             _listener = new TcpListener(IPAddress.Any, port);
             _listener.Start();
-            Logger.Write(Config.MRBNConfig.Instance.LogFile, new StringLogData("Начато прослушивание " + IPAddress.Any + ":" + port), LogLevel.INFO);
+            Logger.Write(Config.MRBNConfig.Instance.Log.LogFile, new StringLogData("Начато прослушивание " + IPAddress.Any + ":" + port), LogLevel.INFO);
 
             _balancer = new GlobalBalancer.GlobalBalancer();
 
@@ -45,7 +46,7 @@ namespace mrbn
             while (_serverIsLife)
             {
                 TcpClient tcpClient = _listener.AcceptTcpClient();
-                Logger.Write(Config.MRBNConfig.Instance.LogFile, new StringLogData("Принято соединие"), LogLevel.INFO);
+                Logger.Write(Config.MRBNConfig.Instance.Log.LogFile, new StringLogData("Принято соединие"), LogLevel.INFO);
 
                 var t = new Thread(ClientThread);
                 t.Start(tcpClient);
@@ -58,7 +59,7 @@ namespace mrbn
         /// <param name="param"></param>
         private void ClientThread(object param)
         {
-            var transmitHelper = new PacketTransmitHelper(Config.MRBNConfig.Instance.LogFile);
+            var transmitHelper = new PacketTransmitHelper(Config.MRBNConfig.Instance.Log.LogFile);
             var rbnClient = (TcpClient) param;
 
             Packet statusPacket = transmitHelper.Recive(rbnClient.GetStream());
@@ -69,7 +70,8 @@ namespace mrbn
             var rbn = new RBN
             {
                 RbnClient = rbnClient,
-                RegionId = (int) rbnStatusPacket.RegionId,
+                RegionId = rbnStatusPacket.RegionId,
+                GlobalId = rbnStatusPacket.GlobalId,
                 Weight = 0
             };
 
@@ -92,7 +94,23 @@ namespace mrbn
                             break;
                         case PacketType.Request:
                             Debug.Assert(rbn.RelayRbn.RbnClient != null, "rbn.RelayRbn.RbnClient != null");
-                            Logger.Write(Config.MRBNConfig.Instance.LogFile, new StringLogData(string.Format("Предача запроса из {0} в {1} РБН", rbn.RegionId, rbn.RelayRbn.RegionId)), LogLevel.INFO);
+                            var dbRequestPacket = new DbRequestPacket(packet.Data);
+                            
+                            Logger.Write(Config.MRBNConfig.Instance.Log.LogFile, new StringLogData(string.Format("Предача запроса из {0} в {1} РБН", rbn.RegionId, rbn.RelayRbn.RegionId)), LogLevel.INFO);
+                            Logger.Write(Config.MRBNConfig.Instance.Log.StatsFile,
+                                new Transmit(
+                                    dbRequestPacket.GlobalId,
+                                    dbRequestPacket.RegionId,
+                                    (int) dbRequestPacket.ClientId,
+                                    dbRequestPacket.QueryNumber,
+                                    rbn.Weight,
+                                    rbn.RelayRbn.GlobalId,
+                                    rbn.RelayRbn.RegionId,
+                                    rbn.RelayRbn.Weight
+                                    ),
+                                LogLevel.INFO
+                                );
+
                             if (transmitHelper.Send(packet, rbn.RelayRbn.RbnClient.GetStream()))
                             {
                                 rbn.RelayRbn = null;
@@ -101,7 +119,7 @@ namespace mrbn
                         case PacketType.Answer: 
                             var dbAnswerPacket = new DbAnswerPacket(packet.Data);
                             RBN remoteRbn = _balancer.GetRbnByRegionId((int) dbAnswerPacket.RegionId);
-                            Logger.Write(Config.MRBNConfig.Instance.LogFile, new StringLogData(string.Format("Получен ответ для {1} из {0} РБН", rbn.RegionId, remoteRbn.RegionId)), LogLevel.INFO);
+                            Logger.Write(Config.MRBNConfig.Instance.Log.LogFile, new StringLogData(string.Format("Получен ответ для {1} из {0} РБН", rbn.RegionId, remoteRbn.RegionId)), LogLevel.INFO);
                             Debug.Assert(rbn.RegionId != remoteRbn.RegionId, "rbn.RegionId == remoteRbn.RegionId");
                             transmitHelper.Send(packet, remoteRbn.RbnClient.GetStream());
                             break;

@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\Data\Log.cs" />
+    <Compile Include="Config\Data\LogData\Transmit.cs" />
     <Compile Include="GlobalBalancer\GlobalBalancer.cs" />
     <Compile Include="GlobalBalancer\Data\RBN.cs" />
     <Compile Include="Config\Data\MRBN.cs" />

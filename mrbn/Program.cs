@@ -21,7 +21,8 @@ namespace mrbn
             }
             MRBNConfig.Load(configFilePath);
 
-            Logger.Write(MRBNConfig.Instance.LogFile,new StringLogData("Сервер запущен"), LogLevel.INFO);
+            Logger.Configure(MRBNConfig.Instance.Log);
+            Logger.Write(MRBNConfig.Instance.Log.LogFile,new StringLogData("Сервер запущен"), LogLevel.INFO);
 
             new Server((int)MRBNConfig.Instance.MRBN.Port);
         }
