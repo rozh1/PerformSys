@@ -6,14 +6,14 @@
     internal enum ComandSwitch
     {
         None,
-        ClientCount,
-        QueryPerClient,
         BalancerHost,
         BalancerPort,
         LogName,
         CsvLogName,
         LogDir,
-        WriteLogToConsole
+        WriteLogToConsole,
+        ScenarioFile,
+        DefaultScenario
     }
 
     /// <summary>
@@ -25,12 +25,9 @@
         {
             switch (input)
             {
-                case "-c":
-                case "--clients":
-                    return ComandSwitch.ClientCount;
-                case "-q":
-                case "--queries":
-                    return ComandSwitch.QueryPerClient;
+                case "-s":
+                case "--scenario":
+                    return ComandSwitch.ScenarioFile;
                 case "-h":
                 case "--host":
                     return ComandSwitch.BalancerHost;
@@ -45,6 +42,8 @@
                     return ComandSwitch.LogDir;
                 case "--log-to-console":
                     return ComandSwitch.WriteLogToConsole;
+                case "--default-scenario":
+                    return ComandSwitch.DefaultScenario;
                 default:
                     return ComandSwitch.None;
             }

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using Balancer.Common.Logger.Enums;
 using client.Config.Data;
+using client.Properties;
 
 namespace client.ComandLineParamsParser
 {
@@ -11,8 +13,6 @@ namespace client.ComandLineParamsParser
     {
         private readonly string[] _args;
         private readonly Config.Config _config;
-
-        public string ErrorText { get; private set; }
 
         public Parser(string[] args)
         {
@@ -30,6 +30,8 @@ namespace client.ComandLineParamsParser
             _args = args;
         }
 
+        public string ErrorText { get; private set; }
+
         /// <summary>
         ///     Парсер параметров
         /// </summary>
@@ -40,11 +42,12 @@ namespace client.ComandLineParamsParser
                 ComandSwitch comandSwitch = Switchs.Parse(_args[i]);
                 switch (comandSwitch)
                 {
-                    case ComandSwitch.ClientCount:
-                        _config.ClientCount = TryParseInt(_args[i + 1]);
+                    case ComandSwitch.DefaultScenario:
+                        _config.ScenarioFile = "defaultScenario.xml";
+                        File.WriteAllLines(_config.ScenarioFile, new[] {Resources.defaultScenario});
                         break;
-                    case ComandSwitch.QueryPerClient:
-                        _config.QueryCount = TryParseInt(_args[i + 1]);
+                    case ComandSwitch.ScenarioFile:
+                        _config.ScenarioFile = _args[i + 1];
                         break;
                     case ComandSwitch.BalancerHost:
                         _config.BalancerHost = _args[i + 1];
@@ -83,8 +86,7 @@ namespace client.ComandLineParamsParser
         private void CheckConfig()
         {
             string error = "";
-            if (_config.ClientCount == null) error += "Не указано количество клиентов!\n";
-            if (_config.QueryCount == null) error += "Не указано количество запросов от одного клиента!\n";
+            if (_config.ScenarioFile == null) error += "Не указан сценарий!\n";
             if (_config.BalancerHost == string.Empty) error += "Не указан адрес балансировщика!\n";
             if (_config.BalancerPort == null) error += "Не указан порт балансировщика!\n";
 

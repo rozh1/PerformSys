@@ -61,6 +61,24 @@ namespace client.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        ///&lt;Scenario xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        ///  &lt;ClientCount&gt;14&lt;/ClientCount&gt;
+        ///  &lt;ScenarioSteps&gt;
+        ///    &lt;ScenarioStep&gt;
+        ///      &lt;Duration&gt;PT5M&lt;/Duration&gt;
+        ///      &lt;Action&gt;Work&lt;/Action&gt;
+        ///    &lt;/ScenarioStep&gt;
+        ///  &lt;/ScenarioSteps&gt;
+        ///&lt;/Scenario&gt;.
+        /// </summary>
+        internal static string defaultScenario {
+            get {
+                return ResourceManager.GetString("defaultScenario", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на SELECT
         ///	L_RETURNFLAG,
         ///	L_LINESTATUS,
@@ -80,8 +98,7 @@ namespace client.Properties {
         ///	L_RETURNFLAG,
         ///	L_LINESTATUS
         ///ORDER BY
-        ///	L_RETURNFLAG,
-        ///	L_LINESTATUS;.
+        ///	L_RETURNFLAG,        /// [остаток строки не уместился]&quot;;.
         /// </summary>
         internal static string q1 {
             get {
@@ -280,8 +297,7 @@ namespace client.Properties {
         ///			REGION
         ///		WHERE
         ///			P_PARTKEY = PS_PARTKEY
-        ///			AND S_SUPPKEY = PS_SUPPKEY
-        ///			AND S_N [остаток строки не уместился]&quot;;.
+        ///			AND  [остаток строки не уместился]&quot;;.
         /// </summary>
         internal static string q2 {
             get {
@@ -311,8 +327,7 @@ namespace client.Properties {
         ///	O_SHIPPRIORITY
         ///ORDER BY
         ///	REVENUE DESC,
-        ///	O_ORDERDATE
-        ///LIMIT 0,10;.
+        ///	O_ORDERDATE;.
         /// </summary>
         internal static string q3 {
             get {

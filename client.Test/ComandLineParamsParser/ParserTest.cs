@@ -17,8 +17,6 @@ namespace client.Test.ComandLineParamsParser
 
             Assert.AreEqual(config.BalancerHost, "localhost");
             Assert.AreEqual(config.BalancerPort, 3409);
-            Assert.AreEqual(config.ClientCount, 10);
-            Assert.AreEqual(config.QueryCount, 1);
         }
 
         [TestMethod]
@@ -31,8 +29,6 @@ namespace client.Test.ComandLineParamsParser
 
             Assert.AreEqual(config.BalancerHost, "localhost");
             Assert.AreEqual(config.BalancerPort, 3409);
-            Assert.AreEqual(config.ClientCount, 10);
-            Assert.AreEqual(config.QueryCount, 1);
         }
 
         [TestMethod]
@@ -45,8 +41,6 @@ namespace client.Test.ComandLineParamsParser
 
             Assert.IsNull(config.BalancerHost);
             Assert.IsNull(config.BalancerPort);
-            Assert.IsNull(config.ClientCount);
-            Assert.IsNull(config.QueryCount);
         }
 
         [TestMethod]
@@ -58,9 +52,7 @@ namespace client.Test.ComandLineParamsParser
             Config.Config config = parser.GetConfig();
 
             Assert.AreEqual(config.BalancerPort, 3409);
-            Assert.AreEqual(config.ClientCount, 10);
             Assert.IsNull(config.BalancerHost);
-            Assert.IsNull(config.QueryCount);
         }
     }
 }
