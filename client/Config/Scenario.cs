@@ -17,18 +17,21 @@
  */
 #endregion
 
-﻿using Balancer.Common.Logger.Enums;
-using Balancer.Common.Logger.Interfaces;
+﻿using Balancer.Common.Config;
+using client.Config.Data;
 
-namespace client.Config.Data
+namespace client.Config
 {
-    public class Log : ILogConfig
+    public class Scenario : ConfigBase<Scenario>
     {
-        public string LogFile { get; set; }
-        public string StatsFile { get; set; }
-        public LogLevel LogLevel { get; set; }
-        public LogMode LogMode { get; set; }
-        public string LogDir { get; set; }
-        public bool WriteToConsole { get; set; }
+        /// <summary>
+        ///     Количество клиентов
+        /// </summary>
+        public int ClientCount { get; set; }
+
+        /// <summary>
+        ///     Последовательность действий сценария
+        /// </summary>
+        public ScenarioStep[] ScenarioSteps { get; set; }
     }
 }
