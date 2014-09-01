@@ -88,7 +88,7 @@ namespace client
         public ScenarioActions GetCurrentScenarioAction()
         {
             int index = FindScenarioStepIndex(_actionTimes);
-            if (index > 0)
+            if (index >= 0)
             {
                 return _scenarioSteps[index].Action;
             }
