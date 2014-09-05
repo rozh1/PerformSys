@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using Balancer.Common.Logger.Data;
 using Balancer.Common.Logger.Enums;
 
@@ -8,6 +9,9 @@ namespace Balancer.Common.Utils
 {
     public class PacketTransmitHelper
     {
+        object writeSyncObject = new object();
+        object readSyncObject = new object();
+
         private readonly string _logFilePath;
         public PacketTransmitHelper(string logFilePath)
         {
@@ -24,8 +28,11 @@ namespace Balancer.Common.Utils
             {
                 try
                 {
-                    networkStream.Write(packetBytes, 0, packetBytes.Length);
-                    networkStream.Flush();
+                    lock (writeSyncObject)
+                    {
+                        networkStream.Write(packetBytes, 0, packetBytes.Length);
+                        networkStream.Flush();
+                    }
                     result = true;
                 }
                 catch (Exception ex)
@@ -80,6 +87,7 @@ namespace Balancer.Common.Utils
                     }
                     _nextPacketData = "";
                 }
+                
                 if (count > 0)
                 {
                     packet = new Packet.Packet(packetData);

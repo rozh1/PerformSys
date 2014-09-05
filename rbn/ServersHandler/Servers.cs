@@ -207,7 +207,7 @@ namespace rbn.ServersHandler
                         case PacketType.Answer:
                             var answer = new DbAnswerPacket(packet.Data);
                             if (AnswerRecivedEvent != null)
-                                AnswerRecivedEvent(answer);
+                                AnswerRecivedEvent.BeginInvoke(answer,null,null);
                             break;
                         case PacketType.DataBaseInfo:
                             var dataBaseInfoPacket = new DataBaseInfoPacket(packet.Data)
