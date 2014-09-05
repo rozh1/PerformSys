@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Text;
 using Balancer.Common.Logger;
 using Balancer.Common.Logger.Data;
 using Balancer.Common.Logger.Enums;
@@ -51,7 +53,7 @@ namespace client
             for (int i = 0; i < scenario.ClientCount; i++)
             {
                 var qSeq = new QuerySequence.QuerySequence(14, (i%14) + 1);
-                clients[i] = new Client(config, (i + 1), qSeq, scenario.ScenarioSteps);
+                clients[i] = new Client(config, (i + 1), qSeq, scenario.ScenarioSteps, scenario.StartTime);
             }
 
             Logger.Write(config.Log.LogFile, new StringLogData("Клиенты запущены"), LogLevel.INFO);

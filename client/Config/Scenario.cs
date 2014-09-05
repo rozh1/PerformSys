@@ -1,4 +1,5 @@
-﻿using Balancer.Common.Config;
+﻿using System;
+using Balancer.Common.Config;
 using client.Config.Data;
 
 namespace client.Config
@@ -9,6 +10,11 @@ namespace client.Config
         ///     Количество клиентов
         /// </summary>
         public int ClientCount { get; set; }
+
+        /// <summary>
+        ///     Время начала выполнения сценария
+        /// </summary>
+        public DateTime StartTime { get; set; }
 
         /// <summary>
         ///     Последовательность действий сценария
