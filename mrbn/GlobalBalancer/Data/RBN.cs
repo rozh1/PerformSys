@@ -26,6 +26,7 @@ namespace mrbn.GlobalBalancer.Data
     internal class RBN : ICloneable<RBN>
     {
         private double _weight;
+        private RBN _relayRbn;
 
         public TcpClient RbnClient { get; set; }
         public uint RegionId { get; set; }
@@ -43,13 +44,33 @@ namespace mrbn.GlobalBalancer.Data
                     {
                         WeightChanged();
                     }
+                    //if (RelayRbn != null && (Weight - RelayRbn.Weight) > 0.001)
+                    //{
+                    //    TransmitRequest();
+                    //}
                 }
             }
         }
 
-        public RBN RelayRbn { get; set; }
+        public RBN RelayRbn
+        {
+            get { return _relayRbn; }
+            set
+            {
+                if (_relayRbn != value)
+                {
+                    _relayRbn = value;
+                    if (RelayRbnChanged != null)
+                    {
+                        RelayRbnChanged();
+                    }
+                }
+            }
+        }
 
         public event Action WeightChanged;
+        public event Action RelayRbnChanged;
+        public event Action TransmitRequest;
 
         public RBN Clone()
         {
