@@ -25,6 +25,7 @@ namespace mrbn.GlobalBalancer
                 RBN existRbn = _rbns.FirstOrDefault(curRbn => curRbn.RegionId == rbn.RegionId);
                 if (existRbn == null)
                 {
+                    rbn.WeightChanged += ConnectRbns;
                     _rbns.Add(rbn);
                     result = true;
                 }
@@ -39,12 +40,13 @@ namespace mrbn.GlobalBalancer
             {
                 if (_rbns.Contains(rbn))
                 {
+                    rbn.WeightChanged -= ConnectRbns;
                     _rbns.Remove(rbn);
                 }
             }
         }
 
-        public void ConnectRbns()
+        private void ConnectRbns()
         {
             var lowLoadRbn = new RBN { RbnClient = null, RegionId = 0, Weight = 1 };
             var highLoadRbn = new RBN { RbnClient = null, RegionId = 0, Weight = 0 }; 

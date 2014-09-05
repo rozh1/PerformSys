@@ -1,9 +1,10 @@
 ﻿using System.Runtime.Serialization;
 using Balancer.Common.Utils;
+using Balancer.Common.Utils.Interfaces;
 
 namespace Balancer.Common.Packet.Packets
 {
-    public class DbRequestPacket : PacketBase, IPacket, IClonable<DbRequestPacket>
+    public class DbRequestPacket : PacketBase, IPacket, ICloneable<DbRequestPacket>
     {
         public DbRequestPacket(string query, int queryNumber)
         {

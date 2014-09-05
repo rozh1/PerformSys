@@ -1,10 +1,11 @@
 ﻿using System.Data;
 using System.Runtime.Serialization;
 using Balancer.Common.Utils;
+using Balancer.Common.Utils.Interfaces;
 
 namespace Balancer.Common.Packet.Packets
 {
-    public class DbAnswerPacket : PacketBase, IPacket, IClonable<DbAnswerPacket>
+    public class DbAnswerPacket : PacketBase, IPacket, ICloneable<DbAnswerPacket>
     {
         public DbAnswerPacket(string answerPacketData)
         {

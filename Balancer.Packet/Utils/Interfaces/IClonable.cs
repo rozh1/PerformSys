@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Balancer.Common.Utils
+﻿namespace Balancer.Common.Utils.Interfaces
 {
-    interface IClonable<out T>
+    public interface ICloneable<out T>
     {
         T Clone();
     }
