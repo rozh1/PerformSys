@@ -80,6 +80,7 @@ namespace mrbn
         {
             var transmitHelper = new PacketTransmitHelper(Config.MRBNConfig.Instance.Log.LogFile);
             var rbnClient = (TcpClient) param;
+            RBN currentRbnRelay = null;
 
             Packet statusPacket = transmitHelper.Recive(rbnClient.GetStream());
             if (statusPacket == null) return;
@@ -112,7 +113,7 @@ namespace mrbn
                             //Logger.Write(string.Format("Получен вес очереди {0} РБН {1}", rbn.RegionId, rbn.Weight));
                             break;
                         case PacketType.Request:
-                            Debug.Assert(rbn.RelayRbn.RbnClient != null, "rbn.RelayRbn.RbnClient != null");
+                            Debug.Assert(currentRbnRelay.RbnClient != null, "currentRbnRelay.RbnClient != null");
                             var dbRequestPacket = new DbRequestPacket(packet.Data);
                             
                             Logger.Write(Config.MRBNConfig.Instance.Log.LogFile, new StringLogData(string.Format("Предача запроса из {0} в {1} РБН", rbn.RegionId, rbn.RelayRbn.RegionId)), LogLevel.INFO);
@@ -123,16 +124,17 @@ namespace mrbn
                                     (int) dbRequestPacket.ClientId,
                                     dbRequestPacket.QueryNumber,
                                     rbn.Weight,
-                                    rbn.RelayRbn.GlobalId,
-                                    rbn.RelayRbn.RegionId,
-                                    rbn.RelayRbn.Weight
+                                    currentRbnRelay.GlobalId,
+                                    currentRbnRelay.RegionId,
+                                    currentRbnRelay.Weight
                                     ),
                                 LogLevel.INFO
                                 );
 
-                            if (transmitHelper.Send(packet, rbn.RelayRbn.RbnClient.GetStream()))
+                            if (transmitHelper.Send(packet, currentRbnRelay.RbnClient.GetStream()))
                             {
                                 rbn.RelayRbn = null;
+                                currentRbnRelay = null;
                             }
                             break;
                         case PacketType.Answer: 
@@ -144,9 +146,9 @@ namespace mrbn
                             break;
                     }
                 }
-                _balancer.ConnectRbns();
-                if (rbn.RelayRbn != null && rbn.RelayRbn.RbnClient != null)
+                if (rbn.RelayRbn != null && rbn.RelayRbn.RbnClient != null && currentRbnRelay == null)
                 {
+                    currentRbnRelay = rbn.RelayRbn.Clone();
                     transmitHelper.Send((new TransmitRequestPacket()).GetPacket(), rbn.RbnClient.GetStream());
                 }
             }
