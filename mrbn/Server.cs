@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -76,6 +77,9 @@ namespace mrbn
                 Weight = 0
             };
 
+            rbn.RelayRbnChanged += (() => currentRbnRelay = rbn.RelayRbn);
+            //rbn.TransmitRequest += (() => transmitHelper.Send((new TransmitRequestPacket()).GetPacket(), rbn.RbnClient.GetStream()));
+
             if (!_balancer.AddRbn(rbn))
             {
                 rbnClient.Close();
@@ -94,7 +98,7 @@ namespace mrbn
                             //Logger.Write(string.Format("Получен вес очереди {0} РБН {1}", rbn.RegionId, rbn.Weight));
                             break;
                         case PacketType.Request:
-                            Debug.Assert(currentRbnRelay.RbnClient != null, "currentRbnRelay.RbnClient != null");
+                            Debug.Assert(currentRbnRelay != null && currentRbnRelay.RbnClient != null, "currentRbnRelay.RbnClient != null");
                             var dbRequestPacket = new DbRequestPacket(packet.Data);
                             
                             Logger.Write(Config.MRBNConfig.Instance.Log.LogFile, new StringLogData(string.Format("Предача запроса из {0} в {1} РБН", rbn.RegionId, rbn.RelayRbn.RegionId)), LogLevel.INFO);
@@ -112,11 +116,7 @@ namespace mrbn
                                 LogLevel.INFO
                                 );
 
-                            if (transmitHelper.Send(packet, currentRbnRelay.RbnClient.GetStream()))
-                            {
-                                rbn.RelayRbn = null;
-                                currentRbnRelay = null;
-                            }
+                            transmitHelper.Send(packet, currentRbnRelay.RbnClient.GetStream());
                             break;
                         case PacketType.Answer: 
                             var dbAnswerPacket = new DbAnswerPacket(packet.Data);
@@ -127,9 +127,8 @@ namespace mrbn
                             break;
                     }
                 }
-                if (rbn.RelayRbn != null && rbn.RelayRbn.RbnClient != null && currentRbnRelay == null)
+                if (currentRbnRelay != null && (rbn.Weight - currentRbnRelay.Weight) > 0.1)
                 {
-                    currentRbnRelay = rbn.RelayRbn.Clone();
                     transmitHelper.Send((new TransmitRequestPacket()).GetPacket(), rbn.RbnClient.GetStream());
                 }
             }
