@@ -45,6 +45,7 @@ namespace client
         private readonly QuerySequence.QuerySequence _querySequence;
         private readonly ScenarioStep[] _scenarioSteps;
         private int _queryNumber;
+        private DateTime _starTime;
 
         /// <summary>
         ///     Конструктор.
@@ -56,7 +57,8 @@ namespace client
         public Client(Config.Config config,
             int clientId,
             QuerySequence.QuerySequence querySequence,
-            ScenarioStep[] scenarioSteps)
+            ScenarioStep[] scenarioSteps,
+            DateTime startTime)
         {
             _address = config.BalancerHost;
             Debug.Assert(config.BalancerPort != null, "config.BalancerPort != null");
@@ -66,6 +68,7 @@ namespace client
             _querySequence = querySequence;
             _config = config;
             _packetTransmitHelper = new PacketTransmitHelper(_config.Log.LogFile);
+            _starTime = startTime;
 
             var t = new Thread(ClientThread);
             t.Start();
@@ -79,6 +82,11 @@ namespace client
             int loopNumber = 0;
             var tcpClient = new TcpClient();
             var clientStatsData = new ClientStatsData();
+
+            while (DateTime.Now < _starTime)
+            {
+                Thread.Sleep(100);
+            }
 
             tcpClient.Connect(_address, _port);
 
