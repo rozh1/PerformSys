@@ -25,10 +25,10 @@ namespace mrbn.GlobalBalancer.Data
                     {
                         WeightChanged();
                     }
-                    //if (RelayRbn != null && (Weight - RelayRbn.Weight) > 0.001)
-                    //{
-                    //    TransmitRequest();
-                    //}
+                    if (RelayRbn != null && (Weight - RelayRbn.Weight) > 0.001)
+                    {
+                        TransmitRequest();
+                    }
                 }
             }
         }

@@ -135,9 +135,12 @@ namespace server
             if (dt != null)
             {
                 Logger.Write(ServerConfig.Instance.Log.LogFile, 
-                    new StringLogData("Отправка информации о БД РБНу"), 
+                    new StringLogData(string.Format("Отправка информации о {0} БД РБНу",regionId)), 
                     LogLevel.INFO);
+                
                 var dataBaseInfoPacket = new DataBaseInfoPacket(tableSizes);
+                dataBaseInfoPacket.RegionId = (uint)regionId;
+
                 _transmitHelper.Send(dataBaseInfoPacket.GetPacket(), _tcpClient.GetStream());
             }
         }

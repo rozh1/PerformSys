@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Balancer.Common.Logger;
@@ -279,7 +280,10 @@ namespace rbn.QueueHandler
             foreach (TableSizes tableSize in _tableSizes)
             {
                 if (tableSize.RegionId == packet.RegionId && tableSize.GlobalId == packet.GlobalId)
+                {
                     tableSizes = tableSize;
+                    break;
+                }
             }
 
             if (tableSizes != null)
@@ -305,22 +309,32 @@ namespace rbn.QueueHandler
 
         public double ComputeQueueWeight()
         {
-            TableSizes tableSizes = null;
-            foreach (TableSizes tableSize in _tableSizes)
+            double weight = 0;
+            double normalize = RBNConfig.Instance.RBN.ServersCount / (double)RBNConfig.Instance.RBN.MaxServersCount;
+
+            if (_queue.Count > 0)
             {
-                if (tableSize.RegionId == RBNConfig.Instance.RBN.RegionId &&
-                    tableSize.GlobalId == RBNConfig.Instance.RBN.GlobalId)
-                    tableSizes = tableSize;
+                lock (_queue)
+                {
+                    foreach (TableSizes tableSize in _tableSizes)
+                    {
+                        if (tableSize != null)
+                        {
+                            QueueEntity[] queueEntities = _queue.Where(queueEntity =>
+                                queueEntity.RequestPacket.RegionId == tableSize.RegionId &&
+                                queueEntity.RequestPacket.GlobalId == tableSize.GlobalId
+                                ).ToArray();
+                            if (queueEntities.Length > 0)
+                            {
+                                double requestVolume = queueEntities.Sum(queueEntity => queueEntity.RelationVolume);
+                                weight += requestVolume / (_queue.Count * tableSize.DataBaseSize);
+                            }
+                        }
+                    }
+                }
             }
-            lock (_queue)
-            {
-                double requestVolume = _queue.Sum(queueEntity => queueEntity.RelationVolume);
-                double normalize = RBNConfig.Instance.RBN.ServersCount/
-                                   (double) RBNConfig.Instance.RBN.MaxServersCount;
-                if (tableSizes != null && _queue.Count > 0)
-                    return (requestVolume/(_queue.Count*tableSizes.DataBaseSize))*normalize;
-            }
-            return 0;
+            Debug.WriteLine(weight * normalize);
+            return weight*normalize;
         }
 
         public int ComputeClientId(PacketBase packet)

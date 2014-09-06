@@ -212,7 +212,6 @@ namespace rbn.ServersHandler
                         case PacketType.DataBaseInfo:
                             var dataBaseInfoPacket = new DataBaseInfoPacket(packet.Data)
                             {
-                                RegionId = Config.RBNConfig.Instance.RBN.RegionId,
                                 GlobalId = Config.RBNConfig.Instance.RBN.GlobalId
                             };
                             if (DataBaseInfoRecivedEvent != null) DataBaseInfoRecivedEvent(dataBaseInfoPacket);
