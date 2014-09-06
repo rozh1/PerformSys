@@ -97,7 +97,7 @@ namespace mrbn
             };
 
             rbn.RelayRbnChanged += (() => currentRbnRelay = rbn.RelayRbn);
-            //rbn.TransmitRequest += (() => transmitHelper.Send((new TransmitRequestPacket()).GetPacket(), rbn.RbnClient.GetStream()));
+            rbn.TransmitRequest += (() => transmitHelper.Send((new TransmitRequestPacket()).GetPacket(), rbn.RbnClient.GetStream()));
 
             if (!_balancer.AddRbn(rbn))
             {
@@ -146,10 +146,10 @@ namespace mrbn
                             break;
                     }
                 }
-                if (currentRbnRelay != null && (rbn.Weight - currentRbnRelay.Weight) > 0.1)
-                {
-                    transmitHelper.Send((new TransmitRequestPacket()).GetPacket(), rbn.RbnClient.GetStream());
-                }
+                //if (currentRbnRelay != null && (rbn.Weight - currentRbnRelay.Weight) > 0.1)
+                //{
+                //    transmitHelper.Send((new TransmitRequestPacket()).GetPacket(), rbn.RbnClient.GetStream());
+                //}
             }
 
             _balancer.Remove(rbn);
