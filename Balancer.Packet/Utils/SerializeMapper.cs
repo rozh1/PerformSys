@@ -1,28 +1,51 @@
 ﻿using System;
+using System.Data;
 using System.IO;
+using ProtoBuf;
+using ProtoBuf.Data;
 
 namespace Balancer.Common.Utils
 {
     public static class SerializeMapper
     {
-        public static string Serialize(object obj)
+        public static string Serialize<T>(T obj)
         {
             using (var stream = new MemoryStream())
             {
-                ProtoBuf.Serializer.Serialize(stream, obj);
+                if (typeof (T) == typeof (DataTable))
+                {
+                    DataTable dt = (DataTable) (object) obj;
+                    DataSerializer.Serialize(stream, dt);
+                }
+                else
+                {
+                    Serializer.Serialize(stream, obj);
+                }
                 byte[] bytes = stream.ToArray();
-                string xml = Convert.ToBase64String(bytes);//Encoding.UTF8.GetString(bytes);
+                string xml = Convert.ToBase64String(bytes); //Encoding.UTF8.GetString(bytes);
                 return xml;
             }
         }
 
         public static T Deserialize<T>(string xml)
         {
-            byte[] bytes = Convert.FromBase64String(xml);//Encoding.UTF8.GetBytes(xml);
+            byte[] bytes = Convert.FromBase64String(xml); //Encoding.UTF8.GetBytes(xml);
             using (var stream = new MemoryStream(bytes))
             {
-                var obj = ProtoBuf.Serializer.Deserialize<T>(stream);
-                return obj;
+                if (typeof (T) == typeof (DataTable))
+                {
+                    DataTable dt = new DataTable();
+                    using (IDataReader reader = DataSerializer.Deserialize(stream))
+                    {
+                        dt.Load(reader);
+                    }
+                    return (T) (object) dt;
+                }
+                else
+                {
+                    var obj = Serializer.Deserialize<T>(stream);
+                    return obj;
+                }
             }
         }
     }
