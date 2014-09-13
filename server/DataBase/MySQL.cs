@@ -18,7 +18,9 @@
 #endregion
 
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using Balancer.Common.Logger;
 using Balancer.Common.Logger.Data;
 using Balancer.Common.Logger.Enums;
@@ -175,6 +177,37 @@ namespace server.DataBase
                 ConnectionClose(conn);
             }
             return answer;
+        }
+
+        protected List<DbDataRecord> GetData(MySqlCommand command)
+        {
+            var dataList = new List<DbDataRecord>();
+            using (command)
+            using (var connection = ConnectionOpen())
+            {
+                try
+                {
+                    connection.Open();
+                    command.Connection = connection;
+                    using (MySqlDataReader dataReader = command.ExecuteReader())
+                    {
+                        if (dataReader.HasRows)
+                        {
+                            foreach (DbDataRecord record in dataReader)
+                            {
+                                dataList.Add(record);
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Write(ServerConfig.Instance.Log.LogFile, 
+                        new StringLogData("GetData. При получении данных из БД вылетело исключение: " + ex.Message),
+                        LogLevel.ERROR);
+                }
+            }
+            return dataList;
         }
 
         /// <summary>

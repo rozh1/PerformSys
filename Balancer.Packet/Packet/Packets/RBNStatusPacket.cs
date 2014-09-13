@@ -17,7 +17,7 @@
  */
 #endregion
 
-﻿using System.Runtime.Serialization;
+﻿using Balancer.Common.Packet.Packets.Data;
 using Balancer.Common.Utils;
 
 namespace Balancer.Common.Packet.Packets
@@ -31,7 +31,7 @@ namespace Balancer.Common.Packet.Packets
 
         public RBNStatusPacket(string serializedPacketData)
         {
-            var packetData = SerializeMapper.Deserialize<PacketData>(serializedPacketData);
+            var packetData = SerializeMapper.Deserialize<RBNStatusPacketData>(serializedPacketData);
             RegionId = packetData.RegionId;
             ClientId = packetData.ClientId;
             GlobalId = packetData.GlobalId;
@@ -42,7 +42,7 @@ namespace Balancer.Common.Packet.Packets
 
         string SerializePacketData()
         {
-            return SerializeMapper.Serialize(new RBNStatusPacket.PacketData()
+            return SerializeMapper.Serialize(new RBNStatusPacketData()
             {
                 ClientId = ClientId,
                 RegionId = RegionId,
@@ -54,13 +54,6 @@ namespace Balancer.Common.Packet.Packets
         public Packet GetPacket()
         {
             return new Packet(PacketType.RBNStatus, SerializePacketData());
-        }
-
-        [DataContract]
-        private class PacketData : PacketBase
-        {
-            [DataMember]
-            public double Weight { get; set; }
         }
     }
 }

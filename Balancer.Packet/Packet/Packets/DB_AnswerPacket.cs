@@ -17,8 +17,7 @@
  */
 #endregion
 
-﻿using System.Data;
-using System.Runtime.Serialization;
+﻿using Balancer.Common.Packet.Packets.Data;
 using Balancer.Common.Utils;
 using Balancer.Common.Utils.Interfaces;
 
@@ -28,7 +27,7 @@ namespace Balancer.Common.Packet.Packets
     {
         public DbAnswerPacket(string answerPacketData)
         {
-            var packetData = SerializeMapper.Deserialize<PacketData>(answerPacketData);
+            var packetData = SerializeMapper.Deserialize<DbAnswerPacketData>(answerPacketData);
             AnswerDataTable = packetData.DataTable;
             QueryNumber = packetData.QueryNumber;
             RegionId = packetData.RegionId;
@@ -55,7 +54,7 @@ namespace Balancer.Common.Packet.Packets
 
         private string SerializePacketData()
         {
-            return SerializeMapper.Serialize(new PacketData
+            return SerializeMapper.Serialize(new DbAnswerPacketData
             {
                 DataTable = AnswerDataTable,
                 QueryNumber = QueryNumber,
@@ -63,16 +62,6 @@ namespace Balancer.Common.Packet.Packets
                 RegionId = RegionId,
                 GlobalId = GlobalId,
             });
-        }
-
-        [DataContract]
-        internal class PacketData : PacketBase
-        {
-            [DataMember]
-            public byte[] DataTable { get; set; }
-
-            [DataMember]
-            public int QueryNumber { get; set; }
         }
 
         public DbAnswerPacket Clone()

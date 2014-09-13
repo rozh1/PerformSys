@@ -47,9 +47,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="mysql.data, Version=6.7.4.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+    <Reference Include="MySql.Data, Version=6.9.3.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\mysql.data.dll</HintPath>
+      <HintPath>..\packages\MySql.Data.6.9.3\lib\net20\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -87,9 +87,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="mysql.data.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <None Include="packages.config" />
     <None Include="Resources\defaultConfig.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -113,10 +111,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy /Y "$(TargetPath)" "$(SolutionDir)_bin\"
-
-xcopy /Y "$(TargetDir)mysql.data.dll" "$(SolutionDir)_bin\"
-xcopy /Y "$(SolutionDir)Utils\_initBaseSystem.bat" "$(SolutionDir)_bin\"
-</PostBuildEvent>
+xcopy /Y "$(TargetDir)*.dll" "$(SolutionDir)_bin\"
+xcopy /Y "$(SolutionDir)Utils\*.bat" "$(SolutionDir)_bin\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

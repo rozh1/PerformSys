@@ -17,26 +17,16 @@
  */
 #endregion
 
-﻿using Balancer.Common.Packet.Packets.Data;
-using Balancer.Common.Utils;
+﻿using System;
+using System.Collections.Generic;
+using ProtoBuf;
 
-namespace Balancer.Common.Packet.Packets
+namespace Balancer.Common.Packet.Packets.Data
 {
-    public class TransmitRequestPacket : PacketBase, IPacket
+    [ProtoContract]
+    public class DataBaseInfoPacketData : PacketBase
     {
-        string SerializePacketData()
-        {
-            return SerializeMapper.Serialize(new TransmitRequestPacketData()
-            {
-                ClientId = ClientId,
-                RegionId = RegionId,
-                GlobalId = GlobalId,
-            });
-        }
-
-        public Packet GetPacket()
-        {
-            return new Packet(PacketType.TransmitRequest, SerializePacketData());
-        }
+        [ProtoMember(1)]
+        public Dictionary<string, UInt64> TableSizes { get; set; }
     }
 }
