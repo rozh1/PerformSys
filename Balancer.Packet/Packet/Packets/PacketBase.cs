@@ -1,16 +1,20 @@
-﻿using System.Runtime.Serialization;
+﻿using Balancer.Common.Packet.Packets.Data;
 using Balancer.Common.Utils;
+using ProtoBuf;
 
 namespace Balancer.Common.Packet.Packets
 {
-    [DataContract]
+    [ProtoContract]
+    [ProtoInclude(100, typeof(DataBaseInfoPacketData))]
+    [ProtoInclude(200, typeof(DbAnswerPacketData))]
+    [ProtoInclude(300, typeof(DbRequestPacketData))]
     public class PacketBase
     {
-        [DataMember]
+        [ProtoMember(1)]
         public uint GlobalId { get; set; }
-        [DataMember]
+        [ProtoMember(2)]
         public uint RegionId { get; set; }
-        [DataMember]
+        [ProtoMember(3)]
         public uint ClientId { get; set; }
 
         public void Deserialize(string serializedPacket)

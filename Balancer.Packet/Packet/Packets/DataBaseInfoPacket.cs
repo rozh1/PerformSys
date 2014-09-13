@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+using Balancer.Common.Packet.Packets.Data;
 using Balancer.Common.Utils;
 
 namespace Balancer.Common.Packet.Packets
@@ -14,18 +14,18 @@ namespace Balancer.Common.Packet.Packets
 
         public DataBaseInfoPacket(string serializedPacketData)
         {
-            var packetData = SerializeMapper.Deserialize<PacketData>(serializedPacketData);
+            var packetData = SerializeMapper.Deserialize<DataBaseInfoPacketData>(serializedPacketData);
             RegionId = packetData.RegionId;
             ClientId = packetData.ClientId;
             GlobalId = packetData.GlobalId;
             TableSizes = packetData.TableSizes;
         }
-
+        
         public Dictionary<string, UInt64> TableSizes { get; set; }
 
         string SerializePacketData()
         {
-            return SerializeMapper.Serialize(new DataBaseInfoPacket.PacketData()
+            return SerializeMapper.Serialize(new DataBaseInfoPacketData()
             {
                 ClientId = ClientId,
                 RegionId = RegionId,
@@ -37,13 +37,6 @@ namespace Balancer.Common.Packet.Packets
         public Packet GetPacket()
         {
             return new Packet(PacketType.DataBaseInfo, SerializePacketData());
-        }
-
-        [DataContract]
-        private class PacketData : PacketBase
-        {
-            [DataMember]
-            public Dictionary<string, UInt64> TableSizes { get; set; }
         }
     }
 }

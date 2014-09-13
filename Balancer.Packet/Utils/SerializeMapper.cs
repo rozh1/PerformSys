@@ -1,7 +1,5 @@
-﻿using System.IO;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Xml.Serialization;
+﻿using System;
+using System.IO;
 
 namespace Balancer.Common.Utils
 {
@@ -9,23 +7,21 @@ namespace Balancer.Common.Utils
     {
         public static string Serialize(object obj)
         {
-            var serializer = new NetDataContractSerializer();
             using (var stream = new MemoryStream())
             {
-                serializer.Serialize(stream, obj);
+                ProtoBuf.Serializer.Serialize(stream, obj);
                 byte[] bytes = stream.ToArray();
-                string xml = Encoding.UTF8.GetString(bytes);
+                string xml = Convert.ToBase64String(bytes);//Encoding.UTF8.GetString(bytes);
                 return xml;
             }
         }
 
         public static T Deserialize<T>(string xml)
         {
-            var serializer = new NetDataContractSerializer();
-            byte[] bytes = Encoding.UTF8.GetBytes(xml);
+            byte[] bytes = Convert.FromBase64String(xml);//Encoding.UTF8.GetBytes(xml);
             using (var stream = new MemoryStream(bytes))
             {
-                var obj = (T)serializer.Deserialize(stream);
+                var obj = ProtoBuf.Serializer.Deserialize<T>(stream);
                 return obj;
             }
         }

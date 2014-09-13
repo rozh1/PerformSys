@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+﻿using Balancer.Common.Packet.Packets.Data;
 using Balancer.Common.Utils;
 using Balancer.Common.Utils.Interfaces;
 
@@ -23,7 +23,7 @@ namespace Balancer.Common.Packet.Packets
 
         public DbRequestPacket(string serializedQuery)
         {
-            var packetData = SerializeMapper.Deserialize<PacketData>(serializedQuery);
+            var packetData = SerializeMapper.Deserialize<DbRequestPacketData>(serializedQuery);
             Query = packetData.Query;
             QueryNumber = packetData.QueryNumber;
             RegionId = packetData.RegionId;
@@ -33,7 +33,7 @@ namespace Balancer.Common.Packet.Packets
 
         string SerializePacketData()
         {
-            return SerializeMapper.Serialize(new PacketData
+            return SerializeMapper.Serialize(new DbRequestPacketData
             {
                 Query = Query,
                 QueryNumber = QueryNumber,
@@ -49,15 +49,6 @@ namespace Balancer.Common.Packet.Packets
         public Packet GetPacket()
         {
             return new Packet(PacketType.Request, SerializePacketData());
-        }
-
-        [DataContract]
-        private class PacketData : PacketBase
-        {
-            [DataMember]
-            public string Query { get; set; }
-            [DataMember]
-            public int QueryNumber { get; set; }
         }
 
         public DbRequestPacket Clone()
