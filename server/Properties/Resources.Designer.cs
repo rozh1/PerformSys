@@ -59,30 +59,5 @@ namespace server.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
-        ///&lt;ServerConfig xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
-        ///  &lt;DataBase&gt;
-        ///    &lt;DataBaseType&gt;MySQL&lt;/DataBaseType&gt;
-        ///    &lt;Host&gt;localhost&lt;/Host&gt;
-        ///    &lt;Port&gt;3306&lt;/Port&gt;
-        ///    &lt;UserName&gt;root&lt;/UserName&gt;
-        ///    &lt;Password&gt;0000&lt;/Password&gt;
-        ///    &lt;DataBaseName&gt;tpch1&lt;/DataBaseName&gt;
-        ///  &lt;/DataBase&gt;
-        ///  &lt;Server&gt;
-        ///    &lt;RBN&gt;
-        ///      &lt;Port&gt;3410&lt;/Port&gt;
-        ///      &lt;Host&gt;localhost&lt;/Host&gt;
-        ///    &lt;/RBN&gt;
-        ///    &lt;WorkMode&gt;Simulation&lt;/WorkMode&gt;
-        ///  &lt;/Serv [остаток строки не уместился]&quot;;.
-        /// </summary>
-        internal static string defaultConfig {
-            get {
-                return ResourceManager.GetString("defaultConfig", resourceCulture);
-            }
-        }
     }
 }
