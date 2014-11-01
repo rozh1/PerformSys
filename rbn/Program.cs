@@ -15,8 +15,7 @@ namespace rbn
             const string configFilePath = "rbnConfig.xml";
             if (!File.Exists(configFilePath))
             {
-                RBNConfig.Load(
-                    new MemoryStream(Encoding.UTF8.GetBytes(Resources.defaultConfig))).Save(configFilePath);
+                (new ConfigInit()).Config.Save(configFilePath);
             }
             RBNConfig.Load(configFilePath);
 
