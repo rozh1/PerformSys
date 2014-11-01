@@ -41,14 +41,14 @@ namespace Balancer.Common.Utils
                     Serializer.Serialize(stream, obj);
                 }
                 byte[] bytes = stream.ToArray();
-                string xml = Convert.ToBase64String(bytes); //Encoding.UTF8.GetString(bytes);
+                string xml = Convert.ToBase64String(bytes);
                 return xml;
             }
         }
 
         public static T Deserialize<T>(string xml)
         {
-            byte[] bytes = Convert.FromBase64String(xml); //Encoding.UTF8.GetBytes(xml);
+            byte[] bytes = Convert.FromBase64String(xml);
             using (var stream = new MemoryStream(bytes))
             {
                 if (typeof (T) == typeof (DataTable))
