@@ -9,19 +9,17 @@ using Balancer.Common.Logger.Enums;
 using server.Config;
 using server.Config.Data;
 using server.DataBase;
-using server.Properties;
 
 namespace server
 {
-    internal class Program
+    internal static class Program
     {
         private static void Main()
         {
             const string configFilePath = "serverConfig.xml";
             if (!File.Exists(configFilePath))
             {
-                ServerConfig.Load(
-                    new MemoryStream(Encoding.UTF8.GetBytes(Resources.defaultConfig))).Save(configFilePath);
+                (new ConfigInit()).Config.Save(configFilePath);
             }
             ServerConfig.Load(configFilePath);
 

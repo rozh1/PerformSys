@@ -175,7 +175,7 @@ namespace server
         /// </summary>
         private void SendStatus()
         {
-            bool status = (_queueLength < Environment.ProcessorCount*2);
+            bool status = (_queueLength < Environment.ProcessorCount+1);
             var sp = new ServerStatusPacket(status);
             if (_tcpClient.Connected)
             {
