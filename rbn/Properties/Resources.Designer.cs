@@ -59,28 +59,5 @@ namespace rbn.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Ищет локализованную строку, похожую на &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
-        ///&lt;RBNConfig xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
-        ///  &lt;RBN&gt;
-        ///    &lt;GlobalId&gt;1&lt;/GlobalId&gt;
-        ///    &lt;RegionId&gt;1&lt;/RegionId&gt;
-        ///    &lt;Port&gt;3409&lt;/Port&gt;
-        ///  &lt;/RBN&gt;
-        ///  &lt;MRBN&gt;
-        ///    &lt;Host&gt;localhost&lt;/Host&gt;
-        ///    &lt;Port&gt;3400&lt;/Port&gt;
-        ///  &lt;/MRBN&gt;
-        ///  &lt;Server&gt;
-        ///    &lt;Port&gt;3410&lt;/Port&gt;
-        ///  &lt;/Server&gt;
-        ///&lt;/RBNConfig&gt;.
-        /// </summary>
-        internal static string defaultConfig {
-            get {
-                return ResourceManager.GetString("defaultConfig", resourceCulture);
-            }
-        }
     }
 }

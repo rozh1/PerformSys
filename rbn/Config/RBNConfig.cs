@@ -17,25 +17,31 @@
  */
 #endregion
 
-﻿using System;
-using System.IO;
-using System.Xml.Serialization;
-using Balancer.Common.Config;
+﻿using Balancer.Common.Config;
 using rbn.Config.Data;
 
 namespace rbn.Config
 {
     public class RBNConfig : ConfigBase<RBNConfig>
     {
-        public Data.RBN RBN { get; set; }
-
-        public Data.MRBN MRBN { get; set; }
-
-        public Log Log { get; set; }
-
         /// <summary>
-        ///     Конфиг серверов
+        ///     Конфиг сервера клиентов
         /// </summary>
         public Data.Server Server { get; set; }
+
+        /// <summary>
+        ///     Конфиг параметров РБН
+        /// </summary>
+        public Data.RBN RBN { get; set; }
+
+        /// <summary>
+        ///     Конфиг подключения к МРБН
+        /// </summary>
+        public Data.MRBN MRBN { get; set; }
+
+        /// <summary>
+        ///     Конфиг логировщика
+        /// </summary>
+        public Log Log { get; set; }
     }
 }
