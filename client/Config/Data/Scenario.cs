@@ -1,19 +1,20 @@
 ﻿using System;
-using Balancer.Common.Config;
-using client.Config.Data;
+using System.Xml.Serialization;
 
-namespace client.Config
+namespace client.Config.Data
 {
-    public class Scenario : ConfigBase<Scenario>
+    public class Scenario
     {
         /// <summary>
         ///     Количество клиентов
         /// </summary>
+        [XmlAttribute]
         public int ClientCount { get; set; }
 
         /// <summary>
         ///     Время начала выполнения сценария
         /// </summary>
+        [XmlAttribute]
         public DateTime StartTime { get; set; }
 
         /// <summary>

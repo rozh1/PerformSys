@@ -57,7 +57,7 @@ namespace server.Config
                         Password = "0000",
                         UserName = "root",
                         Port = 3306,
-                        RegionId = 1,
+                        RegionId = 2,
                         SimulationParams =
                             new SimulationParams
                             {
@@ -100,7 +100,7 @@ namespace server.Config
                     },
                     WorkMode = WorkMode.Simulation
                 },
-                Log = new Log()
+                Log = new Log
                 {
                     LogFile = "serverLog.txt",
                     QueueStatsFile = "serverQueue.csv",

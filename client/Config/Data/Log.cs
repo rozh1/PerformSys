@@ -1,4 +1,5 @@
-﻿using Balancer.Common.Logger.Enums;
+﻿using System.Xml.Serialization;
+using Balancer.Common.Logger.Enums;
 using Balancer.Common.Logger.Interfaces;
 
 namespace client.Config.Data
@@ -7,9 +8,15 @@ namespace client.Config.Data
     {
         public string LogFile { get; set; }
         public string StatsFile { get; set; }
-        public LogLevel LogLevel { get; set; }
-        public LogMode LogMode { get; set; }
         public string LogDir { get; set; }
+
+        [XmlAttribute]
         public bool WriteToConsole { get; set; }
+
+        [XmlAttribute]
+        public LogLevel LogLevel { get; set; }
+
+        [XmlAttribute]
+        public LogMode LogMode { get; set; }
     }
 }

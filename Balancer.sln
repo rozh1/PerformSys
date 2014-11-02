@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "client", "client\client.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Balancer.Common.Test", "Balancer.Common.Test\Balancer.Common.Test.csproj", "{8B80E569-00BA-4E90-948E-69CBC66CC89D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "client.Test", "client.Test\client.Test.csproj", "{3832D577-3802-43D6-BB1F-5F37C7103795}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mrbn", "mrbn\mrbn.csproj", "{0F6991B5-6C9D-4BB8-918A-7E48FE515963}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{046E712F-2177-4DC8-ADE3-AFDD08C9EA68}"
@@ -48,10 +46,6 @@ Global
 		{8B80E569-00BA-4E90-948E-69CBC66CC89D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B80E569-00BA-4E90-948E-69CBC66CC89D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B80E569-00BA-4E90-948E-69CBC66CC89D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3832D577-3802-43D6-BB1F-5F37C7103795}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3832D577-3802-43D6-BB1F-5F37C7103795}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3832D577-3802-43D6-BB1F-5F37C7103795}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3832D577-3802-43D6-BB1F-5F37C7103795}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0F6991B5-6C9D-4BB8-918A-7E48FE515963}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0F6991B5-6C9D-4BB8-918A-7E48FE515963}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F6991B5-6C9D-4BB8-918A-7E48FE515963}.Release|Any CPU.ActiveCfg = Release|Any CPU

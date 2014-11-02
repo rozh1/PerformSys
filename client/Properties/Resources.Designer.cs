@@ -61,24 +61,6 @@ namespace client.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
-        ///&lt;Scenario xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
-        ///  &lt;ClientCount&gt;14&lt;/ClientCount&gt;
-        ///  &lt;ScenarioSteps&gt;
-        ///    &lt;ScenarioStep&gt;
-        ///      &lt;Duration&gt;PT5M&lt;/Duration&gt;
-        ///      &lt;Action&gt;Work&lt;/Action&gt;
-        ///    &lt;/ScenarioStep&gt;
-        ///  &lt;/ScenarioSteps&gt;
-        ///&lt;/Scenario&gt;.
-        /// </summary>
-        internal static string defaultScenario {
-            get {
-                return ResourceManager.GetString("defaultScenario", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Ищет локализованную строку, похожую на SELECT
         ///	L_RETURNFLAG,
         ///	L_LINESTATUS,
