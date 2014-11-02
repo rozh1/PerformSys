@@ -17,35 +17,28 @@
  */
 #endregion
 
-﻿using client.Config.Data;
+﻿using System;
+using System.Xml.Serialization;
 
-namespace client.Config
+namespace client.Config.Data
 {
-    public class Config
+    public class Scenario
     {
         /// <summary>
-        ///     Файл сценария
+        ///     Количество клиентов
         /// </summary>
-        public string ScenarioFile { get; set; }
+        [XmlAttribute]
+        public int ClientCount { get; set; }
 
         /// <summary>
-        ///     Адрес балансировщика
+        ///     Время начала выполнения сценария
         /// </summary>
-        public string BalancerHost { get; set; }
+        [XmlAttribute]
+        public DateTime StartTime { get; set; }
 
         /// <summary>
-        ///     Порт балансировщика
+        ///     Последовательность действий сценария
         /// </summary>
-        public int? BalancerPort { get; set; }
-
-        /// <summary>
-        ///     Данные статистики для записи в лог
-        /// </summary>
-        public LogStats LogStats { get; set; }
-
-        /// <summary>
-        ///     Конфиг лога
-        /// </summary>
-        public Log Log { get; set; }
+        public ScenarioStep[] ScenarioSteps { get; set; }
     }
 }

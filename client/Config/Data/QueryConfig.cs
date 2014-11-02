@@ -17,17 +17,13 @@
  */
 #endregion
 
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Xml.Serialization;
 
-namespace client.Test
+namespace client.Config.Data
 {
-    [TestClass]
-    public class Client
+    public class QueryConfig
     {
-        [TestMethod]
-        public void TestMethod1()
-        {
-        }
+        [XmlAttribute]
+        public int Number { get; set; }
     }
 }

@@ -17,27 +17,23 @@
  */
 #endregion
 
-﻿using System;
-using Balancer.Common.Config;
-using client.Config.Data;
+﻿using System.Xml.Serialization;
 
-namespace client.Config
+namespace client.Config.Data
 {
-    public class Scenario : ConfigBase<Scenario>
+    public class QuerySequence
     {
-        /// <summary>
-        ///     Количество клиентов
-        /// </summary>
-        public int ClientCount { get; set; }
+        [XmlAttribute]
+        public QuerySequenceMode Mode { get; set; }
 
-        /// <summary>
-        ///     Время начала выполнения сценария
-        /// </summary>
-        public DateTime StartTime { get; set; }
+        [XmlArrayItem(ElementName = "Query")]
+        public QueryConfig[] List { get; set; }
+    }
 
-        /// <summary>
-        ///     Последовательность действий сценария
-        /// </summary>
-        public ScenarioStep[] ScenarioSteps { get; set; }
+    public enum QuerySequenceMode
+    {
+        Sequential,
+        Random,
+        FromList
     }
 }

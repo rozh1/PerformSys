@@ -39,10 +39,10 @@ namespace client
     {
         private readonly string _address;
         private readonly int _clientId;
-        private readonly Config.Config _config;
+        private readonly Config.ClientConfig _config;
         private readonly PacketTransmitHelper _packetTransmitHelper;
         private readonly int _port;
-        private readonly QuerySequence.QuerySequence _querySequence;
+        private readonly QuerySequence.IQuerySequence _querySequence;
         private readonly ScenarioStep[] _scenarioSteps;
         private int _queryNumber;
         private DateTime _starTime;
@@ -53,22 +53,19 @@ namespace client
         /// <param name="config">Конфигурация клиента.</param>
         /// <param name="clientId">Идентификатор клиента.</param>
         /// <param name="querySequence">Последовательность запросов.</param>
-        /// <param name="scenarioSteps">Шаги сценария</param>
-        public Client(Config.Config config,
+        public Client(Config.ClientConfig config,
             int clientId,
-            QuerySequence.QuerySequence querySequence,
-            ScenarioStep[] scenarioSteps,
-            DateTime startTime)
+            QuerySequence.IQuerySequence querySequence)
         {
-            _address = config.BalancerHost;
-            Debug.Assert(config.BalancerPort != null, "config.BalancerPort != null");
-            _port = (int) config.BalancerPort;
+            _address = config.Server.Host;
+            Debug.Assert(config.Server.Host != null, "config.BalancerPort != null");
+            _port = (int) config.Server.Port;
             _clientId = clientId;
-            _scenarioSteps = scenarioSteps;
+            _scenarioSteps = config.Scenario.ScenarioSteps;
             _querySequence = querySequence;
             _config = config;
             _packetTransmitHelper = new PacketTransmitHelper(_config.Log.LogFile);
-            _starTime = startTime;
+            _starTime = config.Scenario.StartTime;
 
             var t = new Thread(ClientThread);
             t.Start();
@@ -101,7 +98,11 @@ namespace client
                     Thread.Sleep(100);
                     continue;
                 }
-                if (scenarioAction == ScenarioActions.Stop)
+                if (scenarioAction == ScenarioActions.Stop && _config.QuerySequence.Mode != QuerySequenceMode.FromList)
+                {
+                    break;
+                }
+                if (!_querySequence.CanGetNextQueryNumber())
                 {
                     break;
                 }
@@ -143,12 +144,15 @@ namespace client
                             loopNumber, queryTime)),
                         LogLevel.INFO);
 
-                    _config.LogStats.ClientNumber = _clientId;
-                    _config.LogStats.ClientQueryNumber = loopNumber;
-                    _config.LogStats.QueryNumber = _queryNumber;
-                    _config.LogStats.QueryTime = queryTime;
+                    var logEntity = new LogStats()
+                    {
+                        ClientNumber = _clientId,
+                        ClientQueryNumber = loopNumber,
+                        QueryNumber = _queryNumber,
+                        QueryTime = queryTime
+                    };
 
-                    Logger.Write(_config.Log.StatsFile, _config.LogStats, LogLevel.INFO);
+                    Logger.Write(_config.Log.StatsFile, logEntity, LogLevel.INFO);
                 }
             }
             tcpClient.Close();

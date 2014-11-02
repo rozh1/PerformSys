@@ -17,15 +17,12 @@
  */
 #endregion
 
-﻿using System;
-using System.Linq;
-
-namespace client.QuerySequence
+﻿namespace client.QuerySequence
 {
     /// <summary>
     ///     Контракт последовательности запросов.
     /// </summary>
-    public class QuerySequence
+    public class SequentialQuerySequence : IQuerySequence
     {
         /// <summary> предыдущий индекс в массиве </summary>
         private int _arrayLastIndex;
@@ -38,7 +35,7 @@ namespace client.QuerySequence
         /// </summary>
         /// <param name="startQueryNumber">Номер запроса с которого начинается выдача запросов</param>
         /// <param name="queryCount">Количество запросов</param>
-        public QuerySequence(int queryCount, int startQueryNumber = 1)
+        public SequentialQuerySequence(int queryCount, int startQueryNumber = 1)
         {
             Array = GenerateLine(queryCount);
             _nextQueryNumber = startQueryNumber;
@@ -48,20 +45,27 @@ namespace client.QuerySequence
         /// <summary>
         ///     Массив c последовательностью номеров запросов.
         /// </summary>
-        public int[] Array { get; set; }
+        private int[] Array { get; set; }
 
         /// <summary>
-        ///     Метод для генерации случайной последовательности следования номеров запросов.
+        ///     Получает номер следующий номер запроса
         /// </summary>
-        /// <param name="maxQueryCount">Максимальный номер запроса.</param>
-        /// <returns>Случайная последовательность следования номеров запросов.</returns>
-        private int[] GenerateRandom(int maxQueryCount)
+        /// <returns>номер запроса</returns>
+        public int GetNextQueryNumber()
         {
-            int[] array = Enumerable.Range(1, maxQueryCount).ToArray();
-            var random = new Random(DateTime.Now.Millisecond);
-            array = array.OrderBy(x => random.Next()).ToArray();
+            int queryNumber = _nextQueryNumber;
+            _nextQueryNumber = Array[_arrayLastIndex];
+            _arrayLastIndex = GetNextIndex(_arrayLastIndex, Array.Length);
+            return queryNumber;
+        }
 
-            return array;
+        /// <summary>
+        ///     Проверяет возможность выдачи следующего номера запроса
+        /// </summary>
+        /// <returns></returns>
+        public bool CanGetNextQueryNumber()
+        {
+            return true;
         }
 
         /// <summary>
@@ -117,18 +121,6 @@ namespace client.QuerySequence
                 newIndex = 0;
             }
             return newIndex;
-        }
-
-        /// <summary>
-        ///     Получает номер следующий номер запроса
-        /// </summary>
-        /// <returns>номер запроса</returns>
-        public int GetNextQueryNumber()
-        {
-            int queryNumber = _nextQueryNumber;
-            _nextQueryNumber = Array[_arrayLastIndex];
-            _arrayLastIndex = GetNextIndex(_arrayLastIndex, Array.Length);
-            return queryNumber;
         }
     }
 }

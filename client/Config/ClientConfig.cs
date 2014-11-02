@@ -17,25 +17,28 @@
  */
 #endregion
 
-﻿using System.Xml.Serialization;
-using Balancer.Common.Logger.Enums;
-using Balancer.Common.Logger.Interfaces;
+﻿using Balancer.Common.Config;
+using client.Config.Data;
 
-namespace client.Config.Data
+namespace client.Config
 {
-    public class Log : ILogConfig
+    public class ClientConfig : ConfigBase<ClientConfig>
     {
-        public string LogFile { get; set; }
-        public string StatsFile { get; set; }
-        public string LogDir { get; set; }
+        /// <summary>
+        ///     Конфиг сервера
+        /// </summary>
+        public Server Server { get; set; }
 
-        [XmlAttribute]
-        public bool WriteToConsole { get; set; }
+        /// <summary>
+        ///     Конфиг лога
+        /// </summary>
+        public Log Log { get; set; }
 
-        [XmlAttribute]
-        public LogLevel LogLevel { get; set; }
+        public Data.QuerySequence QuerySequence { get; set; }
 
-        [XmlAttribute]
-        public LogMode LogMode { get; set; }
+        /// <summary>
+        ///     Сценарий работы клиентов
+        /// </summary>
+        public Scenario Scenario { get; set; }
     }
 }

@@ -18,24 +18,15 @@
 #endregion
 
 ﻿using System.Xml.Serialization;
-using Balancer.Common.Logger.Enums;
-using Balancer.Common.Logger.Interfaces;
 
 namespace client.Config.Data
 {
-    public class Log : ILogConfig
+    public class Server
     {
-        public string LogFile { get; set; }
-        public string StatsFile { get; set; }
-        public string LogDir { get; set; }
+        [XmlAttribute]
+        public string Host { get; set; }
 
         [XmlAttribute]
-        public bool WriteToConsole { get; set; }
-
-        [XmlAttribute]
-        public LogLevel LogLevel { get; set; }
-
-        [XmlAttribute]
-        public LogMode LogMode { get; set; }
+        public int Port { get; set; }
     }
 }

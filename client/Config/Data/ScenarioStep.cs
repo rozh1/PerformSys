@@ -32,7 +32,7 @@ namespace client.Config.Data
         // XmlSerializer does not support TimeSpan, so use this property for 
         // serialization instead.
         [Browsable(false)]
-        [XmlElement(DataType = "duration", ElementName = "Duration")]
+        [XmlAttribute(DataType = "duration", AttributeName = "Duration")]
         public string TimeSinceLastEventString
         {
             get { return XmlConvert.ToString(Duration); }
@@ -44,6 +44,7 @@ namespace client.Config.Data
             }
         }
 
+        [XmlAttribute]
         public ScenarioActions Action { get; set; }
     }
 }
