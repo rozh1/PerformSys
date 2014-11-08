@@ -18,6 +18,7 @@
 #endregion
 
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using Balancer.Common.Logger.Enums;
 
@@ -80,9 +81,10 @@ namespace Balancer.Common.Logger.Helpers
         {
             if (!String.IsNullOrEmpty(dir) && !String.IsNullOrEmpty(fileName))
             {
-                if (!dir.EndsWith("\\"))
+                string pathSeparator = Path.DirectorySeparatorChar.ToString(CultureInfo.InvariantCulture);
+                if (!dir.EndsWith(pathSeparator))
                 {
-                    dir = dir + "\\";
+                    dir = dir + pathSeparator;
                 }
 
                 return dir + fileName;
