@@ -270,21 +270,33 @@ namespace rbn.QueueHandler
                 _tableSizes.Remove(tableSizes);
             }
 
-            double dataBaseSize = packet.TableSizes.Aggregate<KeyValuePair<string, ulong>, double>(0,
-                (current, pair) => current + pair.Value);
-
-            _tableSizes.Add(new TableSizes
+            if (packet.TableSizes == null)
             {
-                RegionId = (int) packet.RegionId,
-                GlobalId = (int) packet.GlobalId,
-                Sizes = packet.TableSizes,
-                DataBaseSize = dataBaseSize/1024.0/1024.0
-            });
-
-            foreach (QueueEntity queueEntity in _queue)
-            {
-                queueEntity.RelationVolume = CalculateRelationsVolume(queueEntity.RequestPacket);
+                Logger.Write(
+                    RBNConfig.Instance.Log.LogFile,
+                    new StringLogData(string.Format("Нет данных о объеме БД региона {0}", packet.RegionId)),
+                    LogLevel.ERROR
+                    );
             }
+            else
+            {
+                double dataBaseSize = packet.TableSizes.Aggregate<KeyValuePair<string, ulong>, double>(0,
+                    (current, pair) => current + pair.Value);
+
+                _tableSizes.Add(new TableSizes
+                {
+                    RegionId = (int) packet.RegionId,
+                    GlobalId = (int) packet.GlobalId,
+                    Sizes = packet.TableSizes,
+                    DataBaseSize = dataBaseSize/1024.0/1024.0
+                });
+
+                foreach (QueueEntity queueEntity in _queue)
+                {
+                    queueEntity.RelationVolume = CalculateRelationsVolume(queueEntity.RequestPacket);
+                }
+            }
+
         }
 
         /// <summary>
