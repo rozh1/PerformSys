@@ -96,7 +96,20 @@ namespace server
                 while (_tcpClient.Connected)
                 {
                     SendStatus();
-                    Packet onePacketData = _transmitHelper.Recive(_tcpClient.GetStream());
+                    Packet onePacketData = null;
+                    try
+                    {
+                        onePacketData = _transmitHelper.Recive(_tcpClient.GetStream());
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Write(ServerConfig.Instance.Log.LogFile,
+                            new StringErorrLogData(
+                                "{0}. Ошибка получения пакета: {1}",
+                                System.Reflection.MethodBase.GetCurrentMethod().Name,
+                                ex.Message),
+                            LogLevel.ERROR);
+                    } 
 
                     if (onePacketData != null)
                     {
@@ -160,7 +173,19 @@ namespace server
                 var dataBaseInfoPacket = new DataBaseInfoPacket(tableSizes);
                 dataBaseInfoPacket.RegionId = (uint)regionId;
 
-                _transmitHelper.Send(dataBaseInfoPacket.GetPacket(), _tcpClient.GetStream());
+                try
+                {
+                    _transmitHelper.Send(dataBaseInfoPacket.GetPacket(), _tcpClient.GetStream());
+                }
+                catch (Exception ex)
+                {
+                    Logger.Write(ServerConfig.Instance.Log.LogFile,
+                       new StringErorrLogData(
+                           "{0}. Ошибка передачи ответа: {1}",
+                           System.Reflection.MethodBase.GetCurrentMethod().Name,
+                           ex.Message),
+                       LogLevel.ERROR);
+                }
             }
         }
 
@@ -235,7 +260,19 @@ namespace server
                 Logger.Write(ServerConfig.Instance.Log.LogFile, 
                     new StringLogData(string.Format("Размер посылки ответа запроса {0}: {1} ", requestPacket.QueryNumber, dbAnswerPacket.GetPacket().ToBase64String().Length)), 
                     LogLevel.INFO);
-                _transmitHelper.Send(dbAnswerPacket.GetPacket(), _tcpClient.GetStream());
+                try
+                {
+                    _transmitHelper.Send(dbAnswerPacket.GetPacket(), _tcpClient.GetStream());
+                }
+                catch (Exception ex)
+                {
+                    Logger.Write(ServerConfig.Instance.Log.LogFile,
+                       new StringErorrLogData(
+                           "{0}. Ошибка передачи ответа: {1}",
+                           System.Reflection.MethodBase.GetCurrentMethod().Name,
+                           ex.Message),
+                       LogLevel.ERROR);
+                }
             }
 
             Logger.Write(ServerConfig.Instance.Log.StatsFile,
