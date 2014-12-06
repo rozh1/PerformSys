@@ -1,4 +1,7 @@
-﻿using System.Net;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Balancer.Common.Logger;
@@ -56,16 +59,23 @@ namespace rbn
                 new StringLogData("Начато прослушивание клиентов " + IPAddress.Any + ":" + port), 
                 LogLevel.INFO);
 
-            while (_serverIsLife)
-            {
-                TcpClient tcpClient = _listener.AcceptTcpClient();
-                Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
-                    new StringLogData("Принято соединие"), 
-                    LogLevel.INFO);
+            _listener.BeginAcceptTcpClient(this.OnAcceptConnection, _listener);
 
-                var t = new Thread(ClientThread);
-                t.Start(tcpClient);
-            }
+        }
+
+        private void OnAcceptConnection(IAsyncResult asyn)
+        {
+            var listener = (TcpListener)asyn.AsyncState;
+            TcpClient tcpClient = listener.EndAcceptTcpClient(asyn);
+            
+            Logger.Write(Config.RBNConfig.Instance.Log.LogFile,
+                new StringLogData("Принято соединие"),
+                LogLevel.INFO);
+            
+            var t = new Thread(ClientThread);
+            t.Start(tcpClient);
+
+            listener.BeginAcceptTcpClient(this.OnAcceptConnection, listener);
         }
 
         /// <summary>

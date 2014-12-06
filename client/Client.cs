@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using System.Net.Sockets;
 using System.Threading;
 using Balancer.Common.Logger;
@@ -27,6 +28,7 @@ namespace client
         private readonly ScenarioStep[] _scenarioSteps;
         private int _queryNumber;
         private DateTime _starTime;
+        private TcpClient _tcpClient;
 
         /// <summary>
         ///     Конструктор.
@@ -48,8 +50,37 @@ namespace client
             _packetTransmitHelper = new PacketTransmitHelper(_config.Log.LogFile);
             _starTime = config.Scenario.StartTime;
 
+            Connect();
+
             var t = new Thread(ClientThread);
             t.Start();
+        }
+
+        private TcpClient Connect()
+        {
+            if (_tcpClient == null)
+            {
+                _tcpClient = new TcpClient();
+            }
+
+            if (!_tcpClient.Connected)
+            {
+                try
+                {
+                    _tcpClient.Connect(_address, _port);
+                }
+                catch (SocketException se)
+                {
+                    Logger.Write(_config.Log.LogFile,
+                        new StringErorrLogData("{0}. Ошибка соединения {2}. {1}", "Connect",
+                            _clientId.ToString(CultureInfo.InvariantCulture),
+                            se.SocketErrorCode.ToString()),
+                        LogLevel.INFO);
+                    return new TcpClient();
+                }
+            }
+
+            return _tcpClient;
         }
 
         /// <summary>
@@ -58,16 +89,14 @@ namespace client
         private void ClientThread()
         {
             int loopNumber = 0;
-            var tcpClient = new TcpClient();
+            var tcpClient = Connect();
             var clientStatsData = new ClientStatsData();
 
             while (DateTime.Now < _starTime)
             {
                 Thread.Sleep(100);
             }
-
-            tcpClient.Connect(_address, _port);
-
+            
             var scenarioStepsManager = new ScenarioStepsManager(_scenarioSteps);
 
             while (true)
@@ -88,10 +117,10 @@ namespace client
                     break;
                 }
 
-                loopNumber++;
-
                 if (tcpClient.Connected)
                 {
+                    loopNumber++;
+
                     _queryNumber = _querySequence.GetNextQueryNumber();
                     string query = Resources.ResourceManager.GetString("q" + _queryNumber);
 
@@ -134,6 +163,14 @@ namespace client
                     };
 
                     Logger.Write(_config.Log.StatsFile, logEntity, LogLevel.INFO);
+                }
+                else
+                {
+                    Logger.Write(_config.Log.LogFile,
+                        new StringErorrLogData("{0}. Соедиение потеряно для {1}. Переподключение", "ClientThread",
+                            _clientId.ToString(CultureInfo.InvariantCulture)),
+                        LogLevel.INFO);
+                    tcpClient = Connect();
                 }
             }
             tcpClient.Close();
