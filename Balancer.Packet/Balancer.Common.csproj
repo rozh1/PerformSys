@@ -78,6 +78,8 @@
     <Compile Include="Packet\Packets\DataBaseInfoPacket.cs" />
     <Compile Include="Packet\PacketType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\CommandLineArgsParser\ComandLineArgument.cs" />
+    <Compile Include="Utils\CommandLineArgsParser\CommandLineArgumentsParser.cs" />
     <Compile Include="Utils\Interfaces\IClonable.cs" />
     <Compile Include="Utils\PacketTransmitHelper.cs" />
     <Compile Include="Utils\SerializableDictionary.cs" />
