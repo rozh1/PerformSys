@@ -17,17 +17,15 @@
  */
 #endregion
 
-﻿using System.Xml.Serialization;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace rbn.Config.Data
+namespace client.QuerySequence
 {
-    public class MRBN
+    public class QuerySequenceBase
     {
-        [XmlAttribute]
-        public string Host { get; set; }
-        [XmlAttribute]
-        public uint Port { get; set; }
-        [XmlAttribute]
-        public bool UseMRBN { get; set; }
+        protected readonly object GetNextQueryLockObject = new object();
     }
 }

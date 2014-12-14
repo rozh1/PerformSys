@@ -43,7 +43,8 @@ namespace rbn.Config
                 MRBN = new MRBN()
                 {
                     Host = "localhost",
-                    Port = 3401
+                    Port = 3401,
+                    UseMRBN = false
                 },
                 Log = new Log()
                 {

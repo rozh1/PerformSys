@@ -18,8 +18,6 @@
 #endregion
 
 ﻿using System;
-using System.Diagnostics;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -46,11 +44,6 @@ namespace rbn
         private readonly TcpListener _listener;
 
         /// <summary>
-        ///     признак жизн потока
-        /// </summary>
-        private bool _serverIsLife;
-
-        /// <summary>
         /// Очередь регионального балансировщика
         /// </summary>
         private readonly RbnQueue _rbnQueue;
@@ -59,18 +52,19 @@ namespace rbn
         {
             _rbnQueue = new RbnQueue();
             var servers = new Servers((int)Config.RBNConfig.Instance.Server.Port);
-            var globalBalancer = new GlobalBalancer();
             
             servers.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
             servers.SendRequestFromQueueEvent += _rbnQueue.SendRequestToServer;
             servers.DataBaseInfoRecivedEvent += _rbnQueue.AddDataBaseInfo;
 
-            globalBalancer.RequestRecivedEvent += _rbnQueue.AddClient;
-            globalBalancer.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
-            globalBalancer.SendRequestFromQueueEvent += _rbnQueue.SendRequestToAnotherRegion;
-            globalBalancer.QueryWeightComputeEvent += _rbnQueue.ComputeQueueWeight;
-
-            _serverIsLife = true;
+            if (Config.RBNConfig.Instance.MRBN.UseMRBN)
+            {
+                var globalBalancer = new GlobalBalancer();
+                globalBalancer.RequestRecivedEvent += _rbnQueue.AddClient;
+                globalBalancer.AnswerRecivedEvent += _rbnQueue.ServerAnswer;
+                globalBalancer.SendRequestFromQueueEvent += _rbnQueue.SendRequestToAnotherRegion;
+                globalBalancer.QueryWeightComputeEvent += _rbnQueue.ComputeQueueWeight;
+            }
 
             _listener = new TcpListener(IPAddress.Any, port);
             _listener.Start();
@@ -78,7 +72,7 @@ namespace rbn
                 new StringLogData("Начато прослушивание клиентов " + IPAddress.Any + ":" + port), 
                 LogLevel.INFO);
 
-            _listener.BeginAcceptTcpClient(this.OnAcceptConnection, _listener);
+            _listener.BeginAcceptTcpClient(OnAcceptConnection, _listener);
 
         }
 
@@ -94,7 +88,7 @@ namespace rbn
             var t = new Thread(ClientThread);
             t.Start(tcpClient);
 
-            listener.BeginAcceptTcpClient(this.OnAcceptConnection, listener);
+            listener.BeginAcceptTcpClient(OnAcceptConnection, listener);
         }
 
         /// <summary>
@@ -136,7 +130,6 @@ namespace rbn
         /// </summary>
         ~Server()
         {
-            _serverIsLife = false;
             if (_listener != null)
             {
                 _listener.Stop();

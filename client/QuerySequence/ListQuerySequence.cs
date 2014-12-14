@@ -25,7 +25,7 @@ namespace client.QuerySequence
     /// <summary>
     ///     Контракт последовательности запросов.
     /// </summary>
-    public class ListQuerySequence : IQuerySequence
+    public class ListQuerySequence : QuerySequenceBase, IQuerySequence
     {
         /// <summary> Массив c последовательностью номеров запросов. </summary>
         private readonly int[] _array;
@@ -55,9 +55,13 @@ namespace client.QuerySequence
         /// <returns>номер запроса</returns>
         public int GetNextQueryNumber()
         {
-            if (_array.Length > _queryIndex)
-                return _array[_queryIndex++];
-            return 0;
+            int nextNumber = 0;
+            lock (GetNextQueryLockObject)
+            {
+                if (_array.Length > _queryIndex)
+                    nextNumber = _array[_queryIndex++];
+            }
+            return nextNumber;
         }
 
         /// <summary>
@@ -66,7 +70,12 @@ namespace client.QuerySequence
         /// <returns></returns>
         public bool CanGetNextQueryNumber()
         {
-            return _array.Length > _queryIndex;
+            bool canGet;
+            lock (GetNextQueryLockObject)
+            {
+                canGet = _array.Length > _queryIndex;
+            }
+            return canGet;
         }
     }
 }

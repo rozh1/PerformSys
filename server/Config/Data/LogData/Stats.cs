@@ -31,6 +31,7 @@ namespace server.Config.Data.LogData
             int clientNumber,
             int queryNumber,
             TimeSpan queryExecutionTime,
+            long responseLenght,
             int queueLength)
         {
             GlobalId = globalId;
@@ -38,6 +39,7 @@ namespace server.Config.Data.LogData
             ClientNumber = clientNumber;
             QueryNumber = queryNumber;
             QueryExecutionTime = queryExecutionTime;
+            ResponseLenght = responseLenght;
             QueueLength = queueLength;
         }
 
@@ -46,6 +48,7 @@ namespace server.Config.Data.LogData
         private int ClientNumber { get; set; }
         private int QueryNumber { get; set; }
         private TimeSpan QueryExecutionTime { get; set; }
+        private long ResponseLenght { get; set; }
         private int QueueLength { get; set; }
 
         public string[] DataParams
@@ -54,11 +57,13 @@ namespace server.Config.Data.LogData
             {
                 return new[]
                 {
+                    DateTime.Now.ToString(CultureInfo.InvariantCulture),
                     GlobalId.ToString(CultureInfo.CurrentCulture),
                     RegionId.ToString(CultureInfo.CurrentCulture),
                     ClientNumber.ToString(CultureInfo.CurrentCulture),
                     QueryNumber.ToString(CultureInfo.CurrentCulture),
                     QueryExecutionTime.TotalMilliseconds.ToString(CultureInfo.CurrentCulture),
+                    ResponseLenght.ToString(CultureInfo.CurrentCulture),
                     QueueLength.ToString(CultureInfo.CurrentCulture)
                 };
             }
@@ -70,11 +75,13 @@ namespace server.Config.Data.LogData
             {
                 return new[]
                 {
+                    @"Время",
                     @"Глобальный идентификатор",
                     @"Номер региона",
                     @"Номер клиента",
                     @"Номер запроса",
                     @"Время выполнения",
+                    @"Длина ответа (byte)",
                     @"Длина очереди"
                 };
             }

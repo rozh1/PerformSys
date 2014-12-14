@@ -24,7 +24,7 @@ namespace client.QuerySequence
     /// <summary>
     ///     Контракт последовательности запросов.
     /// </summary>
-    public class RandomSequentialQuerySequence : IQuerySequence
+    public class RandomSequentialQuerySequence : QuerySequenceBase, IQuerySequence
     {
         /// <summary> количество запросов </summary>
         private readonly int _queryCount;
@@ -48,7 +48,12 @@ namespace client.QuerySequence
         /// <returns>номер запроса</returns>
         public int GetNextQueryNumber()
         {
-            return _random.Next(1, _queryCount);
+            int nextNumber;
+            lock (GetNextQueryLockObject)
+            {
+                nextNumber = _random.Next(1, _queryCount);
+            }
+            return nextNumber;
         }
 
         /// <summary>

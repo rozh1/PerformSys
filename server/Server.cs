@@ -240,6 +240,7 @@ namespace server
             var packet = (Packet) packetObj;
             var requestPacket = new DbRequestPacket(packet.Data);
             var elapsedTime = new TimeSpan();
+            long packetLength = 0;
 
             Logger.Write(ServerConfig.Instance.Log.LogFile, 
                 new StringLogData("Принят запрос от клиента: " + requestPacket.ClientId), 
@@ -257,8 +258,9 @@ namespace server
                     Encoding.UTF8.GetBytes(SerializeMapper.Serialize(dt)), 
                     requestPacket.QueryNumber,
                     new PacketBase {ClientId = requestPacket.ClientId, RegionId = requestPacket.RegionId, GlobalId = requestPacket.GlobalId});
-                Logger.Write(ServerConfig.Instance.Log.LogFile, 
-                    new StringLogData(string.Format("Размер посылки ответа запроса {0}: {1} ", requestPacket.QueryNumber, dbAnswerPacket.GetPacket().ToBase64String().Length)), 
+                packetLength = dbAnswerPacket.GetPacket().ToBase64String().Length;
+                Logger.Write(ServerConfig.Instance.Log.LogFile,
+                    new StringLogData(string.Format("Размер посылки ответа запроса {0}: {1} ", requestPacket.QueryNumber, packetLength)), 
                     LogLevel.INFO);
                 try
                 {
@@ -282,6 +284,7 @@ namespace server
                     (int) requestPacket.ClientId,
                     requestPacket.QueryNumber,
                     elapsedTime,
+                    packetLength,
                     _queueLength
                     ), LogLevel.INFO);
 
