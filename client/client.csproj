@@ -54,6 +54,7 @@
     <Compile Include="Config\Data\Scenario.cs" />
     <Compile Include="Config\ClientConfig.cs" />
     <Compile Include="QuerySequence\IQuerySequence.cs" />
+    <Compile Include="QuerySequence\QuerySequenceBase.cs" />
     <Compile Include="QuerySequence\QuerySequenceManager.cs" />
     <Compile Include="QuerySequence\SequentialQuerySequence.cs" />
     <Compile Include="Program.cs" />

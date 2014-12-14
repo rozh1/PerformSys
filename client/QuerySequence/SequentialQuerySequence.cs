@@ -3,7 +3,7 @@
     /// <summary>
     ///     Контракт последовательности запросов.
     /// </summary>
-    public class SequentialQuerySequence : IQuerySequence
+    public class SequentialQuerySequence : QuerySequenceBase, IQuerySequence
     {
         /// <summary> предыдущий индекс в массиве </summary>
         private int _arrayLastIndex;
@@ -34,9 +34,13 @@
         /// <returns>номер запроса</returns>
         public int GetNextQueryNumber()
         {
-            int queryNumber = _nextQueryNumber;
-            _nextQueryNumber = Array[_arrayLastIndex];
-            _arrayLastIndex = GetNextIndex(_arrayLastIndex, Array.Length);
+            int queryNumber;
+            lock (GetNextQueryLockObject)
+            {
+                queryNumber = _nextQueryNumber;
+                _nextQueryNumber = Array[_arrayLastIndex];
+                _arrayLastIndex = GetNextIndex(_arrayLastIndex, Array.Length);
+            }
             return queryNumber;
         }
 

@@ -135,16 +135,6 @@ namespace client
 
                     Packet packet = _packetTransmitHelper.Recive(tcpClient.GetStream());
 
-                    //var dt = (DataTable)SerializeMapper.Deserialize(packet.Data);
-                    //
-                    //string answer = "";
-                    //for (int i = 0; i < dt.Columns.Count; i++)  answer += dt.Columns[i].ColumnName + "\t";
-                    //for (int j = 0; j < dt.Rows.Count; j++)
-                    //{
-                    //    answer += "\n";
-                    //    for (int i = 0; i < dt.Columns.Count; i++) answer += dt.Rows[j][i] + "\t";
-                    //}
-
                     TimeSpan queryTime = DateTime.UtcNow - startTime;
                     clientStatsData.WaitTime += queryTime;
                     clientStatsData.Answer = null; //answer;

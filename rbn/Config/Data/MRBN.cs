@@ -8,5 +8,7 @@ namespace rbn.Config.Data
         public string Host { get; set; }
         [XmlAttribute]
         public uint Port { get; set; }
+        [XmlAttribute]
+        public bool UseMRBN { get; set; }
     }
 }

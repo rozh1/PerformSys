@@ -25,9 +25,10 @@ namespace client
 
             Logger.Write(ClientConfig.Instance.Log.LogFile, new StringLogData("Запуск клиентов..."), LogLevel.INFO);
 
+            int queriesCount = 14;
             for (int i = 0; i < scenario.ClientCount; i++)
             {
-                var qSeq = querySequenceManager.GetQuerySequence((i % 14) + 1, i+1);
+                var qSeq = querySequenceManager.GetQuerySequence((i % queriesCount) + 1, i + 1, queriesCount);
                 clients[i] = new Client(ClientConfig.Instance, (i + 1), qSeq);
             }
 
