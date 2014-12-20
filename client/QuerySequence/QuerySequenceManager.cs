@@ -7,13 +7,15 @@ namespace client.QuerySequence
     internal class QuerySequenceManager
     {
         private readonly ClientConfig _config;
+        private readonly ListQuerySequence _listQuerySequence;
 
         public QuerySequenceManager(ClientConfig config)
         {
             _config = config;
+            _listQuerySequence = new ListQuerySequence(_config.QuerySequence.List);
         }
 
-        public IQuerySequence GetQuerySequence(int startQueryNumber, int clientNumber, int queriesCount)
+        public IQuerySequence GetQuerySequence(int startQueryNumber, int queriesCount)
         {
             switch (_config.QuerySequence.Mode)
             {
@@ -22,7 +24,7 @@ namespace client.QuerySequence
                 case QuerySequenceMode.Random:
                     return new RandomSequentialQuerySequence(queriesCount);
                 case QuerySequenceMode.FromList:
-                    return new ListQuerySequence(_config.QuerySequence.List, clientNumber, _config.Scenario.ClientCount);
+                    return _listQuerySequence;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

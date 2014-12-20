@@ -28,7 +28,7 @@ namespace client
             int queriesCount = 14;
             for (int i = 0; i < scenario.ClientCount; i++)
             {
-                var qSeq = querySequenceManager.GetQuerySequence((i % queriesCount) + 1, i + 1, queriesCount);
+                var qSeq = querySequenceManager.GetQuerySequence((i % queriesCount) + 1, queriesCount);
                 clients[i] = new Client(ClientConfig.Instance, (i + 1), qSeq);
             }
 
