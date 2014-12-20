@@ -37,12 +37,10 @@ namespace client.QuerySequence
         ///     Конструктор последовательности
         /// </summary>
         /// <param name="queryConfigList">Список запросов</param>
-        /// <param name="clientNumber">номер клиента</param>
-        /// <param name="clientCount">количество клиентов</param>
-        public ListQuerySequence(QueryConfig[] queryConfigList, int clientNumber, int clientCount)
+        public ListQuerySequence(QueryConfig[] queryConfigList)
         {
             var queries = new List<int>();
-            for (int i = clientNumber; i < queryConfigList.Length; i += clientCount)
+            for (int i = 0; i < queryConfigList.Length; i++)
             {
                 queries.Add(queryConfigList[i].Number);
             }
