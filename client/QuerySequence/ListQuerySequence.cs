@@ -17,13 +17,13 @@ namespace client.QuerySequence
         /// <summary>
         ///     Конструктор последовательности
         /// </summary>
-        /// <param name="queryConfigList">Список запросов</param>
-        public ListQuerySequence(QueryConfig[] queryConfigList)
+        /// <param name="queryNumbers">Список номеров запросов</param>
+        public ListQuerySequence(int[] queryNumbers)
         {
             var queries = new List<int>();
-            for (int i = 0; i < queryConfigList.Length; i++)
+            for (int i = 0; i < queryNumbers.Length; i++)
             {
-                queries.Add(queryConfigList[i].Number);
+                queries.Add(queryNumbers[i]);
             }
             _array = queries.ToArray();
         }
@@ -31,7 +31,7 @@ namespace client.QuerySequence
         /// <summary>
         ///     Получает номер следующий номер запроса
         /// </summary>
-        /// <returns>номер запроса</returns>
+        /// <returns>номер запроса или 0, если запросы закончились</returns>
         public int GetNextQueryNumber()
         {
             int nextNumber = 0;

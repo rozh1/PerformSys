@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Client.cs" />
     <Compile Include="ClientStatsData.cs" />
+    <Compile Include="Config\QueriesList.cs" />
     <Compile Include="Config\ConfigInit.cs" />
     <Compile Include="Config\Data\Log.cs" />
     <Compile Include="Config\Data\LogStats.cs" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 using Balancer.Common.Logger;
@@ -122,7 +123,15 @@ namespace client
                     loopNumber++;
 
                     _queryNumber = _querySequence.GetNextQueryNumber();
-                    string query = Resources.ResourceManager.GetString("q" + _queryNumber);
+                    if (_queryNumber==0) break;
+
+                    var queryConfig = _config.Queries.FirstOrDefault(q => q.Number == _queryNumber);
+                    if (queryConfig == null)
+                    {
+                        Logger.Write(_config.Log.LogFile, new StringLogData("ОШИБКА: Не найден запрос с номером " + _queryNumber), LogLevel.ERROR);
+                        Environment.Exit(10);
+                    }
+                    string query = queryConfig.Sql;
 
                     var dbRequestPacket = new DbRequestPacket(query, _queryNumber)
                     {
@@ -148,7 +157,7 @@ namespace client
                     {
                         ClientNumber = _clientId,
                         ClientQueryNumber = loopNumber,
-                        QueryNumber = _queryNumber,
+                        QueryNumber = queryConfig.Number,
                         QueryTime = queryTime
                     };
 

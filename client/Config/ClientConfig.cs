@@ -1,4 +1,6 @@
-﻿using Balancer.Common.Config;
+﻿using System.Collections.Generic;
+using System.Xml.Serialization;
+using Balancer.Common.Config;
 using client.Config.Data;
 
 namespace client.Config
@@ -21,5 +23,11 @@ namespace client.Config
         ///     Сценарий работы клиентов
         /// </summary>
         public Scenario Scenario { get; set; }
+
+        /// <summary>
+        ///     Список возможных заросов
+        /// </summary>
+        [XmlIgnore]
+        public List<QueryConfig> Queries { get; set; }
     }
 }
