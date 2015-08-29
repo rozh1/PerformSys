@@ -164,6 +164,8 @@ namespace server.DataBase
                 {
                     var cmd = new MySqlCommand(query, conn);
                     cmd.CommandTimeout = _comandTimeout;
+                    //cmd.ExecuteScalar();
+                    //answer.Tables.Add(new DataTable("Answer"));
                     var da = new MySqlDataAdapter(cmd);
                     da.Fill(answer, "Answer");
                     da.Dispose();

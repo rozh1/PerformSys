@@ -27,7 +27,7 @@ namespace client.Config.Data
         public QuerySequenceMode Mode { get; set; }
 
         [XmlArrayItem(ElementName = "Query")]
-        public QueryConfig[] List { get; set; }
+        public int[] List { get; set; }
     }
 
     public enum QuerySequenceMode

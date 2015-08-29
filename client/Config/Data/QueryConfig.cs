@@ -25,5 +25,8 @@ namespace client.Config.Data
     {
         [XmlAttribute]
         public int Number { get; set; }
+
+        [XmlText]
+        public string Sql { get; set; }
     }
 }
