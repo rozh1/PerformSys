@@ -318,11 +318,19 @@ namespace server
         /// <returns></returns>
         private DataTable ProcessQueryWithMySql(DbRequestPacket requestPacket)
         {
+            bool getFullResult = true;
             int region = (int)requestPacket.RegionId;
             DataTable dt = null;
+
+            var currentDataBase = ServerConfig.Instance.DataBase.FirstOrDefault(
+                db => db.RegionId == region);
+
+            if (currentDataBase != null)
+                getFullResult = currentDataBase.GetFullQueryResult;
+
             try
             {
-                dt = _databases[region].Select(requestPacket.Query).Tables[0];
+                dt = _databases[region].Select(requestPacket.Query, getFullResult).Tables[0];
             }
             catch (Exception ex)
             {

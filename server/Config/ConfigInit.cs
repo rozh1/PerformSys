@@ -19,6 +19,7 @@ namespace server.Config
                         UserName = "root",
                         Port = 3306,
                         RegionId = 1,
+                        GetFullQueryResult = true,
                         SimulationParams =
                             new SimulationParams
                             {
@@ -58,6 +59,7 @@ namespace server.Config
                         UserName = "root",
                         Port = 3306,
                         RegionId = 2,
+                        GetFullQueryResult = true,
                         SimulationParams =
                             new SimulationParams
                             {
