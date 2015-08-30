@@ -35,6 +35,8 @@ namespace server.Config.Data
         public string Password { get; set; }
         [XmlAttribute]
         public string DataBaseName { get; set; }
+        [XmlAttribute]
+        public bool GetFullQueryResult { get; set; }
 
         /// <summary>
         ///     Конфиг времен выполения запросов для режима симуляции

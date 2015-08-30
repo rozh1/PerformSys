@@ -153,8 +153,12 @@ namespace server.DataBase
         ///     Выборка из БД по запросу
         /// </summary>
         /// <param name="query">запрос</param>
+        /// <param name="getFullResult">
+        /// <para>true - получить весь ответ от MySQL</para>
+        /// <para>false - выполнение запроса без получения данных от MySQL</para>
+        /// </param>
         /// <returns>структура DataSet с ответом</returns>
-        public DataSet Select(string query)
+        public DataSet Select(string query, bool getFullResult = true)
         {
             //if (mysqlConn.State != System.Data.ConnectionState.Open) MySQLConnectionOpen();
             var answer = new DataSet();
@@ -164,11 +168,17 @@ namespace server.DataBase
                 {
                     var cmd = new MySqlCommand(query, conn);
                     cmd.CommandTimeout = _comandTimeout;
-                    //cmd.ExecuteScalar();
-                    //answer.Tables.Add(new DataTable("Answer"));
-                    var da = new MySqlDataAdapter(cmd);
-                    da.Fill(answer, "Answer");
-                    da.Dispose();
+                    if (getFullResult)
+                    {
+                        var da = new MySqlDataAdapter(cmd);
+                        da.Fill(answer, "Answer");
+                        da.Dispose();
+                    }
+                    else
+                    {
+                        cmd.ExecuteScalar();
+                        answer.Tables.Add(new DataTable("Answer"));
+                    }
                 }
                 catch (Exception e)
                 {
