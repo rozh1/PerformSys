@@ -75,7 +75,10 @@ namespace Balancer.Common.Utils.CommandLineArgsParser
         public string GetArgumentString()
         {
             var list = new List<string> { Argument };
-            list.AddRange(AlternativeArguments);
+            if (AlternativeArguments != null)
+            {
+                list.AddRange(AlternativeArguments);
+            }
             return string.Join(", ", list.ToArray());
         }
     }
