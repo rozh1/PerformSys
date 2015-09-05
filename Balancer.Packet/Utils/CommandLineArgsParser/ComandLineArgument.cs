@@ -28,6 +28,7 @@ namespace Balancer.Common.Utils.CommandLineArgsParser
             Argument = argument;
             Value = string.Empty;
             IsRequired = isRequired;
+            AlternativeArguments = new string[0];
         }
 
         public ComandLineArgument(string argument, string[] alternativeArguments, bool isRequired = false) :
@@ -75,10 +76,7 @@ namespace Balancer.Common.Utils.CommandLineArgsParser
         public string GetArgumentString()
         {
             var list = new List<string> { Argument };
-            if (AlternativeArguments != null)
-            {
-                list.AddRange(AlternativeArguments);
-            }
+            list.AddRange(AlternativeArguments);
             return string.Join(", ", list.ToArray());
         }
     }
