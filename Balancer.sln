@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rbn", "rbn\rbn.csproj", "{C84123A6-B2D1-489A-BAC2-7D3BDA5B35E3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "server", "server\server.csproj", "{266AD27C-D6AC-42E6-931B-56ACA10F7C59}"
@@ -19,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{046E71
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "router", "router\router.csproj", "{7BC7CA20-7CB6-49EE-8BD7-AB56626F9552}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +54,10 @@ Global
 		{0F6991B5-6C9D-4BB8-918A-7E48FE515963}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F6991B5-6C9D-4BB8-918A-7E48FE515963}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F6991B5-6C9D-4BB8-918A-7E48FE515963}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BC7CA20-7CB6-49EE-8BD7-AB56626F9552}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BC7CA20-7CB6-49EE-8BD7-AB56626F9552}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BC7CA20-7CB6-49EE-8BD7-AB56626F9552}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BC7CA20-7CB6-49EE-8BD7-AB56626F9552}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

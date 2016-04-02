@@ -1,0 +1,18 @@
+using System;
+using Balancer.Common.Packet.Packets;
+
+namespace router.Interfaces
+{
+    public interface IServer
+    {
+        /// <summary>
+        /// Событие иницирования отправки запроса из очереди
+        /// </summary>
+        event Action<IServer> SendRequestFromQueueEvent;
+
+        /// <summary>
+        ///     Отправка запроса серверу
+        /// </summary>
+        bool SendRequest(DbRequestPacket queueEntity);
+    }
+}
