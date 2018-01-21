@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Copyright 2013-2018 Roman Klassen
  *
@@ -15,9 +15,8 @@
  * under the License.
  *
  */
-#endregion
-
-﻿using PerformSys.Common.Config;
+ #endregion
+using PerformSys.Common.Config;
 using router.Config.Data;
 
 namespace router.Config

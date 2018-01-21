@@ -15,8 +15,7 @@
  * under the License.
  *
  */
-#endregion
-
+ #endregion
 using System;
 using rbn.QueueHandler;
 using rbn.QueueHandler.Data;

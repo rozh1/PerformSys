@@ -15,8 +15,7 @@
  * under the License.
  *
  */
-#endregion
-
+ #endregion
 using System;
 using PerformSys.Common.Packet.Packets;
 

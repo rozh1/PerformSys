@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Copyright 2013-2018 Roman Klassen
  *
@@ -15,9 +15,8 @@
  * under the License.
  *
  */
-#endregion
-
-﻿using System.Globalization;
+ #endregion
+using System.Globalization;
 using PerformSys.Common.Logger.Interfaces;
 
 namespace router.Config.Data.LogData

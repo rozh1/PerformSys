@@ -1,6 +1,6 @@
-#region Copyright
+﻿#region Copyright
 /*
- * Copyright 2013-2018 Roman Klassen
+ * Copyright 2013-2018 Lenar Khisamiev, Roman Klassen
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy
@@ -16,8 +16,7 @@
  *
  */
 #endregion
-
-﻿using System;
+using System;
 using System.Globalization;
 using System.IO;
 using PerformSys.Common.Logger.Enums;
