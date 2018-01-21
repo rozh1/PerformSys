@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Serialization;
-using Balancer.Common.Config;
 using client.Config.Data;
+using PerformSys.Common.Config;
 
 namespace client.Config
 {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Balancer.Common.Config;
 using client.Config.Data;
+using PerformSys.Common.Config;
 
 namespace client.Config
 {

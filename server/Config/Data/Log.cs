@@ -1,6 +1,6 @@
 ﻿using System.Xml.Serialization;
-using Balancer.Common.Logger.Enums;
-using Balancer.Common.Logger.Interfaces;
+using PerformSys.Common.Logger.Enums;
+using PerformSys.Common.Logger.Interfaces;
 
 namespace server.Config.Data
 {

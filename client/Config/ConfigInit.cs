@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Balancer.Common.Logger.Enums;
 using client.Config.Data;
+using PerformSys.Common.Logger.Enums;
 
 namespace client.Config
 {

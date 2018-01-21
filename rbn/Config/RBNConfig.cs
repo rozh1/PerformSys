@@ -1,4 +1,4 @@
-﻿using Balancer.Common.Config;
+﻿using PerformSys.Common.Config;
 using rbn.Config.Data;
 
 namespace rbn.Config

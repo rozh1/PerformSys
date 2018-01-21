@@ -1,5 +1,5 @@
-﻿using Balancer.Common.Config;
-using mrbn.Config.Data;
+﻿using mrbn.Config.Data;
+using PerformSys.Common.Config;
 
 namespace mrbn.Config
 {
