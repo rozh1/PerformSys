@@ -67,15 +67,15 @@ namespace server.DataBase
                 var conn = new MySqlConnection(_connectionString.GetConnectionString(true));
                 conn.Open();
                 Insert("SET NAMES utf8", conn);
-                Logger.Write(ServerConfig.Instance.Log.LogFile, 
-                    new StringLogData("Выполненно подключение к БД " + _database), 
+                Logger.Write(ServerConfig.Instance.Log.LogFile,
+                    new StringLogData("Выполненно подключение к БД " + _database),
                     LogLevel.INFO);
                 conn.Close();
             }
             catch (MySqlException e)
             {
-                Logger.Write(ServerConfig.Instance.Log.LogFile, 
-                    new StringLogData("При подключении к серверу MySQL возникло исколючение: " + e.Message), 
+                Logger.Write(ServerConfig.Instance.Log.LogFile,
+                    new StringLogData("При подключении к серверу MySQL возникло исколючение: " + e.Message),
                     LogLevel.INFO);
                 result = false;
             }
@@ -84,21 +84,39 @@ namespace server.DataBase
 
         public MySqlConnection ConnectionOpen()
         {
-            var conn = new MySqlConnection(_connectionString.GetConnectionString(true));
-            try
+            var retry = 0;
+            bool result = true;
+            string errMsg = string.Empty;
+            MySqlConnection conn;
+            do
             {
-                conn.Open();
-                Insert("SET NAMES utf8", conn);
-                Logger.Write(ServerConfig.Instance.Log.LogFile, 
-                    new StringLogData("Выполненно подключение к БД"), 
-                    LogLevel.INFO);
-            }
-            catch (MySqlException e)
+                conn = new MySqlConnection(_connectionString.GetConnectionString(true));
+                try
+                {
+                    conn.Open();
+                    Insert("SET NAMES utf8", conn);
+                    Logger.Write(ServerConfig.Instance.Log.LogFile,
+                        new StringLogData("Выполненно подключение к БД"),
+                        LogLevel.INFO);
+                    result = true;
+                }
+                catch (MySqlException e)
+                {
+                    retry++;
+                    Logger.Write(ServerConfig.Instance.Log.LogFile,
+                        new StringLogData("Попытка подключения: " + retry + " из 10"),
+                        LogLevel.INFO);
+                    result = false;
+                    errMsg = e.Message;
+                }
+
+            } while (!result && retry < 10);
+            if (!result)
             {
                 Logger.Write(ServerConfig.Instance.Log.LogFile,
-                    new StringLogData("При подключении к серверу MySQL возникло исколючение: " + e.Message),
+                    new StringLogData("При подключении к серверу MySQL возникло исколючение: " + errMsg),
                     LogLevel.ERROR);
-                if (ConnectionError != null) ConnectionError();
+                ConnectionError?.Invoke();
             }
             return conn;
         }
