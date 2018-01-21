@@ -1,0 +1,3 @@
+#[name] <email> [organization]
+Roman Klassen <klassen.roman@comp-gluk.ru> KNRTU-KAI
+Lenar Khisamiev <lenar.khisamiev@yandex.ru> KNRTU-KAI
