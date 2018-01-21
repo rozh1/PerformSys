@@ -19,8 +19,8 @@
 
 ﻿using System;
 using System.Globalization;
-using Balancer.Common.Logger.Data;
-using Balancer.Common.Logger.Interfaces;
+using PerformSys.Common.Logger.Data;
+using PerformSys.Common.Logger.Interfaces;
 
 namespace rbn.Config.Data
 {

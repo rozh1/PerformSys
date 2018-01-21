@@ -19,7 +19,7 @@
 
 ﻿using System;
 using System.Globalization;
-using Balancer.Common.Logger.Interfaces;
+using PerformSys.Common.Logger.Interfaces;
 
 namespace rbn.Config.Data.LogData
 {

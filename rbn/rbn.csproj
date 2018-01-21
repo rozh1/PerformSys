@@ -67,9 +67,9 @@
     <Compile Include="GlobalBalancerHandler\GlobalBalancer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Balancer.Packet\Balancer.Common.csproj">
+    <ProjectReference Include="..\PerformSys.Common\PerformSys.Common.csproj">
       <Project>{1f3c64f3-bf67-4593-8f40-f245cb445af4}</Project>
-      <Name>Balancer.Common</Name>
+      <Name>PerformSys.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

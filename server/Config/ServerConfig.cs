@@ -17,7 +17,7 @@
  */
 #endregion
 
-﻿using Balancer.Common.Config;
+﻿using PerformSys.Common.Config;
 using server.Config.Data;
 
 namespace server.Config

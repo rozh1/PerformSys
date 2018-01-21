@@ -17,7 +17,7 @@
  */
 #endregion
 
-﻿using Balancer.Common.Logger.Enums;
+﻿using PerformSys.Common.Logger.Enums;
 using server.Config.Data;
 
 namespace server.Config

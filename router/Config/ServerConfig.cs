@@ -17,7 +17,7 @@
  */
 #endregion
 
-﻿using Balancer.Common.Config;
+﻿using PerformSys.Common.Config;
 using router.Config.Data;
 
 namespace router.Config

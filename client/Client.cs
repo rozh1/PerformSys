@@ -23,14 +23,14 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
-using Balancer.Common.Logger;
-using Balancer.Common.Logger.Data;
-using Balancer.Common.Logger.Enums;
-using Balancer.Common.Packet;
-using Balancer.Common.Packet.Packets;
-using Balancer.Common.Utils;
 using client.Config.Data;
 using client.Properties;
+using PerformSys.Common.Logger;
+using PerformSys.Common.Logger.Data;
+using PerformSys.Common.Logger.Enums;
+using PerformSys.Common.Packet;
+using PerformSys.Common.Packet.Packets;
+using PerformSys.Common.Utils;
 
 namespace client
 {

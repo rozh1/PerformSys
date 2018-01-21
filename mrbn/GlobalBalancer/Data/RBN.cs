@@ -19,7 +19,7 @@
 
 ﻿using System;
 using System.Net.Sockets;
-using Balancer.Common.Utils.Interfaces;
+using PerformSys.Common.Utils.Interfaces;
 
 namespace mrbn.GlobalBalancer.Data
 {

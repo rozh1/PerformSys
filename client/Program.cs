@@ -20,12 +20,12 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Balancer.Common.Logger;
-using Balancer.Common.Logger.Data;
-using Balancer.Common.Logger.Enums;
-using Balancer.Common.Utils.CommandLineArgsParser;
 using client.Config;
 using client.QuerySequence;
+using PerformSys.Common.Logger;
+using PerformSys.Common.Logger.Data;
+using PerformSys.Common.Logger.Enums;
+using PerformSys.Common.Utils.CommandLineArgsParser;
 
 namespace client
 {
