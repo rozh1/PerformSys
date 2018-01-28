@@ -87,6 +87,7 @@ namespace server.DataBase
             bool result = true;
             string errMsg = string.Empty;
             MySqlConnection conn;
+            DateTime startTime = DateTime.Now;
             do
             {
                 conn = new MySqlConnection(_connectionString.GetConnectionString(true));
@@ -103,18 +104,23 @@ namespace server.DataBase
                 {
                     retry++;
                     Logger.Write(ServerConfig.Instance.Log.LogFile,
-                        new StringLogData("Попытка подключения: " + retry + " из 10"),
+                        new StringLogData("Попытка подключения: " + retry),
                         LogLevel.INFO);
                     result = false;
                     errMsg = e.Message;
                 }
 
-            } while (!result && retry < 10);
+            } while (!result && (DateTime.Now - startTime < TimeSpan.FromHours(12)));
             if (!result)
             {
                 Logger.Write(ServerConfig.Instance.Log.LogFile,
                     new StringLogData("При подключении к серверу MySQL возникло исколючение: " + errMsg),
                     LogLevel.ERROR);
+
+                if (DateTime.Now - startTime >= TimeSpan.FromHours(12))
+                    Logger.Write(ServerConfig.Instance.Log.LogFile,
+                        new StringLogData("Превышено время ожидания MySQL"),
+                        LogLevel.ERROR);
                 ConnectionError?.Invoke();
             }
             return conn;
