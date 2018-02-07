@@ -1,0 +1,20 @@
+language: csharp
+solution: PerformSys.sln
+install:
+  - nuget restore solution-name.sln
+script:
+  - xbuild ./Fibonacci/Fibonacci.sln
+  - VERSION="1.1.1"
+  - TAG="PerformSys-${VERSION}"
+  - FILENAME="${TAG}.tgz"
+#  - tar -czf ${FILENAME} -C _bin/ . --exclude='*.pdb' --exclude='*.xml' --exclude='*.mdb' 
+#before_deploy:
+#  # Set up git user name and tag this commit
+#  - git config --local user.name "builder"
+#  - git config --local user.email "builder@travis-ci.com"
+#  - git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
+#deploy:
+#  provider: releases
+#  api_key: "GITHUB OAUTH TOKEN"
+#  file: "FILE TO UPLOAD"
+#  skip_cleanup: true
