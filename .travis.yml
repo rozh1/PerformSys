@@ -3,7 +3,7 @@ solution: PerformSys.sln
 install:
   - nuget restore PerformSys.sln
 script:
-  - xbuild PerformSys.sln
+  - xbuild /p:Configuration=Release PerformSys.sln
   - VERSION="1.1.1"
   - TAG="PerformSys-${VERSION}"
   - FILENAME="${TAG}.tgz"
